@@ -84,8 +84,8 @@
 <script>
 async function loadFDR() {
   try {
-    // Use CORS-safe proxy
-    const url = "https://api.allorigins.win/raw?url=" + 
+    // CORS-safe proxy for BOM XML
+    const url = "https://api.allorigins.win/raw?url=" +
       encodeURIComponent("https://www.bom.gov.au/feeds/idq13016.xml");
 
     const res = await fetch(url);
