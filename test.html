@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KBDI Test – Beerburrum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #0b1020;
+    color: #fff;
+    padding: 20px;
+  }
+  h1 { margin-bottom: 0.5rem; }
+  pre {
+    background: #111628;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    border: 1px solid #222842;
+  }
+</style>
+</head>
+<body>
+
+<h1>KBDI Test – Beerburrum</h1>
+<p>This page fetches daily max temp + rain and computes a pseudo‑KBDI.</p>
+
+<h3>Latest KBDI:</h3>
+<div id="kbdi-latest">Loading…</div>
+
+<h3>Full KBDI Series:</h3>
+<pre id="kbdi-series">Loading…</pre>
+
+<script>
+// -------------------------------
+// 1. Fetch daily data (archive API)
+// -------------------------------
+async function fetchDailyForKBDI() {
+  const lat = -26.95;
+  const lon = 153.06;
+
+  // Pull last 120 days for testing
+  const end = new Date();
+  const start = new Date();
+  start.setDate(end.getDate() - 120);
+
+  const fmt = d => d.toISOString().split("T")[0];
+
+  const url = "https://archive-api.open-meteo.com/v1/archive?" +
+    new URLSearchParams({
+      latitude: lat,
+      longitude: lon,
+      start_date: fmt(start),
+      end_date: fmt(end),
+      daily: "temperature_2m_max,precipitation_sum",
+      timezone: "Australia/Brisbane"
+    });
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Archive fetch failed");
+  const data = await res.json();
+
+  return {
+    dates: data.daily.time,
+    tmax: data.daily.temperature_2m_max,
+    rain: data.daily.precipitation_sum
+  };
+}
+
+// -------------------------------
+// 2. Pseudo‑KBDI daily step
+// -------------------------------
+function stepKBDI(prev, tmax, rainMm) {
+  let k = prev;
+
+  // Drying: hotter days dry faster
+  const drying = Math.max(0, (tmax - 5) * 0.25); // ~0–10/day
+  k += drying;
+
+  // Wetting: ignore first 2 mm, then reduce KBDI
+  if (rainMm > 2) {
+    const effective = rainMm - 2;
+    const wetting = effective * 1.5; // 1.5 units per mm
+    k -= wetting;
+  }
+
+  // Clamp
+  if (k < 0) k = 0;
+  if (k > 200) k = 200;
+
+  return k;
+}
+
+// -------------------------------
+// 3. Build KBDI series
+// -------------------------------
+function buildKBDI(dates, tmaxArr, rainArr) {
+  const kbdi = new Array(dates.length).fill(0);
+
+  // Find last "reset" event: rain >= 150 mm in a day
+  let resetIndex = 0;
+  for (let i = 0; i < rainArr.length; i++) {
+    if (rainArr[i] >= 150) resetIndex = i;
+  }
+
+  // Start near zero after the soaking event
+  kbdi[resetIndex] = 5;
+
+  // Step forward
+  for (let i = resetIndex + 1; i < dates.length; i++) {
+    kbdi[i] = stepKBDI(kbdi[i - 1], tmaxArr[i], rainArr[i]);
+  }
+
+  return kbdi;
+}
+
+// -------------------------------
+// 4. Run everything
+// -------------------------------
+(async () => {
+  try {
+    const daily = await fetchDailyForKBDI();
+    const kbdi = buildKBDI(daily.dates, daily.tmax, daily.rain);
+
+    const latest = kbdi[kbdi.length - 1];
+
+    document.getElementById("kbdi-latest").textContent =
+      latest.toFixed(1);
+
+    document.getElementById("kbdi-series").textContent =
+      kbdi.map((v, i) => `${daily.dates[i]}  →  ${v.toFixed(1)}`).join("\n");
+
+  } catch (err) {
+    document.getElementById("kbdi-latest").textContent = "Error loading data";
+    console.error(err);
+  }
+})();
+</script>
+
+</body>
+</html>
