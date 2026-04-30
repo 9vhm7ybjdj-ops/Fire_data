@@ -155,7 +155,7 @@
 
   <div class="panel">
     <div style="font-size:0.9rem;color:#9ca3af;text-transform:uppercase;">
-      Current Bushfire & Grassfire Incidents
+      Current Bushfire & Vegetation Fire Incidents
     </div>
     <ul class="incident-list" id="incidentList"></ul>
     <div id="incidentMeta" style="font-size:0.75rem;color:#9ca3af;"></div>
@@ -165,7 +165,7 @@
 
 <script>
 /* -----------------------------
-   LIVE BOM AFDRS FETCH (WORKING)
+   LIVE BOM AFDRS FETCH
 ------------------------------ */
 
 const FDR_SOURCE_URL = "https://www.bom.gov.au/qld/forecasts/fire-danger-ratings.shtml";
@@ -238,7 +238,7 @@ function renderFdrWidget() {
 ------------------------------ */
 
 const ARC_URL =
-  "https://services1.arcgis.com/vkTwD8kHw2woKBqV/arcgis/rest/services/ESCAD_Current_Incidents_Public/FeatureServer/0/query?where=1%3D1&outFields=*&f=json";
+  "https://services1.arcgis.com/vkTwD8kHw2woKBqV/arcgis/rest/services/ESCAD_Current_Incidents_Public/FeatureServer/0/query?where=OBJECTID%3E0&outFields=*&returnGeometry=true&f=json";
 
 let map;
 let incidentLayer;
@@ -256,21 +256,22 @@ async function fetchIncidents() {
 
     const features = data.features || [];
 
+    // Correct filter using GroupedType
     const filtered = features
       .map(f => f.attributes)
       .filter(a =>
-        a.incidenttype === "Bushfire" ||
-        a.incidenttype === "Grassfire"
+        a.GroupedType === "FIRE VEGETATION" ||
+        a.GroupedType === "FIRE PERMITTED BURN"
       );
 
     const incidents = filtered.map(a => ({
-      title: a.incidenttype,
-      location: a.location || a.suburb || "",
-      region: a.region || "",
-      status: a.status || "",
-      updated: new Date(a.modifieddate).toLocaleString(),
-      lat: a.latitude,
-      lon: a.longitude
+      title: a.GroupedType,
+      location: a.Location || a.Locality || "",
+      region: a.Jurisdiction || "",
+      status: a.CurrentStatus || "",
+      updated: new Date(a.LastUpdate).toLocaleString(),
+      lat: a.Latitude,
+      lon: a.Longitude
     }));
 
     renderIncidents(incidents);
@@ -287,7 +288,7 @@ function renderIncidents(list) {
   incidentLayer.clearLayers();
 
   if (!list.length) {
-    ul.innerHTML = "<li class='incident-item'>No bushfire or grassfire incidents.</li>";
+    ul.innerHTML = "<li class='incident-item'>No active vegetation or permitted burn fires.</li>";
     meta.textContent = "Updated: " + new Date().toLocaleString();
     return;
   }
