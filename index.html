@@ -1,3 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sunshine Coast Weather Network</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #111;
+    color: #eee;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  h1 { margin: 0; font-size: 1.4rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .card {
+    background: #1b1b1b;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px #333;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .card h2 { margin: 0 0 8px; font-size: 1.1rem; }
+  .obs-time { font-size: 0.8rem; color: #aaa; margin-bottom: 8px; }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
+  .label { color: #ccc; display: flex; gap: 6px; align-items: center; }
+  .value { font-weight: 500; }
+
+  .error { color: #ff8080; margin-top: 8px; font-size: 0.9rem; }
+
+  .fdr-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  .disclaimer {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 6px;
+  }
+
+  .wind-arrow {
+    width: 18px;
+    height: 18px;
+    transform-origin: center;
+    transition: transform 0.3s ease;
+    margin-left: 4px;
+  }
+
+  .sparkline {
+    width: 100%;
+    height: 40px;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Sunshine Coast Weather Network</h1>
+
+<div class="grid">
+
+  <!-- Nambour -->
+  <div class="card" id="nambour-card">
+    <h2>Nambour</h2>
+    <div class="obs-time" id="nambour-time">Loading…</div>
+
+    <div class="row"><span class="label">🌡️ Temp</span><span class="value" id="nambour-temp">–</span></div>
+    <div class="row"><span class="label">🌡️ Dew</span><span class="value" id="nambour-dew">–</span></div>
+    <div class="row"><span class="label">💧 Humidity</span><span class="value" id="nambour-rh">–</span></div>
+
+    <div class="row">
+      <span class="label">🌬️ Wind dir</span>
+      <span class="value">
+        <span id="nambour-wdir">–</span>
+        <svg id="nambour-wdir-arrow" class="wind-arrow" viewBox="0 0 100 100">
+          <polygon points="50,10 65,40 50,35 35,40" fill="#fff"/>
+          <rect x="47" y="40" width="6" height="50" fill="#fff"/>
+        </svg>
+      </span>
+    </div>
+
+    <div class="row"><span class="label">🌬️ Wind speed</span><span class="value" id="nambour-wspd">–</span></div>
+    <div class="row"><span class="label">💨 Gust</span><span class="value" id="nambour-gust">–</span></div>
+    <div class="row"><span class="label">🌧️ Rain 9am</span><span class="value" id="nambour-rain">–</span></div>
+
+    <div class="row"><span class="label">🔥 Fire Danger</span><span class="value" id="nambour-fdr">–</span></div>
+    <div id="nambour-fdr-badge" class="fdr-badge">–</div>
+    <canvas id="nambour-ffdi-spark" class="sparkline"></canvas>
+    <div class="disclaimer">Approximate FFDI-based category — not official AFDRS</div>
+
+    <div class="error" id="nambour-error"></div>
+  </div>
+
+  <!-- Beerburrum -->
+  <div class="card" id="beerburrum-card">
+    <h2>Beerburrum</h2>
+    <div class="obs-time" id="beerburrum-time">Loading…</div>
+
+    <div class="row"><span class="label">🌡️ Temp</span><span class="value" id="beerburrum-temp">–</span></div>
+    <div class="row"><span class="label">🌡️ Dew</span><span class="value" id="beerburrum-dew">–</span></div>
+    <div class="row"><span class="label">💧 Humidity</span><span class="value" id="beerburrum-rh">–</span></div>
+
+    <div class="row">
+      <span class="label">🌬️ Wind dir</span>
+      <span class="value">
+        <span id="beerburrum-wdir">–</span>
+        <svg id="beerburrum-wdir-arrow" class="wind-arrow" viewBox="0 0 100 100">
+          <polygon points="50,10 65,40 50,35 35,40" fill="#fff"/>
+          <rect x="47" y="40" width="6" height="50" fill="#fff"/>
+        </svg>
+      </span>
+    </div>
+
+    <div class="row"><span class="label">🌬️ Wind speed</span><span class="value" id="beerburrum-wspd">–</span></div>
+    <div class="row"><span class="label">💨 Gust</span><span class="value" id="beerburrum-gust">–</span></div>
+    <div class="row"><span class="label">🌧️ Rain 9am</span><span class="value" id="beerburrum-rain">–</span></div>
+
+    <div class="row"><span class="label">🔥 Fire Danger</span><span class="value" id="beerburrum-fdr">–</span></div>
+    <div id="beerburrum-fdr-badge" class="fdr-badge">–</div>
+    <canvas id="beerburrum-ffdi-spark" class="sparkline"></canvas>
+    <div class="disclaimer">Approximate FFDI-based category — not official AFDRS</div>
+
+    <div class="error" id="beerburrum-error"></div>
+  </div>
+
+  <!-- Sunshine Coast Airport -->
+  <div class="card" id="sunshine-card">
+    <h2>Sunshine Coast Airport</h2>
+    <div class="obs-time" id="sunshine-time">Loading…</div>
+
+    <div class="row"><span class="label">🌡️ Temp</span><span class="value" id="sunshine-temp">–</span></div>
+    <div class="row"><span class="label">🌡️ Dew</span><span class="value" id="sunshine-dew">–</span></div>
+    <div class="row"><span class="label">💧 Humidity</span><span class="value" id="sunshine-rh">–</span></div>
+
+    <div class="row">
+      <span class="label">🌬️ Wind dir</span>
+      <span class="value">
+        <span id="sunshine-wdir">–</span>
+        <svg id="sunshine-wdir-arrow" class="wind-arrow" viewBox="0 0 100 100">
+          <polygon points="50,10 65,40 50,35 35,40" fill="#fff"/>
+          <rect x="47" y="40" width="6" height="50" fill="#fff"/>
+        </svg>
+      </span>
+    </div>
+
+    <div class="row"><span class="label">🌬️ Wind speed</span><span class="value" id="sunshine-wspd">–</span></div>
+    <div class="row"><span class="label">💨 Gust</span><span class="value" id="sunshine-gust">–</span></div>
+    <div class="row"><span class="label">🌧️ Rain 9am</span><span class="value" id="sunshine-rain">–</span></div>
+
+    <div class="row"><span class="label">🔥 Fire Danger</span><span class="value" id="sunshine-fdr">–</span></div>
+    <div id="sunshine-fdr-badge" class="fdr-badge">–</div>
+    <canvas id="sunshine-ffdi-spark" class="sparkline"></canvas>
+    <div class="disclaimer">Approximate FFDI-based category — not official AFDRS</div>
+
+    <div class="error" id="sunshine-error"></div>
+  </div>
+
+  <!-- Tewantin -->
+  <div class="card" id="tewantin-card">
+    <h2>Tewantin</h2>
+    <div class="obs-time" id="tewantin-time">Loading…</div>
+
+    <div class="row"><span class="label">🌡️ Temp</span><span class="value" id="tewantin-temp">–</span></div>
+    <div class="row"><span class="label">🌡️ Dew</span><span class="value" id="tewantin-dew">–</span></div>
+    <div class="row"><span class="label">💧 Humidity</span><span class="value" id="tewantin-rh">–</span></div>
+
+    <div class="row">
+      <span class="label">🌬️ Wind dir</span>
+      <span class="value">
+        <span id="tewantin-wdir">–</span>
+        <svg id="tewantin-wdir-arrow" class="wind-arrow" viewBox="0 0 100 100">
+          <polygon points="50,10 65,40 50,35 35,40" fill="#fff"/>
+          <rect x="47" y="40" width="6" height="50" fill="#fff"/>
+        </svg>
+      </span>
+    </div>
+
+    <div class="row"><span class="label">🌬️ Wind speed</span><span class="value" id="tewantin-wspd">–</span></div>
+    <div class="row"><span class="label">💨 Gust</span><span class="value" id="tewantin-gust">–</span></div>
+    <div class="row"><span class="label">🌧️ Rain 9am</span><span class="value" id="tewantin-rain">–</span></div>
+
+    <div class="row"><span class="label">🔥 Fire Danger</span><span class="value" id="tewantin-fdr">–</span></div>
+    <div id="tewantin-fdr-badge" class="fdr-badge">–</div>
+    <canvas id="tewantin-ffdi-spark" class="sparkline"></canvas>
+    <div class="disclaimer">Approximate FFDI-based category — not official AFDRS</div>
+
+    <div class="error" id="tewantin-error"></div>
+  </div>
+
+</div>
+
+<!-- SCRIPT STARTS IN PART 2 -->
 <script>
 //
 //  PART 1 — CONFIG + HELPERS + CORS-FIXED URL
@@ -209,7 +431,12 @@ async function load() {
     const res = await fetch(BOM_URL);
     const xmlText = await res.text();
     const xml = new DOMParser().parseFromString(xmlText, "application/xml");
-    const stations = [...xml.querySelectorAll("station")];
+
+    // NAMESPACE-SAFE STATION SELECTOR
+    const stations = [
+      ...xml.getElementsByTagName("station"),
+      ...xml.getElementsByTagName("aws:station")
+    ];
 
     update(
       "nambour",
@@ -241,4 +468,7 @@ async function load() {
 load();
 setInterval(load, 10 * 60 * 1000);
 </script>
+
+</body>
+</html>
 
