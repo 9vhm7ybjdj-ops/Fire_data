@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>KBDI Test – Beerburrum</title>
+<title>KBDI Test – Beerburrum (Retuned)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
@@ -23,8 +23,8 @@
 </head>
 <body>
 
-<h1>KBDI Test – Beerburrum</h1>
-<p>This page fetches daily max temp + rain and computes a pseudo‑KBDI.</p>
+<h1>KBDI Test – Beerburrum (Retuned)</h1>
+<p>This page fetches daily max temp + rain and computes a retuned pseudo‑KBDI.</p>
 
 <h3>Latest KBDI:</h3>
 <div id="kbdi-latest">Loading…</div>
@@ -40,7 +40,7 @@ async function fetchDailyForKBDI() {
   const lat = -26.95;
   const lon = 153.06;
 
-  // Pull last 120 days for testing
+  // Last 120 days for testing
   const end = new Date();
   const start = new Date();
   start.setDate(end.getDate() - 120);
@@ -58,7 +58,7 @@ async function fetchDailyForKBDI() {
     });
 
   const res = await fetch(url);
-  if (!res.ok) throw new Error("Archive fetch failed");
+  if (!res.ok) throw new Error("Archive fetch failed: " + res.status);
   const data = await res.json();
 
   return {
@@ -69,19 +69,19 @@ async function fetchDailyForKBDI() {
 }
 
 // -------------------------------
-// 2. Pseudo‑KBDI daily step
+// 2. Retuned pseudo‑KBDI daily step
 // -------------------------------
 function stepKBDI(prev, tmax, rainMm) {
   let k = prev;
 
-  // Drying: hotter days dry faster
-  const drying = Math.max(0, (tmax - 5) * 0.25); // ~0–10/day
+  // Drying: softened rate so KBDI doesn't climb too fast
+  const drying = Math.max(0, (tmax - 8) * 0.18); // was (tmax - 5) * 0.25
   k += drying;
 
-  // Wetting: ignore first 2 mm, then reduce KBDI
-  if (rainMm > 2) {
-    const effective = rainMm - 2;
-    const wetting = effective * 1.5; // 1.5 units per mm
+  // Wetting: let rain pull harder, and start biting earlier
+  if (rainMm > 1) {                 // was > 2
+    const effective = rainMm - 1;   // was rainMm - 2
+    const wetting = effective * 2.0; // was 1.5
     k -= wetting;
   }
 
@@ -104,12 +104,16 @@ function buildKBDI(dates, tmaxArr, rainArr) {
     if (rainArr[i] >= 150) resetIndex = i;
   }
 
-  // Start near zero after the soaking event
-  kbdi[resetIndex] = 5;
+  // Start very close to zero after the soaking event
+  kbdi[resetIndex] = 2; // was 5
 
-  // Step forward
+  // Step forward with logging
   for (let i = resetIndex + 1; i < dates.length; i++) {
     kbdi[i] = stepKBDI(kbdi[i - 1], tmaxArr[i], rainArr[i]);
+    console.log(
+      `${dates[i]} | Tmax=${tmaxArr[i]}°C | ` +
+      `Rain=${rainArr[i]}mm | KBDI=${kbdi[i].toFixed(1)}`
+    );
   }
 
   return kbdi;
@@ -133,6 +137,7 @@ function buildKBDI(dates, tmaxArr, rainArr) {
 
   } catch (err) {
     document.getElementById("kbdi-latest").textContent = "Error loading data";
+    document.getElementById("kbdi-series").textContent = String(err);
     console.error(err);
   }
 })();
