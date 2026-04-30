@@ -354,4 +354,76 @@ function update(prefix, node) {
 
   document.getElementById(prefix + "-temp").textContent = temp + arrow;
   document.getElementById(prefix + "-dew").textContent = dew;
-  document.getElementById(prefix + "-
+  document.getElementById(prefix + "-rh").textContent = rh;
+  document.getElementById(prefix + "-wdir").textContent = wdir;
+  document.getElementById(prefix + "-wspd").textContent = wspd;
+  document.getElementById(prefix + "-gust").textContent = gust;
+  document.getElementById(prefix + "-rain").textContent = rain;
+  document.getElementById(prefix + "-time").textContent = "Obs time: " + getTime(node);
+
+  // Colour coding
+  document.getElementById(prefix + "-rh").style.color =
+    colour(rh, { green: 70, yellow: 40 });
+
+  document.getElementById(prefix + "-wspd").style.color =
+    colour(wspd, { green: 10, yellow: 25 });
+
+  document.getElementById(prefix + "-gust").style.color =
+    colour(gust, { green: 20, yellow: 40 });
+
+  // Wind arrow rotation
+  const arrowEl = document.getElementById(prefix + "-wdir-arrow");
+  if (arrowEl && wdir !== "–") {
+    const dirMap = {
+      N: 0, NNE: 22.5, NE: 45, ENE: 67.5,
+      E: 90, ESE: 112.5, SE: 135, SSE: 157.5,
+      S: 180, SSW: 202.5, SW: 225, WSW: 247.5,
+      W: 270, WNW: 292.5, NW: 315, NNW: 337.5
+    };
+    const deg = dirMap[wdir] ?? 0;
+    arrowEl.style.transform = `rotate(${deg}deg)`;
+  }
+
+  // FFDI + AFDRS-style category
+  const ffdi = calcFFDI(temp, rh, wspd);
+  const trend = ffdTrend(prefix, ffdi);
+  const ffdiText = ffdi ? ffdi.toFixed(0) + trend : "–";
+  document.getElementById(prefix + "-fdr").textContent = ffdiText;
+
+  const fdr = fdrCategory(ffdi);
+  const badge = document.getElementById(prefix + "-fdr-badge");
+  badge.textContent = fdr.cat;
+  badge.style.background = fdr.colour;
+  badge.style.color = fdr.text || "#fff";
+
+  // FFDI history + sparkline
+  if (ffdi) {
+    ffdiHistory[prefix].push(ffdi);
+    if (ffdiHistory[prefix].length > 20) ffdiHistory[prefix].shift();
+    drawSpark(prefix);
+  }
+}
+
+async function load() {
+  try {
+    const res = await fetch(BOM_URL);
+    const xmlText = await res.text();
+    const xml = new DOMParser().parseFromString(xmlText, "application/xml");
+    const stations = [...xml.querySelectorAll("station")];
+
+    update("nambour",   stations.find(s => s.getAttribute("bom-id") === STATIONS.nambour));
+    update("beerburrum",stations.find(s => s.getAttribute("bom-id") === STATIONS.beerburrum));
+    update("sunshine",  stations.find(s => s.getAttribute("bom-id") === STATIONS.sunshine));
+    update("tewantin",  stations.find(s => s.getAttribute("bom-id") === STATIONS.tewantin));
+
+  } catch (e) {
+    document.getElementById("nambour-error").textContent   = "Error loading data.";
+    document.getElementById("beerburrum-error").textContent= "Error loading data.";
+    document.getElementById("sunshine-error").textContent  = "Error loading data.";
+    document.getElementById("tewantin-error").textContent  = "Error loading data.";
+  }
+}
+
+load();
+setInterval(load, 10 * 60 * 1000);
+</script>
