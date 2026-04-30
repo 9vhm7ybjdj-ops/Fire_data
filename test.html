@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>KBDI Test – Beerburrum (Retuned)</title>
+<title>KBDI Test – Beerburrum (Balanced)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
@@ -23,8 +23,8 @@
 </head>
 <body>
 
-<h1>KBDI Test – Beerburrum (Retuned)</h1>
-<p>This page fetches daily max temp + rain and computes a retuned pseudo‑KBDI.</p>
+<h1>KBDI Test – Beerburrum (Balanced)</h1>
+<p>This page fetches daily max temp + rain and computes a balanced pseudo‑KBDI.</p>
 
 <h3>Latest KBDI:</h3>
 <div id="kbdi-latest">Loading…</div>
@@ -69,19 +69,19 @@ async function fetchDailyForKBDI() {
 }
 
 // -------------------------------
-// 2. Retuned pseudo‑KBDI daily step
+// 2. Balanced pseudo‑KBDI daily step
 // -------------------------------
 function stepKBDI(prev, tmax, rainMm) {
   let k = prev;
 
-  // Drying: softened rate so KBDI doesn't climb too fast
-  const drying = Math.max(0, (tmax - 8) * 0.18); // was (tmax - 5) * 0.25
+  // Drying: moderate softening (between original and previous)
+  const drying = Math.max(0, (tmax - 6) * 0.22);
   k += drying;
 
-  // Wetting: let rain pull harder, and start biting earlier
-  if (rainMm > 1) {                 // was > 2
-    const effective = rainMm - 1;   // was rainMm - 2
-    const wetting = effective * 2.0; // was 1.5
+  // Wetting: slightly stronger than original, but not extreme
+  if (rainMm > 1) {
+    const effective = rainMm - 1;
+    const wetting = effective * 1.7;
     k -= wetting;
   }
 
@@ -104,8 +104,8 @@ function buildKBDI(dates, tmaxArr, rainArr) {
     if (rainArr[i] >= 150) resetIndex = i;
   }
 
-  // Start very close to zero after the soaking event
-  kbdi[resetIndex] = 2; // was 5
+  // Start near zero after the soaking event
+  kbdi[resetIndex] = 3; // slightly above 0 for stability
 
   // Step forward with logging
   for (let i = resetIndex + 1; i < dates.length; i++) {
