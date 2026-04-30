@@ -151,7 +151,10 @@ h1 {
 </div>
 
 <br>
+
+<!-- ========================= -->
 <!-- Nambour -->
+<!-- ========================= -->
 <div class="station-card">
   <div class="card-title">Nambour <span id="nambour-fdr-badge" class="badge"></span></div>
 
@@ -187,11 +190,121 @@ h1 {
   </div>
 </div>
 
-<!-- Repeat the same structure for Beerburrum, Sunshine, Tewantin -->
+<!-- ========================= -->
+<!-- Beerburrum -->
+<!-- ========================= -->
+<div class="station-card">
+  <div class="card-title">Beerburrum <span id="beerburrum-fdr-badge" class="badge"></span></div>
+
+  <div class="data-grid">
+    <div>Time:</div> <div id="beerburrum-time">–</div>
+    <div>Temp:</div> <div id="beerburrum-temp">–</div>
+    <div>Dew Point:</div> <div id="beerburrum-dew">–</div>
+    <div>Humidity:</div> <div id="beerburrum-rh">–</div>
+    <div>Wind:</div> <div id="beerburrum-wspd">–</div>
+    <div>Gust:</div> <div id="beerburrum-gust">–</div>
+    <div>Rain:</div> <div id="beerburrum-rain">–</div>
+    <div>Dir:</div> <div><span id="beerburrum-wdir">–</span>° <span id="beerburrum-wdir-arrow">🡡</span></div>
+  </div>
+
+  <div class="afdrs-bar">
+    <div class="afdrs-seg norate">No Rating</div>
+    <div class="afdrs-seg mod">Moderate</div>
+    <div class="afdrs-seg high">High</div>
+    <div class="afdrs-seg ext">Extreme</div>
+    <div class="afdrs-seg cat">Catastrophic</div>
+  </div>
+
+  <div id="afdrs-pointer-beerburrum" class="afdrs-pointer"></div>
+
+  <canvas id="beerburrum-ffdi-spark" class="sparkline"></canvas>
+
+  <div class="mini-legend">
+    <span class="leg norate"></span> No Rating
+    <span class="leg mod"></span> Moderate
+    <span class="leg high"></span> High
+    <span class="leg ext"></span> Extreme
+    <span class="leg cat"></span> Catastrophic
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- Sunshine Coast Airport -->
+<!-- ========================= -->
+<div class="station-card">
+  <div class="card-title">Sunshine Coast Airport <span id="sunshine-fdr-badge" class="badge"></span></div>
+
+  <div class="data-grid">
+    <div>Time:</div> <div id="sunshine-time">–</div>
+    <div>Temp:</div> <div id="sunshine-temp">–</div>
+    <div>Dew Point:</div> <div id="sunshine-dew">–</div>
+    <div>Humidity:</div> <div id="sunshine-rh">–</div>
+    <div>Wind:</div> <div id="sunshine-wspd">–</div>
+    <div>Gust:</div> <div id="sunshine-gust">–</div>
+    <div>Rain:</div> <div id="sunshine-rain">–</div>
+    <div>Dir:</div> <div><span id="sunshine-wdir">–</span>° <span id="sunshine-wdir-arrow">🡡</span></div>
+  </div>
+
+  <div class="afdrs-bar">
+    <div class="afdrs-seg norate">No Rating</div>
+    <div class="afdrs-seg mod">Moderate</div>
+    <div class="afdrs-seg high">High</div>
+    <div class="afdrs-seg ext">Extreme</div>
+    <div class="afdrs-seg cat">Catastrophic</div>
+  </div>
+
+  <div id="afdrs-pointer-sunshine" class="afdrs-pointer"></div>
+
+  <canvas id="sunshine-ffdi-spark" class="sparkline"></canvas>
+
+  <div class="mini-legend">
+    <span class="leg norate"></span> No Rating
+    <span class="leg mod"></span> Moderate
+    <span class="leg high"></span> High
+    <span class="leg ext"></span> Extreme
+    <span class="leg cat"></span> Catastrophic
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- Tewantin -->
+<!-- ========================= -->
+<div class="station-card">
+  <div class="card-title">Tewantin <span id="tewantin-fdr-badge" class="badge"></span></div>
+
+  <div class="data-grid">
+    <div>Time:</div> <div id="tewantin-time">–</div>
+    <div>Temp:</div> <div id="tewantin-temp">–</div>
+    <div>Dew Point:</div> <div id="tewantin-dew">–</div>
+    <div>Humidity:</div> <div id="tewantin-rh">–</div>
+    <div>Wind:</div> <div id="tewantin-wspd">–</div>
+    <div>Gust:</div> <div id="tewantin-gust">–</div>
+    <div>Rain:</div> <div id="tewantin-rain">–</div>
+    <div>Dir:</div> <div><span id="tewantin-wdir">–</span>° <span id="tewantin-wdir-arrow">🡡</span></div>
+  </div>
+
+  <div class="afdrs-bar">
+    <div class="afdrs-seg norate">No Rating</div>
+    <div class="afdrs-seg mod">Moderate</div>
+    <div class="afdrs-seg high">High</div>
+    <div class="afdrs-seg ext">Extreme</div>
+    <div class="afdrs-seg cat">Catastrophic</div>
+  </div>
+
+  <div id="afdrs-pointer-tewantin" class="afdrs-pointer"></div>
+
+  <canvas id="tewantin-ffdi-spark" class="sparkline"></canvas>
+
+  <div class="mini-legend">
+    <span class="leg norate"></span> No Rating
+    <span class="leg mod"></span> Moderate
+    <span class="leg high"></span> High
+    <span class="leg ext"></span> Extreme
+    <span class="leg cat"></span> Catastrophic
+  </div>
+</div>
+
 <script>
-//
-// CLEAR CACHE BUTTON
-//
 document.getElementById("clearCacheBtn").addEventListener("click", () => {
   localStorage.clear();
   sessionStorage.clear();
@@ -199,10 +312,6 @@ document.getElementById("clearCacheBtn").addEventListener("click", () => {
   setTimeout(() => location.reload(), 400);
 });
 
-
-//
-// STATION COORDINATES
-//
 const stations = {
   nambour:     { lat: -26.626, lon: 152.959 },
   beerburrum:  { lat: -26.952, lon: 152.959 },
@@ -210,10 +319,6 @@ const stations = {
   tewantin:    { lat: -26.391, lon: 153.037 }
 };
 
-
-//
-// COMPUTE FFDI
-//
 function computeFFDI(temp, rh, wind, rain24) {
   const DF = rain24 > 2 ? 1 : 10;
   return 2 * Math.exp(
@@ -225,9 +330,6 @@ function computeFFDI(temp, rh, wind, rain24) {
   );
 }
 
-//
-// FETCH + UPDATE STATION
-//
 async function loadStation(name, lat, lon) {
   const url =
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
@@ -239,7 +341,6 @@ async function loadStation(name, lat, lon) {
     const data = await res.json();
     const c = data.current;
 
-    // BASIC FIELDS
     document.getElementById(`${name}-time`).textContent = c.time.replace("T", " ");
     document.getElementById(`${name}-temp`).textContent = c.temperature_2m + "°C";
     document.getElementById(`${name}-dew`).textContent = c.dew_point_2m + "°C";
@@ -248,12 +349,10 @@ async function loadStation(name, lat, lon) {
     document.getElementById(`${name}-gust`).textContent = c.wind_gusts_10m + " km/h";
     document.getElementById(`${name}-rain`).textContent = c.precipitation + " mm";
 
-    // WIND DIR
     document.getElementById(`${name}-wdir`).textContent = c.wind_direction_10m;
     document.getElementById(`${name}-wdir-arrow`).style.transform =
       `rotate(${c.wind_direction_10m}deg)`;
 
-    // FFDI
     const rain24 = data.hourly.precipitation.slice(-24).reduce((a, b) => a + b, 0);
     const ffdi = computeFFDI(
       c.temperature_2m,
@@ -262,7 +361,6 @@ async function loadStation(name, lat, lon) {
       rain24
     );
 
-    // AFDRS CATEGORY
     let category = "No Rating";
     let colour = "white";
     let index = 0;
@@ -277,23 +375,23 @@ async function loadStation(name, lat, lon) {
       category = "Catastrophic"; colour = "black"; index = 4;
     }
 
-    // BADGE
     const badge = document.getElementById(`${name}-fdr-badge`);
     badge.style.background = colour;
     badge.style.color = (colour === "black") ? "white" : "black";
     badge.textContent = `${category} (${ffdi.toFixed(1)})`;
 
-    // POINTER POSITION
     const pointer = document.getElementById(`afdrs-pointer-${name}`);
-    pointer.style.left = `calc(${index * 20}% + 10% - 9px)`;
+    if (pointer) {
+      pointer.style.left = `calc(${index * 20}% + 10% - 9px)`;
+    }
 
-    // SPARKLINE
     const spark = document.getElementById(`${name}-ffdi-spark`);
     const ctx = spark.getContext("2d");
 
     const temps = data.hourly.temperature_2m.slice(-24);
     const rhs   = data.hourly.relative_humidity_2m.slice(-24);
     const winds = data.hourly.wind_speed_10m.slice(-24);
+    const rains = data.hour
     const rains = data.hourly.precipitation.slice(-24);
 
     const ffdiSeries = temps.map((t, i) =>
@@ -334,9 +432,6 @@ async function loadStation(name, lat, lon) {
   }
 }
 
-//
-// LOAD ALL
-//
 function loadAll() {
   for (const [name, s] of Object.entries(stations)) {
     loadStation(name, s.lat, s.lon);
