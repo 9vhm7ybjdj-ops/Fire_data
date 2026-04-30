@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>FDR — Southeast Coast</title>
+<title>FDR — South East Coast</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
@@ -74,7 +74,7 @@
 <body>
 
 <div class="card">
-  <div class="district">Southeast Coast</div>
+  <div class="district">South East Coast</div>
   <div class="bar" id="bar"></div>
   <div class="fdr" id="fdr">Loading…</div>
   <div class="fbi" id="fbi">FBI —</div>
@@ -90,15 +90,17 @@ async function loadFDR() {
     const res = await fetch(url);
     const data = await res.json();
 
+    // Correct field name + correct spelling
     const se = data.features.find(
-      f => f.attributes.district.toLowerCase() === "southeast coast"
+      f => f.attributes.district_name.toLowerCase() === "south east coast"
     );
 
     if (!se) throw new Error("District not found");
 
-    const rating = se.attributes.fdr_rating || "No Rating";
-    const fbi = se.attributes.fbi ?? "—";
-    const issued = new Date(se.attributes.issued).toLocaleString();
+    // Correct field names
+    const rating = se.attributes.rating_text || "No Rating";
+    const fbi = se.attributes.fbi_value ?? "—";
+    const issued = new Date(se.attributes.issue_time).toLocaleString();
 
     document.getElementById("fdr").textContent = rating;
     document.getElementById("fbi").textContent = "FBI " + fbi;
@@ -128,5 +130,4 @@ setInterval(loadFDR, 60000);
 
 </body>
 </html>
-
 
