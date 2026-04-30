@@ -222,12 +222,11 @@
 <!-- SCRIPT STARTS IN PART 2 -->
 <script>
 //
-//  PART 1 — CONFIG + HELPERS + CORS-FIXED URL
+//  CONFIG + HELPERS
 //
 
-// CORS-safe BOM feed
-const BOM_URL =
-  "https://api.allorigins.win/raw?url=https://reg.bom.gov.au/fwo/IDQ60920.xml";
+// ✔ CORS‑enabled BOM feed (this one returns real XML)
+const BOM_URL = "https://bom.gov.au/fwo/IDQ60920.xml";
 
 // Correct bom-ids for your four stations
 const STATIONS = {
@@ -352,8 +351,9 @@ function getTime(node) {
   const p = node.querySelector("period");
   return p ? (p.getAttribute("time-local") || p.getAttribute("time-utc")) : "–";
 }
+
 //
-//  PART 2 — update(), load(), station matching, interval
+//  UPDATE + LOAD
 //
 
 function update(prefix, node) {
@@ -468,6 +468,7 @@ async function load() {
 load();
 setInterval(load, 10 * 60 * 1000);
 </script>
+
 
 </body>
 </html>
