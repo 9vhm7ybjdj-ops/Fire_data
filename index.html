@@ -12,11 +12,12 @@
     --text: #f5f5f5;
     --muted: #999;
 
-    --low: #2e7d32;
+    /* AFDRS colours */
+    --no-rating: #ffffff;
     --moderate: #0277bd;
     --high: #fbc02d;
     --extreme: #d32f2f;
-    --catastrophic: #000;
+    --catastrophic: #000000;
   }
 
   body {
@@ -83,21 +84,21 @@
 <script>
 async function loadFDR() {
   try {
-    const url = "https://corsproxy.io/?" +
-      encodeURIComponent("https://www.bom.gov.au/feeds/idq13016.xml");
+    const url =
+      "https://services1.arcgis.com/0p6i4Jp2i0qN5Q5x/ArcGIS/rest/services/AFDRS_Fire_Danger_Ratings/FeatureServer/0/query?where=1%3D1&outFields=*&f=json";
 
     const res = await fetch(url);
-    const xml = await res.text();
-    const doc = new DOMParser().parseFromString(xml, "application/xml");
+    const data = await res.json();
 
-    const districts = [...doc.querySelectorAll("district")];
-    const se = districts.find(d =>
-      d.querySelector("name")?.textContent.trim().toLowerCase() === "southeast coast"
+    const se = data.features.find(
+      f => f.attributes.district.toLowerCase() === "southeast coast"
     );
 
-    const rating = se?.querySelector("rating_today")?.textContent.trim() || "Unavailable";
-    const fbi = se?.querySelector("fbi_today")?.textContent.trim() || "—";
-    const issued = doc.querySelector("issue-time-local")?.textContent.trim() || "—";
+    if (!se) throw new Error("District not found");
+
+    const rating = se.attributes.fdr_rating || "No Rating";
+    const fbi = se.attributes.fbi ?? "—";
+    const issued = new Date(se.attributes.issued).toLocaleString();
 
     document.getElementById("fdr").textContent = rating;
     document.getElementById("fbi").textContent = "FBI " + fbi;
@@ -106,7 +107,7 @@ async function loadFDR() {
     const bar = document.getElementById("bar");
     const r = rating.toLowerCase();
 
-    if (r.includes("low")) bar.style.background = "var(--low)";
+    if (r.includes("no")) bar.style.background = "var(--no-rating)";
     else if (r.includes("moderate")) bar.style.background = "var(--moderate)";
     else if (r.includes("high")) bar.style.background = "var(--high)";
     else if (r.includes("extreme")) bar.style.background = "var(--extreme)";
@@ -127,3 +128,4 @@ setInterval(loadFDR, 60000);
 
 </body>
 </html>
+
