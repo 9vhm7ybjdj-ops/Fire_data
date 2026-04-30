@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>KBDI Test – Beerburrum (Balanced)</title>
+<title>KBDI Test – Beerburrum (Corrected +8)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
@@ -23,8 +23,8 @@
 </head>
 <body>
 
-<h1>KBDI Test – Beerburrum (Balanced)</h1>
-<p>This page fetches daily max temp + rain and computes a balanced pseudo‑KBDI.</p>
+<h1>KBDI Test – Beerburrum (Corrected +8)</h1>
+<p>This page fetches daily max temp + rain and computes a corrected pseudo‑KBDI.</p>
 
 <h3>Latest KBDI:</h3>
 <div id="kbdi-latest">Loading…</div>
@@ -40,7 +40,6 @@ async function fetchDailyForKBDI() {
   const lat = -26.95;
   const lon = 153.06;
 
-  // Last 120 days for testing
   const end = new Date();
   const start = new Date();
   start.setDate(end.getDate() - 120);
@@ -74,11 +73,11 @@ async function fetchDailyForKBDI() {
 function stepKBDI(prev, tmax, rainMm) {
   let k = prev;
 
-  // Drying: moderate softening (between original and previous)
+  // Drying: moderate softening
   const drying = Math.max(0, (tmax - 6) * 0.22);
   k += drying;
 
-  // Wetting: slightly stronger than original, but not extreme
+  // Wetting: slightly stronger than original
   if (rainMm > 1) {
     const effective = rainMm - 1;
     const wetting = effective * 1.7;
@@ -93,26 +92,23 @@ function stepKBDI(prev, tmax, rainMm) {
 }
 
 // -------------------------------
-// 3. Build KBDI series
+// 3. Build KBDI series (+8 correction)
 // -------------------------------
 function buildKBDI(dates, tmaxArr, rainArr) {
   const kbdi = new Array(dates.length).fill(0);
 
-  // Find last "reset" event: rain >= 150 mm in a day
   let resetIndex = 0;
   for (let i = 0; i < rainArr.length; i++) {
     if (rainArr[i] >= 150) resetIndex = i;
   }
 
-  // Start near zero after the soaking event
-  kbdi[resetIndex] = 3; // slightly above 0 for stability
+  // Corrected baseline: 3 → 11 (adds ~8 to entire curve)
+  kbdi[resetIndex] = 11;
 
-  // Step forward with logging
   for (let i = resetIndex + 1; i < dates.length; i++) {
     kbdi[i] = stepKBDI(kbdi[i - 1], tmaxArr[i], rainArr[i]);
     console.log(
-      `${dates[i]} | Tmax=${tmaxArr[i]}°C | ` +
-      `Rain=${rainArr[i]}mm | KBDI=${kbdi[i].toFixed(1)}`
+      `${dates[i]} | Tmax=${tmaxArr[i]}°C | Rain=${rainArr[i]}mm | KBDI=${kbdi[i].toFixed(1)}`
     );
   }
 
