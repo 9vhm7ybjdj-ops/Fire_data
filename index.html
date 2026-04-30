@@ -2,298 +2,87 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>QFES Bushfire + Permitted Burns Dashboard</title>
+<title>FDR — Southeast Coast</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-<!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- Leaflet MarkerCluster -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <style>
   :root {
     --bg: #111;
-    --panel: #1b1b1b;
-    --accent: #f57c00;
-    --accent-blue: #0277bd;
+    --card: #1b1b1b;
     --text: #f5f5f5;
     --muted: #999;
-    --danger-red: #d32f2f;
-  }
 
-  * { box-sizing: border-box; }
+    /* FDR colours */
+    --low: #2e7d32;
+    --moderate: #0277bd;
+    --high: #fbc02d;
+    --extreme: #d32f2f;
+    --catastrophic: #000;
+  }
 
   body {
     margin: 0;
-    font-family: Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
+    font-family: Arial, sans-serif;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
-    overflow: hidden;
   }
 
-  #top {
-    height: 50vh;
-    position: relative;
-  }
-
-  #bottom {
-    height: 50vh;
-    background: var(--panel);
-    overflow-y: auto;
-    border-top: 1px solid #333;
-  }
-
-  #map {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* FDR widget */
-  .fdr-box {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0,0,0,0.85);
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    min-width: 180px;
-  }
-  .fdr-title {
-    font-weight: bold;
-    margin-bottom: 4px;
-  }
-  .fdr-rating {
-    font-size: 15px;
-    margin-bottom: 2px;
-  }
-  .fdr-meta {
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  /* Legend bottom-left */
-  .legend {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    background: rgba(0,0,0,0.85);
-    padding: 8px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px;
-  }
-  .legend-item:last-child {
-    margin-bottom: 0;
-  }
-  .legend-item svg {
-    width: 20px;
-    height: 20px;
-    margin-right: 6px;
-  }
-
-  /* Top controls (right) */
-  .top-controls {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .btn {
-    background: rgba(0,0,0,0.85);
-    color: var(--text);
-    border: 1px solid #444;
-    border-radius: 4px;
-    padding: 6px 10px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  .btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* Incident list */
-  #incidentList {
-    padding: 8px 10px;
-  }
-  .list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .list-header span strong {
-    color: var(--text);
-  }
-  .incident-card {
-    background: #222;
-    border-radius: 6px;
-    padding: 8px 10px;
-    margin-bottom: 6px;
+  .card {
+    background: var(--card);
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
     border: 1px solid #333;
-    cursor: pointer;
   }
-  .incident-card.highlight {
-    border-color: var(--accent);
-  }
-  .incident-type {
-    font-weight: bold;
-    font-size: 13px;
-    margin-bottom: 2px;
-  }
-  .incident-status {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 2px;
-  }
-  .incident-location {
-    font-size: 12px;
-    margin-bottom: 2px;
-  }
-  .incident-time {
-    font-size: 11px;
+
+  .district {
+    font-size: 18px;
+    margin-bottom: 12px;
     color: var(--muted);
   }
 
-  @media (max-width: 768px) {
-    #top { height: 55vh; }
-    #bottom { height: 45vh; }
+  .fdr {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .fbi {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .issued {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .bar {
+    height: 6px;
+    width: 100%;
+    border-radius: 4px;
+    margin-bottom: 18px;
   }
 </style>
 </head>
 <body>
 
-<div id="top">
-  <div id="map"></div>
-
-  <!-- FDR Widget -->
-  <div class="fdr-box" id="fdrBox">
-    <div class="fdr-title">Fire Danger Rating</div>
-    <div class="fdr-rating" id="fdrRating">Loading…</div>
-    <div class="fdr-meta" id="fdrFbi">FBI —</div>
-    <div class="fdr-meta" id="fdrIssued">—</div>
-  </div>
-
-  <!-- Legend -->
-  <div class="legend">
-    <div class="legend-item">
-      <!-- Vegetation Fire Icon -->
-      <svg viewBox="0 0 32 32">
-        <rect x="4" y="4" width="24" height="24" fill="white" stroke="black" stroke-width="2" transform="rotate(45 16 16)"/>
-        <rect x="15" y="15" width="2" height="7" fill="black"/>
-        <path fill="black" d="M12 16c0-2 2-3 4-3s4 1 4 3h-8z"/>
-        <path fill="#d32f2f" d="M16 8c2 2 3 4 3 6 0 2-1 4-3 5-2-1-3-3-3-5 0-2 1-4 3-6z"/>
-      </svg>
-      Vegetation Fire
-    </div>
-    <div class="legend-item">
-      <!-- Permitted Burn Icon -->
-      <svg viewBox="0 0 32 32">
-        <rect x="4" y="4" width="24" height="24" fill="white" stroke="black" stroke-width="2" transform="rotate(45 16 16)"/>
-        <path fill="white" stroke="black" stroke-width="1.5" d="M11 11h10v7l-3 3h-7z"/>
-        <path fill="white" stroke="black" stroke-width="1.5" d="M18 18h3l-3 3z"/>
-        <path fill="#d32f2f" d="M16 13c1 1 2 2 2 3 0 2-1 3-2 4-1-1-2-2-2-4 0-1 1-2 2-3z"/>
-      </svg>
-      Permitted Burn
-    </div>
-  </div>
-
-  <!-- Top-right controls -->
-  <div class="top-controls">
-    <button class="btn" id="nearbyBtn">Nearby</button>
-    <button class="btn" id="locateBtn">GPS</button>
-  </div>
-</div>
-
-<div id="bottom">
-  <div id="incidentList">
-    <div class="list-header">
-      <span><strong>Incidents</strong> (bushfire + permitted burns)</span>
-      <span id="incidentCount">0</span>
-    </div>
-    <div id="incidentCards"></div>
-  </div>
+<div class="card">
+  <div class="district">Southeast Coast</div>
+  <div class="bar" id="bar"></div>
+  <div class="fdr" id="fdr">Loading…</div>
+  <div class="fbi" id="fbi">FBI —</div>
+  <div class="issued" id="issued">—</div>
 </div>
 
 <script>
-/* ---------------------------
-   QFES ICONS (Leaflet DivIcons)
----------------------------- */
-
-const vegIcon = L.divIcon({
-  className: "",
-  html: `
-    <svg width="34" height="34" viewBox="0 0 32 32">
-      <rect x="4" y="4" width="24" height="24" fill="white" stroke="black" stroke-width="2" transform="rotate(45 16 16)"/>
-      <rect x="15" y="15" width="2" height="7" fill="black"/>
-      <path fill="black" d="M12 16c0-2 2-3 4-3s4 1 4 3h-8z"/>
-      <path fill="#d32f2f" d="M16 8c2 2 3 4 3 6 0 2-1 4-3 5-2-1-3-3-3-5 0-2 1-4 3-6z"/>
-    </svg>
-  `,
-  iconSize: [34, 34],
-  iconAnchor: [17, 17]
-});
-
-const permIcon = L.divIcon({
-  className: "",
-  html: `
-    <svg width="34" height="34" viewBox="0 0 32 32">
-      <rect x="4" y="4" width="24" height="24" fill="white" stroke="black" stroke-width="2" transform="rotate(45 16 16)"/>
-      <path fill="white" stroke="black" stroke-width="1.5" d="M11 11h10v7l-3 3h-7z"/>
-      <path fill="white" stroke="black" stroke-width="1.5" d="M18 18h3l-3 3z"/>
-      <path fill="#d32f2f" d="M16 13c1 1 2 2 2 3 0 2-1 3-2 4-1-1-2-2-2-4 0-1 1-2 2-3z"/>
-    </svg>
-  `,
-  iconSize: [34, 34],
-  iconAnchor: [17, 17]
-});
-
-/* ---------------------------
-   MAP INITIALISATION
----------------------------- */
-
-const map = L.map("map", {
-  zoomControl: true
-}).setView([-26.7, 152.9], 8);
-
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19
-}).addTo(map);
-
-const clusterGroup = L.markerClusterGroup();
-map.addLayer(clusterGroup);
-
-/* ---------------------------
-   STATE
----------------------------- */
-
-let incidents = [];
-let markersById = new Map();
-let nearbyMode = false;
-let userLocation = null;
-let autoRefreshMs = 60000; // 60s
-
-/* ---------------------------
-   FDR + FBI (BOM XML IDQ13016)
----------------------------- */
-
-async function fetchFdr() {
+async function loadFDR() {
   try {
     const res = await fetch("https://www.bom.gov.au/feeds/idq13016.xml");
     const xml = await res.text();
@@ -308,249 +97,32 @@ async function fetchFdr() {
     const fbi = se?.querySelector("fbi_today")?.textContent.trim() || "—";
     const issued = doc.querySelector("issue-time-local")?.textContent.trim() || "—";
 
-    const ratingEl = document.getElementById("fdrRating");
-    ratingEl.textContent = rating;
-    document.getElementById("fdrFbi").textContent = "FBI " + fbi;
-    document.getElementById("fdrIssued").textContent = issued;
+    document.getElementById("fdr").textContent = rating;
+    document.getElementById("fbi").textContent = "FBI " + fbi;
+    document.getElementById("issued").textContent = issued;
 
-    // Simple colour logic
-    let bg = "#2e7d32"; // default low/moderate
+    const bar = document.getElementById("bar");
     const r = rating.toLowerCase();
-    if (r.includes("high")) bg = "#fbc02d";
-    if (r.includes("extreme")) bg = "#d32f2f";
-    if (r.includes("catastrophic")) bg = "#000000";
 
-    document.getElementById("fdrBox").style.border = "1px solid " + bg;
+    if (r.includes("low")) bar.style.background = "var(--low)";
+    else if (r.includes("moderate")) bar.style.background = "var(--moderate)";
+    else if (r.includes("high")) bar.style.background = "var(--high)";
+    else if (r.includes("extreme")) bar.style.background = "var(--extreme)";
+    else if (r.includes("catastrophic")) bar.style.background = "var(--catastrophic)";
+    else bar.style.background = "#444";
+
   } catch (err) {
-    document.getElementById("fdrRating").textContent = "Unavailable";
-    document.getElementById("fdrFbi").textContent = "FBI —";
-    document.getElementById("fdrIssued").textContent = "Data unavailable";
+    document.getElementById("fdr").textContent = "Unavailable";
+    document.getElementById("fbi").textContent = "FBI —";
+    document.getElementById("issued").textContent = "Data unavailable";
+    document.getElementById("bar").style.background = "#444";
   }
 }
 
-fetchFdr();
-
-/* ---------------------------
-   QFES INCIDENTS (BUSHFIRE + PERMITTED BURNS)
----------------------------- */
-
-/*
-  NOTE: This uses a generic ArcGIS FeatureServer endpoint pattern.
-  Replace INCIDENT_URL with the actual QFES bushfire layer URL if needed.
-*/
-
-const INCIDENT_URL = "https://services1.arcgis.com/example/FeatureServer/1/query";
-
-async function fetchIncidents() {
-  // where clause: vegetation fires + permitted burns only
-  const where = encodeURIComponent(
-    "UPPER(type) IN ('VEGETATION FIRE','PERMITTED BURN','PERMIT BURN','PERMITTED BURNS')"
-  );
-
-  const params = [
-    "where=" + where,
-    "outFields=*",
-    "f=json",
-    "returnGeometry=true",
-    "outSR=4326"
-  ].join("&");
-
-  const url = INCIDENT_URL + "?" + params;
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const feats = data.features || [];
-    incidents = feats.map(f => {
-      const attr = f.attributes || {};
-      const geom = f.geometry || {};
-      const id = attr.OBJECTID || attr.objectid || Math.random();
-      const type = (attr.type || attr.incidenttype || "").toString();
-      const status = (attr.status || attr.incidentstatus || "").toString();
-      const location = (attr.location || attr.address || attr.locality || "").toString();
-      const started = attr.starttime || attr.created || attr.datetime || null;
-
-      let timeStr = "";
-      if (started) {
-        const d = new Date(started);
-        if (!isNaN(d.getTime())) {
-          timeStr = d.toLocaleString();
-        }
-      }
-
-      return {
-        id,
-        type,
-        status,
-        location,
-        time: timeStr,
-        lat: geom.y,
-        lng: geom.x
-      };
-    }).filter(i => i.lat && i.lng);
-
-    renderIncidents();
-  } catch (err) {
-    console.error("Incident fetch failed", err);
-  }
-}
-
-/* ---------------------------
-   RENDER INCIDENTS (MAP + LIST)
----------------------------- */
-
-function getIconForIncident(inc) {
-  const t = (inc.type || "").toLowerCase();
-  if (t.includes("permit")) return permIcon;
-  if (t.includes("permitted")) return permIcon;
-  return vegIcon; // default to vegetation fire
-}
-
-function renderIncidents() {
-  clusterGroup.clearLayers();
-  markersById.clear();
-
-  const cardsContainer = document.getElementById("incidentCards");
-  cardsContainer.innerHTML = "";
-
-  let filtered = incidents;
-
-  if (nearbyMode && userLocation) {
-    const maxKm = 20; // nearby radius
-    filtered = incidents.filter(i => {
-      const d = distanceKm(userLocation.lat, userLocation.lng, i.lat, i.lng);
-      return d <= maxKm;
-    });
-  }
-
-  filtered.forEach(inc => {
-    const marker = L.marker([inc.lat, inc.lng], {
-      icon: getIconForIncident(inc)
-    });
-
-    marker.on("click", () => {
-      highlightCard(inc.id);
-      scrollCardIntoView(inc.id);
-    });
-
-    clusterGroup.addLayer(marker);
-    markersById.set(inc.id, marker);
-
-    const card = document.createElement("div");
-    card.className = "incident-card";
-    card.dataset.id = inc.id;
-
-    card.innerHTML = `
-      <div class="incident-type">${escapeHtml(inc.type || "Incident")}</div>
-      <div class="incident-status">${escapeHtml(inc.status || "Status unknown")}</div>
-      <div class="incident-location">${escapeHtml(inc.location || "Location unknown")}</div>
-      <div class="incident-time">${inc.time ? escapeHtml(inc.time) : ""}</div>
-    `;
-
-    card.addEventListener("click", () => {
-      const m = markersById.get(inc.id);
-      if (m) {
-        map.setView(m.getLatLng(), 13, { animate: true });
-        highlightCard(inc.id);
-      }
-    });
-
-    cardsContainer.appendChild(card);
-  });
-
-  document.getElementById("incidentCount").textContent = filtered.length.toString();
-
-  if (filtered.length > 0) {
-    const group = L.featureGroup(
-      filtered.map(i => L.marker([i.lat, i.lng]))
-    );
-    map.fitBounds(group.getBounds().pad(0.2));
-  }
-}
-
-function highlightCard(id) {
-  document.querySelectorAll(".incident-card").forEach(c => {
-    c.classList.toggle("highlight", c.dataset.id == id);
-  });
-}
-
-function scrollCardIntoView(id) {
-  const card = document.querySelector(`.incident-card[data-id="${id}"]`);
-  if (card) {
-    card.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
-}
-
-/* ---------------------------
-   NEARBY MODE + GPS
----------------------------- */
-
-document.getElementById("nearbyBtn").addEventListener("click", () => {
-  nearbyMode = !nearbyMode;
-  document.getElementById("nearbyBtn").classList.toggle("active", nearbyMode);
-  renderIncidents();
-});
-
-let userMarker = null;
-
-document.getElementById("locateBtn").addEventListener("click", () => {
-  if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(pos => {
-    userLocation = {
-      lat: pos.coords.latitude,
-      lng: pos.coords.longitude
-    };
-    if (!userMarker) {
-      userMarker = L.circleMarker(userLocation, {
-        radius: 6,
-        color: "#2196f3",
-        fillColor: "#2196f3",
-        fillOpacity: 0.9
-      }).addTo(map);
-    } else {
-      userMarker.setLatLng(userLocation);
-    }
-    map.setView(userLocation, 11, { animate: true });
-    if (nearbyMode) renderIncidents();
-  });
-});
-
-/* ---------------------------
-   AUTO-REFRESH
----------------------------- */
-
-async function refreshAll() {
-  await fetchIncidents();
-  fetchFdr();
-}
-
-refreshAll();
-setInterval(refreshAll, autoRefreshMs);
-
-/* ---------------------------
-   UTILITIES
----------------------------- */
-
-function distanceKm(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
-function toRad(v) { return v * Math.PI / 180; }
-
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
+loadFDR();
+setInterval(loadFDR, 60000); // auto-refresh every 60s
 </script>
+
 </body>
 </html>
+
