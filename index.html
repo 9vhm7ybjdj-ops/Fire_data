@@ -5,11 +5,8 @@
   <title>QFD Bushfires + AFDRS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Leaflet for map -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
@@ -171,8 +168,7 @@
    LIVE BOM AFDRS FETCH (WORKING)
 ------------------------------ */
 
-const FDR_SOURCE_URL =
-  "https://www.bom.gov.au/qld/forecasts/fire-danger-ratings.shtml";
+const FDR_SOURCE_URL = "https://www.bom.gov.au/qld/forecasts/fire-danger-ratings.shtml";
 
 const fdrState = {
   district: "Southeast Coast",
@@ -199,29 +195,32 @@ async function fetchFdr() {
   try {
     const res = await fetch(FDR_SOURCE_URL);
     const html = await res.text();
-
     const doc = new DOMParser().parseFromString(html, "text/html");
 
-    const rows = [...doc.querySelectorAll("table tr")];
+    const table = doc.querySelector("table.fire-danger, table");
+    if (!table) throw new Error("AFDRS table not found");
+
+    const rows = [...table.querySelectorAll("tr")];
     const row = rows.find(r =>
       r.textContent.toLowerCase().includes("southeast coast")
     );
+    if (!row) throw new Error("Southeast Coast row not found");
 
-    if (!row) throw new Error("Row not found");
-
-    const cells = row.querySelectorAll("td");
-
+    const cells = row.querySelectorAll("td, th");
+    fdrState.district = cells[0]?.textContent.trim() || "Southeast Coast";
     fdrState.rating = cells[1]?.textContent.trim() || "Unavailable";
     fdrState.fbi = cells[2]?.textContent.trim() || "—";
     fdrState.tomorrowRating = cells[3]?.textContent.trim() || null;
 
-    const issued = doc.querySelector("p, .issued, .timestamp");
-    fdrState.issued = issued ? issued.textContent.trim() : "";
+    const issued = doc.querySelector("p:contains('Issued'), footer, .timestamp");
+    fdrState.issued = issued ? issued.textContent.trim() : new Date().toLocaleDateString();
 
     renderFdrWidget();
   } catch (err) {
-    console.error("AFDRS error:", err);
+    console.error("AFDRS fetch error:", err);
     fdrState.rating = "Unavailable";
+    fdrState.fbi = "—";
+    fdrState.issued = "Data unavailable";
     renderFdrWidget();
   }
 }
@@ -231,7 +230,6 @@ function renderFdrWidget() {
   document.getElementById("fdrWidgetFbi").textContent = `FBI ${fdrState.fbi}`;
   document.getElementById("fdrWidgetFooter").textContent =
     `${fdrState.district} • ${fdrState.issued}`;
-
   markActiveBar(fdrState.rating);
 }
 
@@ -247,10 +245,7 @@ let incidentLayer;
 
 function initMap() {
   map = L.map("map").setView([-26.65, 152.96], 8);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
-    .addTo(map);
-
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
   incidentLayer = L.layerGroup().addTo(map);
 }
 
@@ -263,82 +258,5 @@ async function fetchBushfires() {
     const incidents = items.map(item => {
       const get = tag =>
         item.getElementsByTagName(tag)[0]?.textContent.trim() || "";
-
       const lat = parseFloat(get("geo:lat") || get("lat"));
-      const lon = parseFloat(get("geo:long") || get("long"));
-
-      return {
-        title: get("title"),
-        location: get("qfes:locality"),
-        region: get("qfes:region"),
-        updated: get("pubDate"),
-        status: get("category"),
-        lat: isNaN(lat) ? null : lat,
-        lon: isNaN(lon) ? null : lon
-      };
-    });
-
-    renderIncidents(incidents);
-  } catch (err) {
-    console.error("Bushfire error:", err);
-  }
-}
-
-function renderIncidents(list) {
-  const ul = document.getElementById("incidentList");
-  const meta = document.getElementById("incidentMeta");
-
-  ul.innerHTML = "";
-  incidentLayer.clearLayers();
-
-  if (!list.length) {
-    ul.innerHTML = "<li class='incident-item'>No current bushfires.</li>";
-    meta.textContent = "Updated: " + new Date().toLocaleString();
-    return;
-  }
-
-  list.forEach(inc => {
-    const li = document.createElement("li");
-    li.className = "incident-item";
-
-    li.innerHTML = `
-      <div style="font-weight:500;">${inc.title}</div>
-      <div style="font-size:0.75rem;color:#9ca3af;">
-        ${inc.location} • ${inc.region} • Updated ${inc.updated}
-      </div>
-      <div style="font-size:0.75rem;color:#fbbf24;">${inc.status}</div>
-    `;
-
-    ul.appendChild(li);
-
-    if (inc.lat && inc.lon) {
-      L.marker([inc.lat, inc.lon])
-        .addTo(incidentLayer)
-        .bindPopup(`<strong>${inc.title}</strong><br>${inc.location}`);
-    }
-  });
-
-  meta.textContent =
-    `Incidents: ${list.length} • Updated: ${new Date().toLocaleString()}`;
-
-  try {
-    map.fitBounds(incidentLayer.getBounds(), { padding: [20, 20] });
-  } catch {}
-}
-
-/* -----------------------------
-   INIT
------------------------------- */
-
-document.addEventListener("DOMContentLoaded", () => {
-  initMap();
-  fetchFdr();
-  fetchBushfires();
-
-  setInterval(fetchFdr, 30 * 60 * 1000);
-  setInterval(fetchBushfires, 5 * 60 * 1000);
-});
-</script>
-
-</body>
-</html>
+      const lon = parseFloat(get("geo
