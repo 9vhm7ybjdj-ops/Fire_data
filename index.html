@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Nambour & Beerburrum Observations</title>
+<title>Sunshine Coast Weather Network</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
@@ -16,73 +16,113 @@
     align-items: center;
     gap: 20px;
   }
+
   h1 { margin: 0; font-size: 1.4rem; }
+
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 16px;
     width: 100%;
-    max-width: 720px;
+    max-width: 900px;
   }
+
   .card {
     background: #1b1b1b;
     padding: 16px;
     border-radius: 10px;
     box-shadow: 0 0 0 1px #333;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* equal height */
   }
+
   .card h2 { margin: 0 0 8px; font-size: 1.1rem; }
   .obs-time { font-size: 0.8rem; color: #aaa; margin-bottom: 8px; }
-  .row { display: flex; justify-content: space-between; padding: 4px 0; }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
   .label { color: #ccc; display: flex; gap: 6px; align-items: center; }
   .value { font-weight: 500; }
+
   .error { color: #ff8080; margin-top: 8px; font-size: 0.9rem; }
 </style>
 </head>
 <body>
 
-<h1>Nambour & Beerburrum – Current BOM Observations</h1>
+<h1>Sunshine Coast Weather Network</h1>
 
 <div class="grid">
+
   <div class="card" id="nambour-card">
     <h2>Nambour</h2>
     <div class="obs-time" id="nambour-time">Loading…</div>
-
-    <div class="row"><span class="label">🌡️ Temperature</span><span class="value" id="nambour-temp">–</span></div>
-    <div class="row"><span class="label">🌡️ Dew point</span><span class="value" id="nambour-dew">–</span></div>
+    <div class="row"><span class="label">🌡️ Temp</span><span class="value" id="nambour-temp">–</span></div>
+    <div class="row"><span class="label">🌡️ Dew</span><span class="value" id="nambour-dew">–</span></div>
     <div class="row"><span class="label">💧 Humidity</span><span class="value" id="nambour-rh">–</span></div>
     <div class="row"><span class="label">🌬️ Wind dir</span><span class="value" id="nambour-wdir">–</span></div>
     <div class="row"><span class="label">🌬️ Wind speed</span><span class="value" id="nambour-wspd">–</span></div>
     <div class="row"><span class="label">💨 Gust</span><span class="value" id="nambour-gust">–</span></div>
     <div class="row"><span class="label">🌧️ Rain 9am</span><span class="value" id="nambour-rain">–</span></div>
-
     <div class="error" id="nambour-error"></div>
   </div>
 
   <div class="card" id="beerburrum-card">
     <h2>Beerburrum</h2>
     <div class="obs-time" id="beerburrum-time">Loading…</div>
-
-    <div class="row"><span class="label">🌡️ Temperature</span><span class="value" id="beerburrum-temp">–</span></div>
-    <div class="row"><span class="label">🌡️ Dew point</span><span class="value" id="beerburrum-dew">–</span></div>
+    <div class="row"><span class="label">🌡️ Temp</span><span class="value" id="beerburrum-temp">–</span></div>
+    <div class="row"><span class="label">🌡️ Dew</span><span class="value" id="beerburrum-dew">–</span></div>
     <div class="row"><span class="label">💧 Humidity</span><span class="value" id="beerburrum-rh">–</span></div>
     <div class="row"><span class="label">🌬️ Wind dir</span><span class="value" id="beerburrum-wdir">–</span></div>
     <div class="row"><span class="label">🌬️ Wind speed</span><span class="value" id="beerburrum-wspd">–</span></div>
     <div class="row"><span class="label">💨 Gust</span><span class="value" id="beerburrum-gust">–</span></div>
     <div class="row"><span class="label">🌧️ Rain 9am</span><span class="value" id="beerburrum-rain">–</span></div>
-
     <div class="error" id="beerburrum-error"></div>
   </div>
+
+  <div class="card" id="sunshine-card">
+    <h2>Sunshine Coast Airport</h2>
+    <div class="obs-time" id="sunshine-time">Loading…</div>
+    <div class="row"><span class="label">🌡️ Temp</span><span class="value" id="sunshine-temp">–</span></div>
+    <div class="row"><span class="label">🌡️ Dew</span><span class="value" id="sunshine-dew">–</span></div>
+    <div class="row"><span class="label">💧 Humidity</span><span class="value" id="sunshine-rh">–</span></div>
+    <div class="row"><span class="label">🌬️ Wind dir</span><span class="value" id="sunshine-wdir">–</span></div>
+    <div class="row"><span class="label">🌬️ Wind speed</span><span class="value" id="sunshine-wspd">–</span></div>
+    <div class="row"><span class="label">💨 Gust</span><span class="value" id="sunshine-gust">–</span></div>
+    <div class="row"><span class="label">🌧️ Rain 9am</span><span class="value" id="sunshine-rain">–</span></div>
+    <div class="error" id="sunshine-error"></div>
+  </div>
+
+  <div class="card" id="tewantin-card">
+    <h2>Tewantin</h2>
+    <div class="obs-time" id="tewantin-time">Loading…</div>
+    <div class="row"><span class="label">🌡️ Temp</span><span class="value" id="tewantin-temp">–</span></div>
+    <div class="row"><span class="label">🌡️ Dew</span><span class="value" id="tewantin-dew">–</span></div>
+    <div class="row"><span class="label">💧 Humidity</span><span class="value" id="tewantin-rh">–</span></div>
+    <div class="row"><span class="label">🌬️ Wind dir</span><span class="value" id="tewantin-wdir">–</span></div>
+    <div class="row"><span class="label">🌬️ Wind speed</span><span class="value" id="tewantin-wspd">–</span></div>
+    <div class="row"><span class="label">💨 Gust</span><span class="value" id="tewantin-gust">–</span></div>
+    <div class="row"><span class="label">🌧️ Rain 9am</span><span class="value" id="tewantin-rain">–</span></div>
+    <div class="error" id="tewantin-error"></div>
+  </div>
+
 </div>
 
 <script>
 const BOM_URL = "https://reg.bom.gov.au/fwo/IDQ60920.xml";
 
 const STATIONS = {
-  nambour: "NAMBOUR",
-  beerburrum: "BEERBURRUM"
+  nambour: "NAMBOUR DAFF - HILLSIDE",
+  beerburrum: "BEERBURRUM FOREST STATION",
+  sunshine: "SUNSHINE COAST AIRPORT",
+  tewantin: "TEWANTIN RSL PARK"
 };
 
-let lastTemp = { nambour: null, beerburrum: null };
+let lastTemp = { nambour: null, beerburrum: null, sunshine: null, tewantin: null };
 
 function colour(value, thresholds) {
   if (value === "–" || value === null) return "#eee";
@@ -97,8 +137,8 @@ function trendArrow(prefix, newTemp) {
   lastTemp[prefix] = newTemp;
 
   if (old === null || newTemp === "–") return "";
-
   const diff = newTemp - old;
+
   if (diff > 0.2) return " ▲";
   if (diff < -0.2) return " ▼";
   return " →";
@@ -139,7 +179,7 @@ function update(prefix, node) {
   document.getElementById(prefix + "-rain").textContent = rain;
   document.getElementById(prefix + "-time").textContent = "Obs time: " + getTime(node);
 
-  // Apply colour coding
+  // Colour coding
   document.getElementById(prefix + "-rh").style.color =
     colour(rh, { green: 70, yellow: 40 });
 
@@ -156,15 +196,16 @@ async function load() {
     const xml = new DOMParser().parseFromString(await res.text(), "application/xml");
     const stations = [...xml.querySelectorAll("station")];
 
-    const nNode = stations.find(s => s.getAttribute("stn-name")?.toUpperCase().includes(STATIONS.nambour));
-    const bNode = stations.find(s => s.getAttribute("stn-name")?.toUpperCase().includes(STATIONS.beerburrum));
-
-    update("nambour", nNode);
-    update("beerburrum", bNode);
+    update("nambour", stations.find(s => s.getAttribute("stn-name")?.toUpperCase() === STATIONS.nambour));
+    update("beerburrum", stations.find(s => s.getAttribute("stn-name")?.toUpperCase() === STATIONS.beerburrum));
+    update("sunshine", stations.find(s => s.getAttribute("stn-name")?.toUpperCase() === STATIONS.sunshine));
+    update("tewantin", stations.find(s => s.getAttribute("stn-name")?.toUpperCase() === STATIONS.tewantin));
 
   } catch (e) {
     document.getElementById("nambour-error").textContent = "Error loading data.";
     document.getElementById("beerburrum-error").textContent = "Error loading data.";
+    document.getElementById("sunshine-error").textContent = "Error loading data.";
+    document.getElementById("tewantin-error").textContent = "Error loading data.";
   }
 }
 
