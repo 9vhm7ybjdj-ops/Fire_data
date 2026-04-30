@@ -312,9 +312,14 @@
     }
 
     .legend-icon {
-      width: 16px;
-      height: 16px;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .legend-small svg {
+      width: 14px;
+      height: 14px;
     }
 
     @media (max-width: 720px) {
@@ -395,7 +400,7 @@
             </select>
           </label>
 
-          <button id="nearbyBtn" class="primary">Nearby (5 km)</button>
+          <button id="nearbyBtn" class="primary">Nearby (25 km)</button>
         </div>
       </div>
 
@@ -452,17 +457,30 @@
         );
         if (!row) throw new Error("Southeast Coast row not found");
 
-        const cells = row.querySelectorAll("td, th");
-        fdrState.district = cells[0]?.textContent.trim() || "Southeast Coast";
-        fdrState.rating = cells[1]?.textContent.trim() || "Unavailable";
-        fdrState.fbi = cells[2]?.textContent.trim() || "—";
+        const cells = [...row.querySelectorAll("td, th")];
 
-        const issued =
-          doc.querySelector("p:contains('Issued')") ||
-          doc.querySelector("footer") ||
-          doc.querySelector(".timestamp");
-        fdrState.issued = issued
-          ? issued.textContent.trim()
+        // District
+        fdrState.district = cells[0]?.textContent.trim() || "Southeast Coast";
+
+        // Rating (first cell containing a known rating)
+        const ratingCell = cells.find((c) =>
+          /(moderate|high|extreme|catastrophic)/i.test(c.textContent)
+        );
+        fdrState.rating = ratingCell
+          ? ratingCell.textContent.trim()
+          : "Unavailable";
+
+        // FBI (first numeric cell)
+        const fbiCell = cells.find((c) =>
+          /^\d+$/.test(c.textContent.trim())
+        );
+        fdrState.fbi = fbiCell ? fbiCell.textContent.trim() : "—";
+
+        // Issued timestamp: search any element containing 'Issued'
+        const issuedNode = [...doc.querySelectorAll("p, div, span, footer")]
+          .find((el) => /issued/i.test(el.textContent));
+        fdrState.issued = issuedNode
+          ? issuedNode.textContent.trim()
           : new Date().toLocaleDateString();
 
         renderFdrWidget();
@@ -503,13 +521,13 @@
     const vegSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
   <rect x="1" y="1" width="30" height="30" rx="4" fill="#f57c00" stroke="white" stroke-width="2"/>
-  <path fill="white" d="M16 6c2 3 3 5 3 7 0 2-1 4-3 5-2-1-3-3-3-5 0-2 1-4 3-7zm0 9c3 2 5 4 5 7 0 3-2 5-5 5s-5-2-5-5c0-3 2-5 5-7z"/>
+  <path fill="white" d="M16 4c3 4 5 7 5 10 0 3-2 6-5 7-3-1-5-4-5-7 0-3 2-6 5-10zm0 11c4 3 6 5 6 8s-3 6-6 6-6-3-6-6 2-5 6-8z"/>
 </svg>`.trim();
 
     const permSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
   <rect x="1" y="1" width="30" height="30" rx="4" fill="#0277bd" stroke="white" stroke-width="2"/>
-  <path fill="white" d="M16 6c2 3 3 5 3 7 0 2-1 4-3 5-2-1-3-3-3-5 0-2 1-4 3-7zm0 9c3 2 5 4 5 7 0 3-2 5-5 5s-5-2-5-5c0-3 2-5 5-7z"/>
+  <path fill="white" d="M16 4c3 4 5 7 5 10 0 3-2 6-5 7-3-1-5-4-5-7 0-3 2-6 5-10zm0 11c4 3 6 5 6 8s-3 6-6 6-6-3-6-6 2-5 6-8z"/>
 </svg>`.trim();
 
     const vegIcon = L.divIcon({
@@ -542,11 +560,11 @@
           const div = L.DomUtil.create("div", "leaflet-control legend");
           div.innerHTML = `
             <div class="legend-item">
-              <span class="legend-icon">${vegSvg}</span>
+              <span class="legend-icon legend-small">${vegSvg}</span>
               <span>Vegetation Fire</span>
             </div>
             <div class="legend-item">
-              <span class="legend-icon">${permSvg}</span>
+              <span class="legend-icon legend-small">${permSvg}</span>
               <span>Permitted Burn</span>
             </div>
           `;
@@ -598,7 +616,7 @@
           );
         }
 
-        // Nearby filter (5 km) if enabled
+        // Nearby filter (25 km) if enabled
         if (nearbyMode && userLocation) {
           attrs = attrs.filter((a) => {
             if (!a.Latitude || !a.Longitude) return false;
@@ -608,7 +626,7 @@
               a.Latitude,
               a.Longitude
             );
-            return d <= 5;
+            return d <= 25;
           });
         }
 
@@ -763,7 +781,7 @@
     }
 
     /* -----------------------------
-       Nearby mode (5 km)
+       Nearby mode (25 km)
     ------------------------------ */
 
     function enableNearbyMode() {
