@@ -20,6 +20,29 @@
 
   h1 { margin: 0; font-size: 1.4rem; }
 
+  .cache-btn {
+    background: #333;
+    color: #eee;
+    border: 1px solid #555;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+
+  .cache-btn:hover {
+    background: #444;
+  }
+
+  .cache-msg {
+    font-size: 0.8rem;
+    color: #6f6;
+    margin-bottom: 10px;
+    height: 14px;
+  }
+
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -86,6 +109,9 @@
 <body>
 
 <h1>Sunshine Coast Weather Network</h1>
+
+<button id="clearCacheBtn" class="cache-btn">Clear Cache</button>
+<div id="cacheMsg" class="cache-msg"></div>
 
 <div class="grid">
 
@@ -222,10 +248,27 @@
 <!-- SCRIPT STARTS IN PART 2 -->
 <script>
 //
+//  CLEAR CACHE BUTTON
+//
+document.getElementById("clearCacheBtn").addEventListener("click", () => {
+  localStorage.clear();
+  sessionStorage.clear();
+
+  const msg = document.getElementById("cacheMsg");
+  msg.textContent = "✔ Cache cleared — reloading…";
+
+  const stamp = Date.now();
+  setTimeout(() => {
+    window.location.href = window.location.pathname + "?nocache=" + stamp;
+  }, 400);
+});
+
+
+//
 //  CONFIG + HELPERS
 //
 
-// ✔ CORS‑enabled BOM feed (this one returns real XML)
+// ✔ CORS‑enabled BOM feed (real XML)
 const BOM_URL = "https://bom.gov.au/fwo/IDQ60920.xml";
 
 // Correct bom-ids for your four stations
@@ -351,7 +394,6 @@ function getTime(node) {
   const p = node.querySelector("period");
   return p ? (p.getAttribute("time-local") || p.getAttribute("time-utc")) : "–";
 }
-
 //
 //  UPDATE + LOAD
 //
@@ -469,7 +511,5 @@ load();
 setInterval(load, 10 * 60 * 1000);
 </script>
 
-
 </body>
 </html>
-
