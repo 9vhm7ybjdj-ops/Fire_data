@@ -155,7 +155,7 @@
 
   <div class="panel">
     <div style="font-size:0.9rem;color:#9ca3af;text-transform:uppercase;">
-      Current Bushfire Incidents
+      Current Bushfire & Grassfire Incidents
     </div>
     <ul class="incident-list" id="incidentList"></ul>
     <div id="incidentMeta" style="font-size:0.75rem;color:#9ca3af;"></div>
@@ -234,11 +234,11 @@ function renderFdrWidget() {
 }
 
 /* -----------------------------
-   QFES BUSHFIRE XML FETCH
+   QFES INCIDENTS (ArcGIS)
 ------------------------------ */
 
-const BUSHFIRE_XML_URL =
-  "https://publiccontent-gis-psba-qld-gov-au.s3.amazonaws.com/content/Feeds/BushfireCurrentIncidents/bushfireAlert.xml";
+const ARC_URL =
+  "https://services1.arcgis.com/vkTwD8kHw2woKBqV/arcgis/rest/services/ESCAD_Current_Incidents_Public/FeatureServer/0/query?where=1%3D1&outFields=*&f=json";
 
 let map;
 let incidentLayer;
@@ -249,14 +249,91 @@ function initMap() {
   incidentLayer = L.layerGroup().addTo(map);
 }
 
-async function fetchBushfires() {
+async function fetchIncidents() {
   try {
-    const res = await fetch(BUSHFIRE_XML_URL);
-    const xml = new DOMParser().parseFromString(await res.text(), "text/xml");
+    const res = await fetch(ARC_URL);
+    const data = await res.json();
 
-    const items = [...xml.getElementsByTagName("item")];
-    const incidents = items.map(item => {
-      const get = tag =>
-        item.getElementsByTagName(tag)[0]?.textContent.trim() || "";
-      const lat = parseFloat(get("geo:lat") || get("lat"));
-      const lon = parseFloat(get("geo
+    const features = data.features || [];
+
+    const filtered = features
+      .map(f => f.attributes)
+      .filter(a =>
+        a.incidenttype === "Bushfire" ||
+        a.incidenttype === "Grassfire"
+      );
+
+    const incidents = filtered.map(a => ({
+      title: a.incidenttype,
+      location: a.location || a.suburb || "",
+      region: a.region || "",
+      status: a.status || "",
+      updated: new Date(a.modifieddate).toLocaleString(),
+      lat: a.latitude,
+      lon: a.longitude
+    }));
+
+    renderIncidents(incidents);
+  } catch (err) {
+    console.error("ArcGIS error:", err);
+  }
+}
+
+function renderIncidents(list) {
+  const ul = document.getElementById("incidentList");
+  const meta = document.getElementById("incidentMeta");
+
+  ul.innerHTML = "";
+  incidentLayer.clearLayers();
+
+  if (!list.length) {
+    ul.innerHTML = "<li class='incident-item'>No bushfire or grassfire incidents.</li>";
+    meta.textContent = "Updated: " + new Date().toLocaleString();
+    return;
+  }
+
+  list.forEach(inc => {
+    const li = document.createElement("li");
+    li.className = "incident-item";
+
+    li.innerHTML = `
+      <div style="font-weight:500;">${inc.title}</div>
+      <div style="font-size:0.75rem;color:#9ca3af;">
+        ${inc.location} • ${inc.region} • Updated ${inc.updated}
+      </div>
+      <div style="font-size:0.75rem;color:#fbbf24;">${inc.status}</div>
+    `;
+
+    ul.appendChild(li);
+
+    if (inc.lat && inc.lon) {
+      L.marker([inc.lat, inc.lon])
+        .addTo(incidentLayer)
+        .bindPopup(`<strong>${inc.title}</strong><br>${inc.location}`);
+    }
+  });
+
+  meta.textContent =
+    `Incidents: ${list.length} • Updated: ${new Date().toLocaleString()}`;
+
+  try {
+    map.fitBounds(incidentLayer.getBounds(), { padding: [20, 20] });
+  } catch {}
+}
+
+/* -----------------------------
+   INIT
+------------------------------ */
+
+document.addEventListener("DOMContentLoaded", () => {
+  initMap();
+  fetchFdr();
+  fetchIncidents();
+
+  setInterval(fetchFdr, 30 * 60 * 1000);
+  setInterval(fetchIncidents, 5 * 60 * 1000);
+});
+</script>
+
+</body>
+</html>
