@@ -6,23 +6,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0b0b0f;
-      --bg-elevated: #111827;
+      --bg: #020617;
+      --bg-elevated: #0b1120;
       --fg: #e5e7eb;
       --fg-muted: #9ca3af;
+      --accent: #f97316;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
       background: var(--bg);
       color: var(--fg);
-      font-family: system-ui, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
     }
 
     .app {
@@ -35,28 +44,35 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 1rem;
+      gap: 0.75rem;
       margin-bottom: 0.75rem;
     }
 
     .app-title {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 600;
+    }
+
+    .app-subtitle {
+      font-size: 0.8rem;
+      color: var(--fg-muted);
     }
 
     /* AFDRS widget */
     .fdr-widget {
       background: var(--bg-elevated);
-      padding: 1rem;
+      padding: 0.75rem 1rem;
       border-radius: 8px;
       min-width: 260px;
       max-width: 380px;
     }
 
     .fdr-widget-title {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       text-transform: uppercase;
       color: var(--fg-muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.25rem;
     }
 
     .fdr-widget-rating {
@@ -67,6 +83,7 @@
     .fdr-widget-fbi {
       font-size: 0.9rem;
       opacity: 0.9;
+      margin-top: 0.1rem;
     }
 
     .fdr-bar {
@@ -74,42 +91,230 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 2px;
       height: 10px;
-      margin: 0.75rem 0;
+      margin: 0.6rem 0;
       border-radius: 999px;
       overflow: hidden;
     }
 
-    .mod { background:#4caf50; }
-    .high { background:#ffeb3b; }
-    .ext { background:#ff9800; }
-    .cat { background:#f44336; }
-    .active { box-shadow: 0 0 0 2px #fff inset; }
+    .mod {
+      background: #22c55e;
+    }
+    .high {
+      background: #eab308;
+    }
+    .ext {
+      background: #f97316;
+    }
+    .cat {
+      background: #ef4444;
+    }
+    .active {
+      box-shadow: 0 0 0 2px #ffffffcc inset;
+    }
 
     #map {
       width: 100%;
       height: 360px;
       border-radius: 8px;
       background: #020617;
+      margin-bottom: 0.5rem;
     }
 
     .panel {
       background: var(--bg-elevated);
       padding: 0.75rem;
       border-radius: 8px;
-      margin-top: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .panel-title {
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    select,
+    button {
+      font-size: 0.8rem;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: var(--fg);
+      padding: 0.25rem 0.6rem;
+      outline: none;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: #111827;
+    }
+
+    button.primary.active {
+      background: var(--accent);
+      color: #111827;
+    }
+
+    .banner {
+      font-size: 0.8rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      background: #022c22;
+      color: #6ee7b7;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .banner strong {
+      font-weight: 600;
+    }
+
+    .banner.alert {
+      background: #451a03;
+      color: #fed7aa;
     }
 
     .incident-list {
       list-style: none;
       padding: 0;
-      margin: 0;
+      margin: 0.25rem 0 0;
       max-height: 320px;
       overflow-y: auto;
     }
 
     .incident-item {
-      padding: 0.5rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      cursor: pointer;
+    }
+
+    .incident-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .incident-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .badge-veg {
+      background: #451a03;
+      border-color: #f97316;
+      color: #fed7aa;
+    }
+
+    .badge-perm {
+      background: #0b1f33;
+      border-color: #38bdf8;
+      color: #e0f2fe;
+    }
+
+    .badge-status-going {
+      background: #450a0a;
+      border-color: #f97373;
+      color: #fecaca;
+    }
+
+    .badge-status-patrolled {
+      background: #022c22;
+      border-color: #22c55e;
+      color: #bbf7d0;
+    }
+
+    .incident-meta {
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+      margin-top: 0.15rem;
+    }
+
+    .incident-status-line {
+      font-size: 0.75rem;
+      margin-top: 0.15rem;
+      color: #fbbf24;
+    }
+
+    .incident-details {
+      font-size: 0.75rem;
+      color: #cbd5f5;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .incident-details.open {
+      display: block;
+    }
+
+    .incident-details-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.1rem;
+    }
+
+    .incident-meta-bar {
+      font-size: 0.75rem;
+      color: var(--fg-muted);
+      margin-top: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .leaflet-control.legend {
+      background: rgba(15, 23, 42, 0.9);
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      color: #e5e7eb;
+      font-size: 0.75rem;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9),
+        0 4px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin: 0.1rem 0;
+    }
+
+    .legend-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
     }
 
     @media (max-width: 720px) {
@@ -126,215 +331,493 @@
     }
   </style>
 </head>
-
 <body>
-<div class="app">
-
-  <header class="app-header">
-    <div class="app-title">QFD Bushfires</div>
-
-    <div class="fdr-widget" id="fdrWidget">
-      <div class="fdr-widget-title">Fire Danger Rating</div>
-      <div class="fdr-widget-rating" id="fdrWidgetRating">Loading…</div>
-      <div class="fdr-widget-fbi" id="fdrWidgetFbi"></div>
-
-      <div class="fdr-bar">
-        <span class="mod" id="barMod"></span>
-        <span class="high" id="barHigh"></span>
-        <span class="ext" id="barExt"></span>
-        <span class="cat" id="barCat"></span>
+  <div class="app">
+    <header class="app-header">
+      <div>
+        <div class="app-title">QFD Bushfires</div>
+        <div class="app-subtitle">
+          Live QFES incidents + AFDRS (Southeast Coast)
+        </div>
       </div>
 
-      <div id="fdrWidgetFooter" style="font-size:0.75rem;color:#9ca3af;">
-        Fetching AFDRS data…
+      <div class="fdr-widget" id="fdrWidget">
+        <div class="fdr-widget-title">Fire Danger Rating</div>
+        <div class="fdr-widget-rating" id="fdrWidgetRating">Loading…</div>
+        <div class="fdr-widget-fbi" id="fdrWidgetFbi"></div>
+
+        <div class="fdr-bar">
+          <span class="mod" id="barMod"></span>
+          <span class="high" id="barHigh"></span>
+          <span class="ext" id="barExt"></span>
+          <span class="cat" id="barCat"></span>
+        </div>
+
+        <div
+          id="fdrWidgetFooter"
+          style="font-size: 0.75rem; color: #9ca3af"
+        >
+          Fetching AFDRS data…
+        </div>
+      </div>
+    </header>
+
+    <div id="map"></div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">
+            Current Bushfire & Vegetation Fire Incidents
+          </div>
+          <div id="lastUpdatedBanner" class="banner">
+            <strong>Updated</strong>
+            <span id="lastUpdatedText">—</span>
+          </div>
+          <div
+            id="newIncidentBanner"
+            class="banner alert"
+            style="display: none"
+          ></div>
+        </div>
+
+        <div class="controls-row">
+          <label>
+            Region:
+            <select id="regionFilter">
+              <option value="South Eastern Region" selected>
+                South Eastern Region
+              </option>
+              <option value="Northern Region">Northern Region</option>
+              <option value="Central Region">Central Region</option>
+              <option value="Far Northern Region">Far Northern Region</option>
+              <option value="All">All Regions</option>
+            </select>
+          </label>
+
+          <button id="nearbyBtn" class="primary">Nearby (5 km)</button>
+        </div>
+      </div>
+
+      <ul class="incident-list" id="incidentList"></ul>
+
+      <div class="incident-meta-bar">
+        <span id="incidentCountMeta">Incidents: 0</span>
+        <span>Data: QFES ArcGIS ESCAD Current Incidents</span>
       </div>
     </div>
-  </header>
-
-  <div id="map"></div>
-
-  <div class="panel">
-    <div style="font-size:0.9rem;color:#9ca3af;text-transform:uppercase;">
-      Current Bushfire & Vegetation Fire Incidents
-    </div>
-    <ul class="incident-list" id="incidentList"></ul>
-    <div id="incidentMeta" style="font-size:0.75rem;color:#9ca3af;"></div>
   </div>
 
-</div>
+  <script>
+    /* -----------------------------
+       AFDRS (BOM) - Southeast Coast
+    ------------------------------ */
 
-<script>
-/* -----------------------------
-   LIVE BOM AFDRS FETCH
------------------------------- */
+    const FDR_SOURCE_URL =
+      "https://www.bom.gov.au/qld/forecasts/fire-danger-ratings.shtml";
 
-const FDR_SOURCE_URL = "https://www.bom.gov.au/qld/forecasts/fire-danger-ratings.shtml";
+    const fdrState = {
+      district: "Southeast Coast",
+      rating: null,
+      fbi: null,
+      issued: null,
+    };
 
-const fdrState = {
-  district: "Southeast Coast",
-  rating: null,
-  fbi: null,
-  tomorrowRating: null,
-  issued: null
-};
-
-function markActiveBar(rating) {
-  const map = {
-    "Moderate": "barMod",
-    "High": "barHigh",
-    "Extreme": "barExt",
-    "Catastrophic": "barCat"
-  };
-  Object.values(map).forEach(id =>
-    document.getElementById(id).classList.remove("active")
-  );
-  if (map[rating]) document.getElementById(map[rating]).classList.add("active");
-}
-
-async function fetchFdr() {
-  try {
-    const res = await fetch(FDR_SOURCE_URL);
-    const html = await res.text();
-    const doc = new DOMParser().parseFromString(html, "text/html");
-
-    const table = doc.querySelector("table.fire-danger, table");
-    if (!table) throw new Error("AFDRS table not found");
-
-    const rows = [...table.querySelectorAll("tr")];
-    const row = rows.find(r =>
-      r.textContent.toLowerCase().includes("southeast coast")
-    );
-    if (!row) throw new Error("Southeast Coast row not found");
-
-    const cells = row.querySelectorAll("td, th");
-    fdrState.district = cells[0]?.textContent.trim() || "Southeast Coast";
-    fdrState.rating = cells[1]?.textContent.trim() || "Unavailable";
-    fdrState.fbi = cells[2]?.textContent.trim() || "—";
-    fdrState.tomorrowRating = cells[3]?.textContent.trim() || null;
-
-    const issued = doc.querySelector("p:contains('Issued'), footer, .timestamp");
-    fdrState.issued = issued ? issued.textContent.trim() : new Date().toLocaleDateString();
-
-    renderFdrWidget();
-  } catch (err) {
-    console.error("AFDRS fetch error:", err);
-    fdrState.rating = "Unavailable";
-    fdrState.fbi = "—";
-    fdrState.issued = "Data unavailable";
-    renderFdrWidget();
-  }
-}
-
-function renderFdrWidget() {
-  document.getElementById("fdrWidgetRating").textContent = fdrState.rating;
-  document.getElementById("fdrWidgetFbi").textContent = `FBI ${fdrState.fbi}`;
-  document.getElementById("fdrWidgetFooter").textContent =
-    `${fdrState.district} • ${fdrState.issued}`;
-  markActiveBar(fdrState.rating);
-}
-
-/* -----------------------------
-   QFES INCIDENTS (ArcGIS)
------------------------------- */
-
-const ARC_URL =
-  "https://services1.arcgis.com/vkTwD8kHw2woKBqV/arcgis/rest/services/ESCAD_Current_Incidents_Public/FeatureServer/0/query?where=OBJECTID%3E0&outFields=*&returnGeometry=true&f=json";
-
-let map;
-let incidentLayer;
-
-function initMap() {
-  map = L.map("map").setView([-26.65, 152.96], 8);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-  incidentLayer = L.layerGroup().addTo(map);
-}
-
-async function fetchIncidents() {
-  try {
-    const res = await fetch(ARC_URL);
-    const data = await res.json();
-
-    const features = data.features || [];
-
-    // Correct filter using GroupedType
-    const filtered = features
-      .map(f => f.attributes)
-      .filter(a =>
-        a.GroupedType === "FIRE VEGETATION" ||
-        a.GroupedType === "FIRE PERMITTED BURN"
+    function markActiveBar(rating) {
+      const map = {
+        Moderate: "barMod",
+        High: "barHigh",
+        Extreme: "barExt",
+        Catastrophic: "barCat",
+      };
+      Object.values(map).forEach((id) =>
+        document.getElementById(id).classList.remove("active")
       );
-
-    const incidents = filtered.map(a => ({
-      title: a.GroupedType,
-      location: a.Location || a.Locality || "",
-      region: a.Jurisdiction || "",
-      status: a.CurrentStatus || "",
-      updated: new Date(a.LastUpdate).toLocaleString(),
-      lat: a.Latitude,
-      lon: a.Longitude
-    }));
-
-    renderIncidents(incidents);
-  } catch (err) {
-    console.error("ArcGIS error:", err);
-  }
-}
-
-function renderIncidents(list) {
-  const ul = document.getElementById("incidentList");
-  const meta = document.getElementById("incidentMeta");
-
-  ul.innerHTML = "";
-  incidentLayer.clearLayers();
-
-  if (!list.length) {
-    ul.innerHTML = "<li class='incident-item'>No active vegetation or permitted burn fires.</li>";
-    meta.textContent = "Updated: " + new Date().toLocaleString();
-    return;
-  }
-
-  list.forEach(inc => {
-    const li = document.createElement("li");
-    li.className = "incident-item";
-
-    li.innerHTML = `
-      <div style="font-weight:500;">${inc.title}</div>
-      <div style="font-size:0.75rem;color:#9ca3af;">
-        ${inc.location} • ${inc.region} • Updated ${inc.updated}
-      </div>
-      <div style="font-size:0.75rem;color:#fbbf24;">${inc.status}</div>
-    `;
-
-    ul.appendChild(li);
-
-    if (inc.lat && inc.lon) {
-      L.marker([inc.lat, inc.lon])
-        .addTo(incidentLayer)
-        .bindPopup(`<strong>${inc.title}</strong><br>${inc.location}`);
+      if (map[rating]) document.getElementById(map[rating]).classList.add("active");
     }
-  });
 
-  meta.textContent =
-    `Incidents: ${list.length} • Updated: ${new Date().toLocaleString()}`;
+    async function fetchFdr() {
+      try {
+        const res = await fetch(FDR_SOURCE_URL);
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
 
-  try {
-    map.fitBounds(incidentLayer.getBounds(), { padding: [20, 20] });
-  } catch {}
-}
+        const table =
+          doc.querySelector("table.fire-danger") || doc.querySelector("table");
+        if (!table) throw new Error("AFDRS table not found");
 
-/* -----------------------------
-   INIT
------------------------------- */
+        const rows = [...table.querySelectorAll("tr")];
+        const row = rows.find((r) =>
+          r.textContent.toLowerCase().includes("southeast coast")
+        );
+        if (!row) throw new Error("Southeast Coast row not found");
 
-document.addEventListener("DOMContentLoaded", () => {
-  initMap();
-  fetchFdr();
-  fetchIncidents();
+        const cells = row.querySelectorAll("td, th");
+        fdrState.district = cells[0]?.textContent.trim() || "Southeast Coast";
+        fdrState.rating = cells[1]?.textContent.trim() || "Unavailable";
+        fdrState.fbi = cells[2]?.textContent.trim() || "—";
 
-  setInterval(fetchFdr, 30 * 60 * 1000);
-  setInterval(fetchIncidents, 5 * 60 * 1000);
-});
-</script>
+        const issued =
+          doc.querySelector("p:contains('Issued')") ||
+          doc.querySelector("footer") ||
+          doc.querySelector(".timestamp");
+        fdrState.issued = issued
+          ? issued.textContent.trim()
+          : new Date().toLocaleDateString();
 
+        renderFdrWidget();
+      } catch (err) {
+        console.error("AFDRS fetch error:", err);
+        fdrState.rating = "Unavailable";
+        fdrState.fbi = "—";
+        fdrState.issued = "Data unavailable";
+        renderFdrWidget();
+      }
+    }
+
+    function renderFdrWidget() {
+      document.getElementById("fdrWidgetRating").textContent =
+        fdrState.rating || "Unavailable";
+      document.getElementById(
+        "fdrWidgetFbi"
+      ).textContent = `FBI ${fdrState.fbi || "—"}`;
+      document.getElementById(
+        "fdrWidgetFooter"
+      ).textContent = `${fdrState.district} • ${fdrState.issued}`;
+      markActiveBar(fdrState.rating);
+    }
+
+    /* -----------------------------
+       QFES INCIDENTS (ArcGIS)
+    ------------------------------ */
+
+    const ARC_URL =
+      "https://services1.arcgis.com/vkTwD8kHw2woKBqV/arcgis/rest/services/ESCAD_Current_Incidents_Public/FeatureServer/0/query?where=OBJECTID%3E0&outFields=*&returnGeometry=true&f=json";
+
+    let map;
+    let incidentLayer;
+    let userLocation = null;
+    let nearbyMode = false;
+    let previousIncidentIds = new Set();
+
+    const vegSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect x="1" y="1" width="30" height="30" rx="4" fill="#f57c00" stroke="white" stroke-width="2"/>
+  <path fill="white" d="M16 6c2 3 3 5 3 7 0 2-1 4-3 5-2-1-3-3-3-5 0-2 1-4 3-7zm0 9c3 2 5 4 5 7 0 3-2 5-5 5s-5-2-5-5c0-3 2-5 5-7z"/>
+</svg>`.trim();
+
+    const permSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect x="1" y="1" width="30" height="30" rx="4" fill="#0277bd" stroke="white" stroke-width="2"/>
+  <path fill="white" d="M16 6c2 3 3 5 3 7 0 2-1 4-3 5-2-1-3-3-3-5 0-2 1-4 3-7zm0 9c3 2 5 4 5 7 0 3-2 5-5 5s-5-2-5-5c0-3 2-5 5-7z"/>
+</svg>`.trim();
+
+    const vegIcon = L.divIcon({
+      className: "",
+      html: `<div style="width:32px;height:32px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));">${vegSvg}</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+    });
+
+    const permIcon = L.divIcon({
+      className: "",
+      html: `<div style="width:32px;height:32px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));">${permSvg}</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+    });
+
+    function initMap() {
+      map = L.map("map").setView([-26.65, 152.96], 8);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+      incidentLayer = L.layerGroup().addTo(map);
+
+      // Legend control
+      const LegendControl = L.Control.extend({
+        options: { position: "bottomleft" },
+        onAdd: function () {
+          const div = L.DomUtil.create("div", "leaflet-control legend");
+          div.innerHTML = `
+            <div class="legend-item">
+              <span class="legend-icon">${vegSvg}</span>
+              <span>Vegetation Fire</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-icon">${permSvg}</span>
+              <span>Permitted Burn</span>
+            </div>
+          `;
+          return div;
+        },
+      });
+      map.addControl(new LegendControl());
+    }
+
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const toRad = (d) => (d * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) *
+          Math.cos(toRad(lat2)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    async function fetchIncidents() {
+      try {
+        const res = await fetch(ARC_URL);
+        const data = await res.json();
+
+        const features = data.features || [];
+        const regionFilter = document.getElementById("regionFilter").value;
+
+        let attrs = features.map((f) => f.attributes);
+
+        // Filter by fire type
+        attrs = attrs.filter(
+          (a) =>
+            a.GroupedType === "FIRE VEGETATION" ||
+            a.GroupedType === "FIRE PERMITTED BURN"
+        );
+
+        // Region filter
+        if (regionFilter !== "All") {
+          attrs = attrs.filter(
+            (a) =>
+              (a.Jurisdiction || "")
+                .toLowerCase()
+                .indexOf(regionFilter.toLowerCase()) !== -1
+          );
+        }
+
+        // Nearby filter (5 km) if enabled
+        if (nearbyMode && userLocation) {
+          attrs = attrs.filter((a) => {
+            if (!a.Latitude || !a.Longitude) return false;
+            const d = haversineKm(
+              userLocation.lat,
+              userLocation.lon,
+              a.Latitude,
+              a.Longitude
+            );
+            return d <= 5;
+          });
+        }
+
+        const incidents = attrs.map((a) => ({
+          id: a.OBJECTID,
+          type: a.GroupedType,
+          location: a.Location || a.Locality || "",
+          region: a.Jurisdiction || "",
+          status: a.CurrentStatus || "",
+          updated: a.LastUpdate ? new Date(a.LastUpdate).toLocaleString() : "",
+          lat: a.Latitude,
+          lon: a.Longitude,
+          master: a.Master_Incident_Number || "",
+          vehiclesAssigned: a.VehiclesAssigned,
+          vehiclesOnRoute: a.VehiclesOnRoute,
+          vehiclesOnScene: a.VehiclesOnScene,
+          responseDate: a.Response_Date
+            ? new Date(a.Response_Date).toLocaleString()
+            : "",
+        }));
+
+        handleNewIncidents(incidents);
+        renderIncidents(incidents);
+      } catch (err) {
+        console.error("ArcGIS error:", err);
+      }
+    }
+
+    function handleNewIncidents(incidents) {
+      const currentIds = new Set(incidents.map((i) => i.id));
+      const newOnes = incidents.filter((i) => !previousIncidentIds.has(i.id));
+
+      previousIncidentIds = currentIds;
+
+      const banner = document.getElementById("newIncidentBanner");
+      if (!newOnes.length) {
+        banner.style.display = "none";
+        return;
+      }
+
+      const first = newOnes[0];
+      banner.textContent = `New fire detected: ${first.type} — ${first.location ||
+        "Unknown location"} (${first.region || "Unknown region"})`;
+      banner.style.display = "inline-flex";
+
+      setTimeout(() => {
+        banner.style.display = "none";
+      }, 10000);
+    }
+
+    function renderIncidents(list) {
+      const ul = document.getElementById("incidentList");
+      const countMeta = document.getElementById("incidentCountMeta");
+      const lastUpdatedText = document.getElementById("lastUpdatedText");
+
+      ul.innerHTML = "";
+      incidentLayer.clearLayers();
+
+      lastUpdatedText.textContent = new Date().toLocaleString();
+      countMeta.textContent = `Incidents: ${list.length}`;
+
+      if (!list.length) {
+        ul.innerHTML =
+          "<li class='incident-item'>No active vegetation fires or permitted burns for the current filters.</li>";
+        return;
+      }
+
+      const bounds = [];
+
+      list.forEach((inc) => {
+        const li = document.createElement("li");
+        li.className = "incident-item";
+
+        const typeBadgeClass =
+          inc.type === "FIRE VEGETATION" ? "badge-veg" : "badge-perm";
+
+        const statusClass =
+          inc.status.toLowerCase() === "going"
+            ? "badge-status-going"
+            : "badge-status-patrolled";
+
+        li.innerHTML = `
+          <div class="incident-header">
+            <div class="incident-title">${inc.type}</div>
+            <div style="display:flex;gap:0.25rem;align-items:center;">
+              <span class="badge ${typeBadgeClass}">
+                ${inc.type === "FIRE VEGETATION" ? "Vegetation" : "Permitted"}
+              </span>
+              ${
+                inc.status
+                  ? `<span class="badge ${statusClass}">${inc.status}</span>`
+                  : ""
+              }
+            </div>
+          </div>
+          <div class="incident-meta">
+            ${inc.location || "Unknown location"} • ${inc.region ||
+          "Unknown region"}${
+          inc.updated ? ` • Updated ${inc.updated}` : ""
+        }
+          </div>
+          ${
+            inc.status
+              ? `<div class="incident-status-line">Status: ${inc.status}</div>`
+              : ""
+          }
+          <div class="incident-details">
+            <div class="incident-details-row">
+              <span>Incident: ${inc.master || "—"}</span>
+              <span>Response: ${inc.responseDate || "—"}</span>
+            </div>
+            <div class="incident-details-row">
+              <span>Assigned: ${
+                inc.vehiclesAssigned != null ? inc.vehiclesAssigned : "—"
+              }</span>
+              <span>On Route: ${
+                inc.vehiclesOnRoute != null ? inc.vehiclesOnRoute : "—"
+              }</span>
+              <span>On Scene: ${
+                inc.vehiclesOnScene != null ? inc.vehiclesOnScene : "—"
+              }</span>
+            </div>
+          </div>
+        `;
+
+        const detailsEl = li.querySelector(".incident-details");
+        li.addEventListener("click", () => {
+          detailsEl.classList.toggle("open");
+        });
+
+        ul.appendChild(li);
+
+        if (inc.lat && inc.lon) {
+          const icon =
+            inc.type === "FIRE VEGETATION" ? vegIcon : permIcon;
+          const marker = L.marker([inc.lat, inc.lon], { icon }).addTo(
+            incidentLayer
+          );
+          marker.bindPopup(
+            `<strong>${inc.type}</strong><br>${inc.location ||
+              "Unknown location"}<br>${inc.region || ""}`
+          );
+          bounds.push([inc.lat, inc.lon]);
+        }
+      });
+
+      if (bounds.length) {
+        try {
+          map.fitBounds(bounds, { padding: [20, 20] });
+        } catch {}
+      }
+    }
+
+    /* -----------------------------
+       Nearby mode (5 km)
+    ------------------------------ */
+
+    function enableNearbyMode() {
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported on this device.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLocation = {
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+          };
+          nearbyMode = true;
+          document.getElementById("nearbyBtn").classList.add("active");
+          map.setView([userLocation.lat, userLocation.lon], 11);
+          fetchIncidents();
+        },
+        () => {
+          alert("Unable to get your location.");
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+
+    function toggleNearby() {
+      if (!nearbyMode) {
+        enableNearbyMode();
+      } else {
+        nearbyMode = false;
+        document.getElementById("nearbyBtn").classList.remove("active");
+        fetchIncidents();
+      }
+    }
+
+    /* -----------------------------
+       INIT
+    ------------------------------ */
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initMap();
+      fetchFdr();
+      fetchIncidents();
+
+      setInterval(fetchFdr, 30 * 60 * 1000);
+      setInterval(fetchIncidents, 5 * 60 * 1000);
+
+      document
+        .getElementById("regionFilter")
+        .addEventListener("change", fetchIncidents);
+      document
+        .getElementById("nearbyBtn")
+        .addEventListener("click", toggleNearby);
+    });
+  </script>
 </body>
 </html>
