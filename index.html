@@ -275,13 +275,34 @@ const stations = {
 
 
 //
+//  COMPUTE FFDI (McArthur Mark 5)
+//
+function computeFFDI(temp, rh, wind, rain24) {
+  // Simplified drought factor
+  const DF = rain24 > 2 ? 1 : 10;
+
+  const ffdi =
+    2 *
+    Math.exp(
+      -0.45 +
+        0.987 * Math.log(DF) -
+        0.0345 * rh +
+        0.0338 * temp +
+        0.0234 * wind
+    );
+
+  return ffdi;
+}
+
+
+//
 //  FETCH + UPDATE A SINGLE STATION
 //
 async function loadStation(name, lat, lon) {
   const url =
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&current=temperature_2m,dew_point_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,fire_weather_index` +
-    `&hourly=fire_weather_index&timezone=auto`;
+    `&current=temperature_2m,dew_point_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation` +
+    `&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation&timezone=auto`;
 
   try {
     const res = await fetch(url);
@@ -323,40 +344,52 @@ async function loadStation(name, lat, lon) {
 
 
     //
-    // FIRE WEATHER INDEX (FWI)
+    // FIRE DANGER (FFDI)
     //
-    const fwi = c.fire_weather_index;
-    document.getElementById(`${name}-fdr`).textContent = fwi.toFixed(1);
+    const rain24 = data.hourly.precipitation.slice(-24).reduce((a, b) => a + b, 0);
+
+    const ffdi = computeFFDI(
+      c.temperature_2m,
+      c.relative_humidity_2m,
+      c.wind_speed_10m,
+      rain24
+    );
+
+    document.getElementById(`${name}-fdr`).textContent = ffdi.toFixed(1);
 
     const badge = document.getElementById(`${name}-fdr-badge`);
-    badge.textContent = fwi.toFixed(1);
+    badge.textContent = ffdi.toFixed(1);
 
-    if (fwi < 5)       badge.style.background = "#4caf50";  // Low
-    else if (fwi < 12) badge.style.background = "#ffeb3b";  // Moderate
-    else if (fwi < 25) badge.style.background = "#ff9800";  // High
-    else               badge.style.background = "#f44336";  // Extreme
+    if (ffdi < 12)       badge.style.background = "#4caf50";  // Low–Moderate
+    else if (ffdi < 25)  badge.style.background = "#ffeb3b";  // High
+    else if (ffdi < 50)  badge.style.background = "#ff9800";  // Extreme
+    else                 badge.style.background = "#f44336";  // Catastrophic
 
 
     //
-    // SPARKLINE (FWI last 24 hours)
+    // SPARKLINE (FFDI last 24 hours)
     //
     const spark = document.getElementById(`${name}-ffdi-spark`);
     const ctx = spark.getContext("2d");
 
-    const hourlyTimes = data.hourly.time;
-    const hourlyFWI   = data.hourly.fire_weather_index;
+    const temps = data.hourly.temperature_2m.slice(-24);
+    const rhs   = data.hourly.relative_humidity_2m.slice(-24);
+    const winds = data.hourly.wind_speed_10m.slice(-24);
+    const rains = data.hourly.precipitation.slice(-24);
 
-    // Last 24 values
-    const last24 = hourlyFWI.slice(-24);
-    const maxVal = Math.max(...last24);
-    const minVal = Math.min(...last24);
+    const ffdiSeries = temps.map((t, i) =>
+      computeFFDI(t, rhs[i], winds[i], rains[i])
+    );
+
+    const maxVal = Math.max(...ffdiSeries);
+    const minVal = Math.min(...ffdiSeries);
 
     ctx.clearRect(0, 0, spark.width, spark.height);
     ctx.strokeStyle = "#6cf";
     ctx.lineWidth = 2;
     ctx.beginPath();
 
-    last24.forEach((v, i) => {
+    ffdiSeries.forEach((v, i) => {
       const x = (i / 23) * spark.width;
       const y = spark.height - ((v - minVal) / (maxVal - minVal + 0.01)) * spark.height;
       if (i === 0) ctx.moveTo(x, y);
@@ -385,6 +418,7 @@ function loadAll() {
 loadAll();
 setInterval(loadAll, 5 * 60 * 1000); // refresh every 5 minutes
 </script>
+
 
 
 </body>
