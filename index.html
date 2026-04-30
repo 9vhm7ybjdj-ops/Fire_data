@@ -85,7 +85,7 @@
 async function loadFDR() {
   try {
     const url =
-      "https://services1.arcgis.com/0p6i4Jp2i0qN5Q5x/ArcGIS/rest/services/AFDRS_Fire_Danger_Ratings/FeatureServer/0/query?where=1%3D1&outFields=*&f=json";
+      "https://services1.arcgis.com/0p6i4Jp2i0qN5Q5x/ArcGIS/rest/services/AFDRS_Ratings_Public/FeatureServer/0/query?where=1%3D1&outFields=*&f=json";
 
     const res = await fetch(url);
     const data = await res.json();
@@ -128,4 +128,5 @@ setInterval(loadFDR, 60000);
 
 </body>
 </html>
+
 
