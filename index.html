@@ -84,7 +84,11 @@
 <script>
 async function loadFDR() {
   try {
-    const res = await fetch("https://www.bom.gov.au/feeds/idq13016.xml");
+    // Use CORS-safe proxy
+    const url = "https://api.allorigins.win/raw?url=" + 
+      encodeURIComponent("https://www.bom.gov.au/feeds/idq13016.xml");
+
+    const res = await fetch(url);
     const xml = await res.text();
     const doc = new DOMParser().parseFromString(xml, "application/xml");
 
@@ -125,4 +129,3 @@ setInterval(loadFDR, 60000); // auto-refresh every 60s
 
 </body>
 </html>
-
