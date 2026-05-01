@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Weathers for Sunshine Coast</title>
+<title>4‑Station Weather – Coloured Icons + Wind/Humidity Colours</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
@@ -39,17 +39,13 @@
     margin-bottom: 6px;
   }
 
-  .icon {
+  .icon, .wind-arrow {
     width: 22px;
     height: 22px;
     margin-right: 8px;
-    opacity: 0.9;
   }
 
   .wind-arrow {
-    width: 22px;
-    height: 22px;
-    margin-right: 8px;
     transition: transform 0.4s ease;
   }
 
@@ -63,7 +59,7 @@
 </head>
 <body>
 
-<h1>4‑Station Weather – Animated Wind Direction</h1>
+<h1>4‑Station Weather – Coloured Icons + Wind/Humidity Colours</h1>
 
 <div class="grid">
   <div class="card"><div class="name">Nambour</div><div id="nambour">Loading…</div></div>
@@ -73,27 +69,29 @@
 </div>
 
 <p class="disclaimer">
-  ⚠️ Estimated model data — not official Bureau of Meteorology observations.
+  ⚠️ Data sourced from Open‑Meteo — estimated model data, not official observations.
 </p>
 
 <script>
+/* ---------------- ICONS (COLOURED) ---------------- */
+
 function iconTemp() {
   return `<img class="icon" src="data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'>
+  <svg xmlns='http://www.w3.org/2000/svg' fill='%23ff7043' viewBox='0 0 24 24'>
     <path d='M13 15.07V5a1 1 0 10-2 0v10.07a4 4 0 102 0z'/>
   </svg>">`;
 }
 
 function iconHumidity() {
   return `<img class="icon" src="data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'>
+  <svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'>
     <path d='M12 2.69l5.66 5.66a8 8 0 11-11.31 0L12 2.69z'/>
   </svg>">`;
 }
 
 function iconRain() {
   return `<img class="icon" src="data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'>
+  <svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'>
     <path d='M8 19a2 2 0 104 0 2 2 0 00-4 0zm4-4a2 2 0 104 0 2 2 0 00-4 0z'/>
   </svg>">`;
 }
@@ -101,17 +99,35 @@ function iconRain() {
 function iconWindArrow(deg) {
   return `<img class="wind-arrow" style="transform: rotate(${deg}deg)" 
     src="data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'>
+    <svg xmlns='http://www.w3.org/2000/svg' fill='%2300e5ff' viewBox='0 0 24 24'>
       <path d='M12 2l4 8h-3v12h-2V10H8l4-8z'/>
     </svg>">`;
 }
+
+/* ---------------- COLOUR LOGIC ---------------- */
+
+function windColour(speed) {
+  if (speed < 15) return "#00e5ff";
+  if (speed < 30) return "#00bcd4";
+  if (speed < 45) return "#ffb74d";
+  return "#ff5252";
+}
+
+function humidityColour(rh) {
+  if (rh > 60) return "#44aaff";
+  if (rh > 40) return "#00e5ff";
+  if (rh > 20) return "#ffeb3b";
+  return "#ff5252";
+}
+
+/* ---------------- FETCH + RENDER ---------------- */
 
 async function loadStation(elId, lat, lon) {
   const url = "https://api.open-meteo.com/v1/forecast?" +
     new URLSearchParams({
       latitude: lat,
       longitude: lon,
-      current: "temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,precipitation",
+      current: "temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation",
       timezone: "Australia/Brisbane"
     });
 
@@ -122,9 +138,26 @@ async function loadStation(elId, lat, lon) {
 
     document.getElementById(elId).innerHTML = `
       <div class="row">${iconTemp()} ${c.temperature_2m}°C</div>
-      <div class="row">${iconHumidity()} ${c.relative_humidity_2m}%</div>
-      <div class="row">${iconWindArrow(c.wind_direction_10m)} ${c.wind_speed_10m} km/h</div>
-      <div class="row">${iconRain()} ${c.precipitation} mm</div>
+
+      <div class="row">${iconHumidity()}
+        <span style="color:${humidityColour(c.relative_humidity_2m)}">
+          ${c.relative_humidity_2m}%
+        </span>
+      </div>
+
+      <div class="row">${iconWindArrow(c.wind_direction_10m)}
+        <span style="color:${windColour(c.wind_speed_10m)}">
+          ${c.wind_speed_10m} km/h
+        </span>
+      </div>
+
+      <div class="row">${iconWindArrow(c.wind_direction_10m)}
+        <span style="color:${windColour(c.wind_gusts_10m)}">
+          Gusts: ${c.wind_gusts_10m} km/h
+        </span>
+      </div>
+
+      <div class="row">${iconRain()} Rain (24h): ${c.precipitation} mm</div>
     `;
   } catch (err) {
     document.getElementById(elId).textContent = "Error loading data";
@@ -132,7 +165,8 @@ async function loadStation(elId, lat, lon) {
   }
 }
 
-// Station coordinates
+/* ---------------- STATION COORDINATES ---------------- */
+
 loadStation("nambour",    -26.63, 152.96);
 loadStation("beerburrum", -26.95, 153.06);
 loadStation("sunshine",   -26.60, 153.09);
