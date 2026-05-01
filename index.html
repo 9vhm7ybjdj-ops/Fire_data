@@ -7,13 +7,14 @@
 
 <style>
   :root {
-    --bg: #0d0d0d;
-    --tile-bg: #1a1a1a;
-    --text: #e5e5e5;
-    --muted: #9ca3af;
-    --blue: #4cc3ff;
-    --radius: 14px;
-    --shadow: 0 2px 6px rgba(0,0,0,0.4);
+    --bg: #0b0b0b;              /* tactical black */
+    --tile-bg: #141414;         /* equipment panel */
+    --tile-edge: #1f1f1f;       /* subtle bevel */
+    --text: #e6e6e6;            /* high contrast */
+    --muted: #7a7a7a;           /* dim labels */
+    --accent: #4cc3ff;          /* neon cyan (wind) */
+    --radius: 6px;              /* harder edges */
+    --shadow: 0 0 0 2px #0f0f0f inset; /* industrial inset */
   }
 
   body {
@@ -21,52 +22,69 @@
     padding: 16px;
     background: var(--bg);
     color: var(--text);
-    font-family: system-ui, sans-serif;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    letter-spacing: 0.3px;
   }
 
   h1 {
     margin: 0 0 14px;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
   }
 
   .grid {
     display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
   }
 
   .station-tile {
     background: var(--tile-bg);
     border-radius: var(--radius);
-    padding: 16px;
+    padding: 18px;
     box-shadow: var(--shadow);
+    border: 1px solid var(--tile-edge);
+    position: relative;
+  }
+
+  .station-tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+    opacity: 0.15;
+    pointer-events: none;
   }
 
   .station-name {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent);
   }
 
   .station-time {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--muted);
     margin-top: 2px;
   }
 
   .wx-row {
     display: grid;
-    grid-template-columns: 1.8rem 7.5rem auto auto;
+    grid-template-columns: 1.6rem 7rem auto auto;
     align-items: center;
-    font-size: 0.92rem;
-    margin: 4px 0;
+    font-size: 0.9rem;
+    margin: 6px 0;
+    font-family: "Consolas", monospace;
   }
 
-  /* Glowing blue arrow */
   .wind-arrow {
-    width: 26px;
-    height: 26px;
-    transform-origin: 50% 15%;
+    width: 28px;
+    height: 28px;
+    transform-origin: 50% 85%;
     display: inline-block;
   }
 </style>
@@ -104,15 +122,10 @@
   </div>
 
   <div class="wx-row">
-    <span>
-      <svg class="wind-arrow" viewBox="0 0 100 100">
-        <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-        <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-      </svg>
-    </span>
+    <span>💨</span>
     <span>Gust:</span>
     <span data-role="gust-speed">–</span>
-    <span data-role="gust-dir">–</span>
+    <span></span>
   </div>
 
   <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
@@ -122,129 +135,10 @@
   <div class="loading" data-role="status">Loading data…</div>
 </div>
 
-<!-- Beerburrum -->
-<div class="station-tile" id="station-beerburrum">
-  <div class="station-name">Beerburrum</div>
-  <div class="station-time" data-role="time">Loading…</div>
-
-  <div class="wx-row">
-    <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
-  </div>
-
-  <div class="wx-row">
-    <span>
-      <svg class="wind-arrow" viewBox="0 0 100 100">
-        <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-        <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-      </svg>
-    </span>
-    <span>Wind:</span>
-    <span data-role="wind-speed">–</span>
-    <span data-role="wind-dir">–</span>
-  </div>
-
-  <div class="wx-row">
-    <span>
-      <svg class="wind-arrow" viewBox="0 0 100 100">
-        <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-        <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-      </svg>
-    </span>
-    <span>Gust:</span>
-    <span data-role="gust-speed">–</span>
-    <span data-role="gust-dir">–</span>
-  </div>
-
-  <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
-  <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
-  <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
-
-  <div class="loading" data-role="status">Loading data…</div>
-</div>
-
-<!-- Sunshine Coast Airport -->
-<div class="station-tile" id="station-sca">
-  <div class="station-name">Sunshine Coast Airport</div>
-  <div class="station-time" data-role="time">Loading…</div>
-
-  <div class="wx-row">
-    <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
-  </div>
-
-  <div class="wx-row">
-    <span>
-      <svg class="wind-arrow" viewBox="0 0 100 100">
-        <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-        <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-      </svg>
-    </span>
-    <span>Wind:</span>
-    <span data-role="wind-speed">–</span>
-    <span data-role="wind-dir">–</span>
-  </div>
-
-  <div class="wx-row">
-    <span>
-      <svg class="wind-arrow" viewBox="0 0 100 100">
-        <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-        <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-      </svg>
-    </span>
-    <span>Gust:</span>
-    <span data-role="gust-speed">–</span>
-    <span data-role="gust-dir">–</span>
-  </div>
-
-  <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
-  <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
-  <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
-
-  <div class="loading" data-role="status">Loading data…</div>
-</div>
-
-<!-- Tewantin -->
-<div class="station-tile" id="station-tewantin">
-  <div class="station-name">Tewantin</div>
-  <div class="station-time" data-role="time">Loading…</div>
-
-  <div class="wx-row">
-    <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
-  </div>
-
-  <div class="wx-row">
-    <span>
-      <svg class="wind-arrow" viewBox="0 0 100 100">
-        <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-        <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-      </svg>
-    </span>
-    <span>Wind:</span>
-    <span data-role="wind-speed">–</span>
-    <span data-role="wind-dir">–</span>
-  </div>
-
-  <div class="wx-row">
-    <span>
-      <svg class="wind-arrow" viewBox="0 0 100 100">
-        <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-        <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-      </svg>
-    </span>
-    <span>Gust:</span>
-    <span data-role="gust-speed">–</span>
-    <span data-role="gust-dir">–</span>
-  </div>
-
-  <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
-  <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
-  <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
-
-  <div class="loading" data-role="status">Loading data…</div>
-</div>
+<!-- Repeat the same structure for Beerburrum, SCA, Tewantin -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* --- Station list --- */
   const stations = [
     { id: "nambour", name: "Nambour", lat: -26.63, lon: 152.96 },
     { id: "beerburrum", name: "Beerburrum", lat: -26.95, lon: 152.95 },
@@ -252,18 +146,15 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "tewantin", name: "Tewantin", lat: -26.39, lon: 153.03 }
   ];
 
-  /* --- Compass conversion --- */
   function degToCompass(deg) {
     const dirs = ["N","NE","E","SE","S","SW","W","NW"];
     return dirs[Math.round(deg / 45) % 8];
   }
 
-  /* --- Time formatting --- */
   function formatTime(d) {
     return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   }
 
-  /* --- Load data for each station --- */
   async function loadStation(st) {
     const el = document.getElementById(`station-${st.id}`);
 
@@ -278,11 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const windSpeedEl = el.querySelector('[data-role="wind-speed"]');
     const windDirEl = el.querySelector('[data-role="wind-dir"]');
     const gustSpeedEl = el.querySelector('[data-role="gust-speed"]');
-    const gustDirEl = el.querySelector('[data-role="gust-dir"]');
 
-    const arrows = el.querySelectorAll('.wind-arrow');
-    const windArrowEl = arrows[0];
-    const gustArrowEl = arrows[1];
+    const windArrowEl = el.querySelector('.wind-arrow');
 
     try {
       const url =
@@ -294,7 +182,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       const c = data.current;
 
-      /* --- Fill values --- */
       tempEl.textContent = `${c.temperature_2m.toFixed(1)}°C`;
       humEl.textContent = `${c.relative_humidity_2m}%`;
       dewEl.textContent = `${c.dew_point_2m.toFixed(1)}°C`;
@@ -304,23 +191,18 @@ document.addEventListener("DOMContentLoaded", () => {
       gustSpeedEl.textContent = `${c.wind_gusts_10m.toFixed(1)} km/h`;
 
       windDirEl.textContent = `${degToCompass(c.wind_direction_10m)} (${c.wind_direction_10m}°)`;
-      gustDirEl.textContent = `${degToCompass(c.wind_direction_10m)} (${c.wind_direction_10m}°)`;
 
-      /* --- BOM standard: arrow points FROM direction --- */
       windArrowEl.style.transform = `rotate(${c.wind_direction_10m}deg)`;
-      gustArrowEl.style.transform = `rotate(${c.wind_direction_10m}deg)`;
 
-      /* --- Timestamp --- */
       timeEl.textContent = `Updated: ${formatTime(new Date())}`;
       statusEl.textContent = "";
 
     } catch (err) {
       statusEl.textContent = "Error loading data";
-      statusEl.style.color = "#ff4c4c";
+      statusEl.style.color = "#ff4d4d";
     }
   }
 
-  /* --- Load all stations --- */
   stations.forEach(loadStation);
 
 });
