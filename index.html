@@ -7,65 +7,77 @@
 <style>
   body {
     font-family: system-ui, sans-serif;
-    background: #0b1020;
-    color: #fff;
-    padding: 20px;
+    background:#0b1020;
+    color:#fff;
+    padding:20px;
+    text-align:center;
   }
-
-  h1 { margin-bottom: 1rem; }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+  h1{margin-bottom:1rem;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+    margin-bottom:30px;
   }
-
-  .card {
-    background: #111628;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #222842;
-    min-height: 190px;
-    display: flex;
-    flex-direction: column;
+  .card{
+    background:#111628;
+    padding:15px;
+    border-radius:8px;
+    border:1px solid #222842;
+    min-height:190px;
+    display:flex;
+    flex-direction:column;
+    text-align:left;
   }
-
-  .name {
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
+  .name{
+    font-size:1.2rem;
+    margin-bottom:8px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
   }
-
-  .station-icon {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
-    opacity: 0.9;
+  .station-icon{
+    width:18px;height:18px;margin-right:8px;opacity:0.9;
   }
-
-  .row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 6px;
+  .row{display:flex;align-items:center;margin-bottom:6px;}
+  #compass-container{
+    position:relative;
+    width:220px;height:260px;
+    margin:0 auto;
   }
-
-  .icon, .wind-arrow {
-    width: 22px;
-    height: 22px;
-    margin-right: 8px;
+  #compass-base{
+    width:220px;height:220px;
+    border-radius:50%;
+    border:2px solid #888;
+    background:radial-gradient(circle at center,#1a1f33 60%,#0b1020 100%);
+    position:relative;
+    margin:0 auto;
   }
-
-  .wind-arrow {
-    transition: transform 0.4s ease;
+  .label{
+    position:absolute;
+    color:#fff;
+    font-size:0.8rem;
+    font-weight:bold;
   }
-
-  .disclaimer {
-    margin-top: 20px;
-    font-size: 0.85rem;
-    color: #aaa;
-    text-align: center;
+  .label.n{top:5px;left:50%;transform:translateX(-50%);}
+  .label.s{bottom:5px;left:50%;transform:translateX(-50%);}
+  .label.e{top:50%;right:5px;transform:translateY(-50%);}
+  .label.w{top:50%;left:5px;transform:translateY(-50%);}
+  #device-arrow,#wind-arrow{
+    position:absolute;
+    width:0;height:0;
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+    border-bottom:40px solid;
+    left:50%;top:50%;
+    transform-origin:center bottom;
+  }
+  #device-arrow{border-bottom-color:#ff5252;}
+  #wind-arrow{border-bottom-color:#00e5ff;}
+  .disclaimer{
+    margin-top:20px;
+    font-size:0.85rem;
+    color:#aaa;
   }
 </style>
 </head>
@@ -74,17 +86,49 @@
 <h1>Sunshine Coast Weather Stations</h1>
 
 <div class="grid">
-  <div class="card"><div class="name"><img class="station-icon" src="data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' fill='%23ff7043' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">Nambour</div><div id="nambour">Loading…</div></div>
+  <div class="card">
+    <div class="name">
+      <img class="station-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23ff7043' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
+      Nambour
+    </div>
+    <div id="nambour">Loading…</div>
+  </div>
 
-  <div class="card"><div class="name"><img class="station-icon" src="data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">Beerburrum</div><div id="beerburrum">Loading…</div></div>
+  <div class="card">
+    <div class="name">
+      <img class="station-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
+      Beerburrum
+    </div>
+    <div id="beerburrum">Loading…</div>
+  </div>
 
-  <div class="card"><div class="name"><img class="station-icon" src="data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' fill='%2300e5ff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">Sunshine Coast Airport</div><div id="sunshine">Loading…</div></div>
+  <div class="card">
+    <div class="name">
+      <img class="station-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2300e5ff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
+      Sunshine Coast Airport
+    </div>
+    <div id="sunshine">Loading…</div>
+  </div>
 
-  <div class="card"><div class="name"><img class="station-icon" src="data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' fill='%23ffeb3b' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">Tewantin</div><div id="tewantin">Loading…</div></div>
+  <div class="card">
+    <div class="name">
+      <img class="station-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23ffeb3b' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
+      Tewantin
+    </div>
+    <div id="tewantin">Loading…</div>
+  </div>
+</div>
+
+<div id="compass-container">
+  <div id="compass-base">
+    <div class="label n">N</div>
+    <div class="label e">E</div>
+    <div class="label s">S</div>
+    <div class="label w">W</div>
+    <div id="device-arrow"></div>
+    <div id="wind-arrow"></div>
+  </div>
+  <p id="nearest-label" style="margin-top:10px;">Nearest station: —</p>
 </div>
 
 <p class="disclaimer">
@@ -92,147 +136,154 @@
 </p>
 
 <script>
-/* ---------------- ICONS (COLOURED) ---------------- */
-
-function iconTemp() {
-  return `<img class="icon" src="data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' fill='%23ff7043' viewBox='0 0 24 24'>
-    <path d='M13 15.07V5a1 1 0 10-2 0v10.07a4 4 0 102 0z'/>
-  </svg>">`;
+function windColour(speed){
+  if(speed<15) return "#00e5ff";
+  if(speed<30) return "#00bcd4";
+  if(speed<45) return "#ffb74d";
+  return "#ff5252";
 }
-
-function iconHumidity() {
-  return `<img class="icon" src="data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'>
-    <path d='M12 2.69l5.66 5.66a8 8 0 11-11.31 0L12 2.69z'/>
-  </svg>">`;
+function humidityColour(rh){
+  if(rh>60) return "#44aaff";
+  if(rh>40) return "#00e5ff";
+  if(rh>20) return "#ffeb3b";
+  return "#ff5252";
 }
-
-function iconRain() {
-  return `<img class="icon" src="data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'>
-    <path d='M8 19a2 2 0 104 0 2 2 0 00-4 0zm4-4a2 2 0 104 0 2 2 0 00-4 0z'/>
-  </svg>">`;
-}
-
-function iconWindArrow(deg) {
-  return `<img class="wind-arrow" style="transform: rotate(${deg}deg)" 
-    src="data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' fill='%2300e5ff' viewBox='0 0 24 24'>
-      <path d='M12 2l4 8h-3v12h-2V10H8l4-8z'/>
-    </svg>">`;
-}
-
-/* ---------------- COLOUR LOGIC ---------------- */
-
-function windColour(speed) {
-  if (speed < 15) return "#00e5ff";
-  if (speed < 30) return "#00bcd4";
-  if (speed < 45) return "#ffb74d";
+function tempColour(t){
+  if(t<15) return "#44aaff";
+  if(t<25) return "#ffeb3b";
+  if(t<32) return "#ff9800";
   return "#ff5252";
 }
 
-function humidityColour(rh) {
-  if (rh > 60) return "#44aaff";
-  if (rh > 40) return "#00e5ff";
-  if (rh > 20) return "#ffeb3b";
-  return "#ff5252";
-}
+const stations = [
+  {id:"nambour",   name:"Nambour",               lat:-26.63, lon:152.96},
+  {id:"beerburrum",name:"Beerburrum",           lat:-26.95, lon:153.06},
+  {id:"sunshine",  name:"Sunshine Coast Airport",lat:-26.60, lon:153.09},
+  {id:"tewantin",  name:"Tewantin",             lat:-26.39, lon:153.03}
+];
 
-function tempColour(t) {
-  if (t < 15) return "#44aaff";
-  if (t < 25) return "#ffeb3b";
-  if (t < 32) return "#ff9800";
-  return "#ff5252";
-}
-
-/* ---------------- FETCH + RENDER ---------------- */
-
-async function loadStation(elId, lat, lon) {
-
-  const nowUrl = "https://api.open-meteo.com/v1/forecast?" +
-    new URLSearchParams({
-      latitude: lat,
-      longitude: lon,
-      current: "temperature_2m,apparent_temperature,dew_point_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
-      timezone: "Australia/Brisbane"
-    });
-
-  const rainUrl = "https://archive-api.open-meteo.com/v1/archive?" +
-    new URLSearchParams({
-      latitude: lat,
-      longitude: lon,
-      start_date: getPastDate(1),
-      end_date: getPastDate(0),
-      daily: "precipitation_sum",
-      timezone: "Australia/Brisbane"
-    });
-
-  try {
-    const [nowRes, rainRes] = await Promise.all([fetch(nowUrl), fetch(rainUrl)]);
-    const now = await nowRes.json();
-    const rain = await rainRes.json();
-
-    const c = now.current;
-    const rain24 = rain.daily.precipitation_sum[0];
-
-    document.getElementById(elId).innerHTML = `
-      <div class="row">${iconTemp()}
-        <span style="color:${tempColour(c.temperature_2m)}">
-          ${c.temperature_2m}°C
-        </span>
-      </div>
-
-      <div class="row">${iconTemp()}
-        <span style="color:${tempColour(c.apparent_temperature)}">
-          Feels like: ${c.apparent_temperature}°C
-        </span>
-      </div>
-
-      <div class="row">${iconHumidity()}
-        <span style="color:${humidityColour(c.relative_humidity_2m)}">
-          ${c.relative_humidity_2m}%
-        </span>
-      </div>
-
-      <div class="row">${iconHumidity()}
-        <span style="color:${humidityColour(c.dew_point_2m)}">
-          Dew point: ${c.dew_point_2m}°C
-        </span>
-      </div>
-
-      <div class="row">${iconWindArrow(c.wind_direction_10m)}
-        <span style="color:${windColour(c.wind_speed_10m)}">
-          ${c.wind_speed_10m} km/h
-        </span>
-      </div>
-
-      <div class="row">${iconWindArrow(c.wind_direction_10m)}
-        <span style="color:${windColour(c.wind_gusts_10m)}">
-          Gusts: ${c.wind_gusts_10m} km/h
-        </span>
-      </div>
-
-      <div class="row">${iconRain()} Rain (24h): ${rain24} mm</div>
-    `;
-  } catch (err) {
-    document.getElementById(elId).textContent = "Error loading data";
-    console.error(err);
-  }
-}
-
-function getPastDate(days) {
+function getPastDate(days){
   const d = new Date();
   d.setDate(d.getDate() - days);
   return d.toISOString().split("T")[0];
 }
 
-/* ---------------- STATION COORDINATES ---------------- */
+async function loadStation(st){
+  const nowUrl = "https://api.open-meteo.com/v1/forecast?" + new URLSearchParams({
+    latitude:st.lat,
+    longitude:st.lon,
+    current:"temperature_2m,apparent_temperature,dew_point_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+    timezone:"Australia/Brisbane"
+  });
+  const rainUrl = "https://archive-api.open-meteo.com/v1/archive?" + new URLSearchParams({
+    latitude:st.lat,
+    longitude:st.lon,
+    start_date:getPastDate(1),
+    end_date:getPastDate(0),
+    daily:"precipitation_sum",
+    timezone:"Australia/Brisbane"
+  });
 
-loadStation("nambour",    -26.63, 152.96);
-loadStation("beerburrum", -26.95, 153.06);
-loadStation("sunshine",   -26.60, 153.09);
-loadStation("tewantin",   -26.39, 153.03);
+  try{
+    const [nowRes, rainRes] = await Promise.all([fetch(nowUrl), fetch(rainUrl)]);
+    const now = await nowRes.json();
+    const rain = await rainRes.json();
+    const c = now.current;
+    const rain24 = rain.daily && rain.daily.precipitation_sum ? rain.daily.precipitation_sum[0] : 0;
+
+    st.windDir = c.wind_direction_10m;
+
+    document.getElementById(st.id).innerHTML = `
+      <div class="row"><span style="color:${tempColour(c.temperature_2m)}">Temp: ${c.temperature_2m}°C</span></div>
+      <div class="row"><span style="color:${tempColour(c.apparent_temperature)}">Feels like: ${c.apparent_temperature}°C</span></div>
+      <div class="row"><span style="color:${humidityColour(c.relative_humidity_2m)}">Humidity: ${c.relative_humidity_2m}%</span></div>
+      <div class="row"><span style="color:${humidityColour(c.dew_point_2m)}">Dew point: ${c.dew_point_2m}°C</span></div>
+      <div class="row"><span style="color:${windColour(c.wind_speed_10m)}">Wind: ${c.wind_speed_10m} km/h</span></div>
+      <div class="row"><span style="color:${windColour(c.wind_gusts_10m)}">Gusts: ${c.wind_gusts_10m} km/h</span></div>
+      <div class="row">Rain (24h): ${rain24} mm</div>
+    `;
+  }catch(e){
+    console.error(e);
+    document.getElementById(st.id).textContent = "Error loading data";
+  }
+}
+
+function haversine(lat1,lon1,lat2,lon2){
+  const R = 6371;
+  const toRad = x => x*Math.PI/180;
+  const dLat = toRad(lat2-lat1);
+  const dLon = toRad(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+function findNearestStation(lat,lon){
+  let best = null;
+  let bestDist = Infinity;
+  for(const st of stations){
+    const d = haversine(lat,lon,st.lat,st.lon);
+    if(d < bestDist){
+      bestDist = d;
+      best = st;
+    }
+  }
+  return best;
+}
+
+function initCompass(nearest){
+  const windArrow = document.getElementById("wind-arrow");
+  const label = document.getElementById("nearest-label");
+
+  if(nearest && typeof nearest.windDir === "number"){
+    windArrow.style.transform = `translate(-50%, -100%) rotate(${nearest.windDir}deg)`;
+    label.textContent = `Nearest station: ${nearest.name}`;
+  }else{
+    label.textContent = "Nearest station: (no wind data yet)";
+  }
+
+  if (window.DeviceOrientationEvent) {
+    function handleOrientation(event){
+      let heading = event.alpha;
+      if(typeof event.webkitCompassHeading === "number"){
+        heading = event.webkitCompassHeading;
+      }
+      if(typeof heading === "number"){
+        const deviceArrow = document.getElementById("device-arrow");
+        deviceArrow.style.transform = `translate(-50%, -100%) rotate(${heading}deg)`;
+      }
+    }
+
+    if (typeof DeviceOrientationEvent.requestPermission === "function") {
+      DeviceOrientationEvent.requestPermission().then(state=>{
+        if(state === "granted"){
+          window.addEventListener("deviceorientation", handleOrientation, true);
+        }
+      }).catch(console.error);
+    } else {
+      window.addEventListener("deviceorientation", handleOrientation, true);
+    }
+  }
+}
+
+async function init(){
+  await Promise.all(stations.map(loadStation));
+
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const {latitude, longitude} = pos.coords;
+      const nearest = findNearestStation(latitude, longitude);
+      initCompass(nearest);
+    }, err=>{
+      console.warn("Geolocation failed", err);
+      initCompass(null);
+    });
+  }else{
+    initCompass(null);
+  }
+}
+
+init();
 </script>
 
 </body>
