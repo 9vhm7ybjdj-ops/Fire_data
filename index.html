@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>4‑Station Weather – Coloured Icons + Wind/Humidity Colours</title>
+<title>Sunshine Coast Weather Stations</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
@@ -25,12 +25,24 @@
     padding: 15px;
     border-radius: 8px;
     border: 1px solid #222842;
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
   }
 
   .name {
     font-size: 1.2rem;
     margin-bottom: 8px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+
+  .station-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    opacity: 0.9;
   }
 
   .row {
@@ -59,13 +71,20 @@
 </head>
 <body>
 
-<h1>4‑Station Weather – Coloured Icons + Wind/Humidity Colours</h1>
+<h1>Sunshine Coast Weather Stations</h1>
 
 <div class="grid">
-  <div class="card"><div class="name">Nambour</div><div id="nambour">Loading…</div></div>
-  <div class="card"><div class="name">Beerburrum</div><div id="beerburrum">Loading…</div></div>
-  <div class="card"><div class="name">Sunshine Coast Airport</div><div id="sunshine">Loading…</div></div>
-  <div class="card"><div class="name">Tewantin</div><div id="tewantin">Loading…</div></div>
+  <div class="card"><div class="name"><img class="station-icon" src="data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' fill='%23ff7043' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">Nambour</div><div id="nambour">Loading…</div></div>
+
+  <div class="card"><div class="name"><img class="station-icon" src="data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">Beerburrum</div><div id="beerburrum">Loading…</div></div>
+
+  <div class="card"><div class="name"><img class="station-icon" src="data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' fill='%2300e5ff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">Sunshine Coast Airport</div><div id="sunshine">Loading…</div></div>
+
+  <div class="card"><div class="name"><img class="station-icon" src="data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' fill='%23ffeb3b' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">Tewantin</div><div id="tewantin">Loading…</div></div>
 </div>
 
 <p class="disclaimer">
@@ -120,28 +139,65 @@ function humidityColour(rh) {
   return "#ff5252";
 }
 
+function tempColour(t) {
+  if (t < 15) return "#44aaff";
+  if (t < 25) return "#ffeb3b";
+  if (t < 32) return "#ff9800";
+  return "#ff5252";
+}
+
 /* ---------------- FETCH + RENDER ---------------- */
 
 async function loadStation(elId, lat, lon) {
-  const url = "https://api.open-meteo.com/v1/forecast?" +
+
+  const nowUrl = "https://api.open-meteo.com/v1/forecast?" +
     new URLSearchParams({
       latitude: lat,
       longitude: lon,
-      current: "temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation",
+      current: "temperature_2m,apparent_temperature,dew_point_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+      timezone: "Australia/Brisbane"
+    });
+
+  const rainUrl = "https://archive-api.open-meteo.com/v1/archive?" +
+    new URLSearchParams({
+      latitude: lat,
+      longitude: lon,
+      start_date: getPastDate(1),
+      end_date: getPastDate(0),
+      daily: "precipitation_sum",
       timezone: "Australia/Brisbane"
     });
 
   try {
-    const res = await fetch(url);
-    const data = await res.json();
-    const c = data.current;
+    const [nowRes, rainRes] = await Promise.all([fetch(nowUrl), fetch(rainUrl)]);
+    const now = await nowRes.json();
+    const rain = await rainRes.json();
+
+    const c = now.current;
+    const rain24 = rain.daily.precipitation_sum[0];
 
     document.getElementById(elId).innerHTML = `
-      <div class="row">${iconTemp()} ${c.temperature_2m}°C</div>
+      <div class="row">${iconTemp()}
+        <span style="color:${tempColour(c.temperature_2m)}">
+          ${c.temperature_2m}°C
+        </span>
+      </div>
+
+      <div class="row">${iconTemp()}
+        <span style="color:${tempColour(c.apparent_temperature)}">
+          Feels like: ${c.apparent_temperature}°C
+        </span>
+      </div>
 
       <div class="row">${iconHumidity()}
         <span style="color:${humidityColour(c.relative_humidity_2m)}">
           ${c.relative_humidity_2m}%
+        </span>
+      </div>
+
+      <div class="row">${iconHumidity()}
+        <span style="color:${humidityColour(c.dew_point_2m)}">
+          Dew point: ${c.dew_point_2m}°C
         </span>
       </div>
 
@@ -157,12 +213,18 @@ async function loadStation(elId, lat, lon) {
         </span>
       </div>
 
-      <div class="row">${iconRain()} Rain (24h): ${c.precipitation} mm</div>
+      <div class="row">${iconRain()} Rain (24h): ${rain24} mm</div>
     `;
   } catch (err) {
     document.getElementById(elId).textContent = "Error loading data";
     console.error(err);
   }
+}
+
+function getPastDate(days) {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d.toISOString().split("T")[0];
 }
 
 /* ---------------- STATION COORDINATES ---------------- */
