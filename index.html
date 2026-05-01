@@ -1,533 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sunshine Coast Fire Weather</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --bg: #0b1020;
-      --card-bg: #151b2f;
-      --text: #f5f5f5;
-      --muted: #9ea4c0;
-      --accent: #4caf50;
-      --border: #222842;
-      --danger: #f44336;
-      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: var(--font);
-      background: radial-gradient(circle at top, #1b2340 0, #050814 55%, #000 100%);
-      color: var(--text);
-    }
-
-    h1 {
-      text-align: center;
-      margin: 1rem 0 0.5rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .page {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 1rem 2rem;
-    }
-
-    /* ===== Curved AFDRS gauge ===== */
-
-    .gauge-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .afdrs-gauge {
-      width: 320px;
-      height: 160px;
-      border-radius: 160px 160px 0 0;
-      overflow: hidden;
-      border: 4px solid #000;
-      background: #000;
-      position: relative;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-    }
-
-    .afdrs-band {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: flex-end;
-    }
-
-    .afdrs-seg {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 0.4rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      border-right: 1px solid rgba(0, 0, 0, 0.4);
-    }
-
-    .afdrs-seg:last-child {
-      border-right: none;
-    }
-
-    .afdrs-seg.norate { background: #ffffff; color: #000; }
-    .afdrs-seg.mod    { background: #4caf50; color: #000; }
-    .afdrs-seg.high   { background: #ffeb3b; color: #000; }
-    .afdrs-seg.ext    { background: #ff9800; color: #000; }
-    .afdrs-seg.cat    { background: #f44336; color: #fff; }
-
-    .afdrs-pointer {
-      position: absolute;
-      bottom: -12px;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 22px solid #ffffff;
-      transform-origin: 50% 100%;
-      transform: translateX(-50%) rotate(-90deg);
-      filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));
-      border-radius: 2px;
-      border: 1px solid #000;
-    }
-
-    .afdrs-label {
-      margin-top: 0.4rem;
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text);
-    }
-
-    .afdrs-label span {
-      padding: 0.15rem 0.5rem;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    /* ===== Station cards ===== */
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1rem;
-    }
-
-    .card {
-      background: radial-gradient(circle at top left, #202744 0, #111628 55%, #050814 100%);
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      padding: 0.9rem 0.9rem 0.8rem;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 0.4rem;
-    }
-
-    .card-title {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .card-sub {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.35rem 0.75rem;
-      margin-top: 0.4rem;
-      font-size: 0.8rem;
-    }
-
-    .metric-label {
-      color: var(--muted);
-      font-size: 0.75rem;
-    }
-
-    .metric-value {
-      font-weight: 500;
-    }
-
-    .ffdi-value {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .sparkline-wrap {
-      margin-top: 0.5rem;
-    }
-
-    .sparkline-label {
-      font-size: 0.7rem;
-      color: var(--muted);
-      margin-bottom: 0.15rem;
-    }
-
-    canvas.spark {
-      width: 100%;
-      height: 40px;
-      display: block;
-      background: rgba(0, 0, 0, 0.35);
-      border-radius: 6px;
-    }
-
-    .footer-note {
-      margin-top: 1.2rem;
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    @media (max-width: 600px) {
-      .afdrs-gauge {
-        width: 260px;
-        height: 130px;
-        border-radius: 130px 130px 0 0;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Open‑Meteo Test – Beerburrum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #0b1020;
+    color: #fff;
+    padding: 20px;
+  }
+  h1 { margin-bottom: 0.5rem; }
+  pre {
+    background: #111628;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    border: 1px solid #222842;
+  }
+</style>
 </head>
 <body>
-  <div class="page">
-    <h1>Sunshine Coast Fire Weather</h1>
-    <div class="subtitle">Beerburrum AFDRS gauge · Open‑Meteo data · Locally computed FFDI</div>
 
-    <!-- Curved AFDRS gauge (Beerburrum-driven) -->
-    <div class="gauge-wrapper">
-      <div class="afdrs-gauge">
-        <div class="afdrs-band">
-          <div class="afdrs-seg norate">No rating</div>
-          <div class="afdrs-seg mod">Moderate</div>
-          <div class="afdrs-seg high">High</div>
-          <div class="afdrs-seg ext">Extreme</div>
-          <div class="afdrs-seg cat">Catastrophic</div>
-        </div>
-        <div id="afdrs-pointer" class="afdrs-pointer"></div>
-      </div>
-      <div class="afdrs-label">
-        AFDRS: <span id="afdrs-label-text">No rating</span>
-      </div>
-    </div>
+<h1>Open‑Meteo Test – Beerburrum</h1>
+<p>Simple test to confirm Open‑Meteo data loads correctly.</p>
 
-    <!-- Station cards -->
-    <div class="grid">
-      <div class="card" id="card-nambour">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Nambour (Hillside)</div>
-            <div class="card-sub">AWS</div>
-          </div>
-          <div class="ffdi-value" id="ffdi-nambour">–</div>
-        </div>
-        <div class="metrics">
-          <div>
-            <div class="metric-label">Temp</div>
-            <div class="metric-value" id="temp-nambour">–</div>
-          </div>
-          <div>
-            <div class="metric-label">RH</div>
-            <div class="metric-value" id="rh-nambour">–</div>
-          </div>
-          <div>
-            <div class="metric-label">Wind</div>
-            <div class="metric-value" id="wind-nambour">–</div>
-          </div>
-          <div>
-            <div class="metric-label">Rain (24h)</div>
-            <div class="metric-value" id="rain-nambour">–</div>
-          </div>
-        </div>
-        <div class="sparkline-wrap">
-          <div class="sparkline-label">FFDI last 24 hours</div>
-          <canvas id="spark-nambour" class="spark" width="240" height="40"></canvas>
-        </div>
-      </div>
+<h3>Current Weather:</h3>
+<pre id="weather">Loading…</pre>
 
-      <div class="card" id="card-beerburrum">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Beerburrum Forest</div>
-            <div class="card-sub">AWS · AFDRS gauge source</div>
-          </div>
-          <div class="ffdi-value" id="ffdi-beerburrum">–</div>
-        </div>
-        <div class="metrics">
-          <div>
-            <div class="metric-label">Temp</div>
-            <div class="metric-value" id="temp-beerburrum">–</div>
-          </div>
-          <div>
-            <div class="metric-label">RH</div>
-            <div class="metric-value" id="rh-beerburrum">–</div>
-          </div>
-          <div>
-            <div class="metric-label">Wind</div>
-            <div class="metric-value" id="wind-beerburrum">–</div>
-          </div>
-          <div>
-            <div class="metric-label">Rain (24h)</div>
-            <div class="metric-value" id="rain-beerburrum">–</div>
-          </div>
-        </div>
-        <div class="sparkline-wrap">
-          <div class="sparkline-label">FFDI last 24 hours</div>
-          <canvas id="spark-beerburrum" class="spark" width="240" height="40"></canvas>
-        </div>
-      </div>
+<script>
+async function fetchWeather() {
+  const lat = -26.95;
+  const lon = 153.06;
 
-      <div class="card" id="card-airport">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Sunshine Coast Airport</div>
-            <div class="card-sub">AWS</div>
-          </div>
-          <div class="ffdi-value" id="ffdi-airport">–</div>
-        </div>
-        <div class="metrics">
-          <div>
-            <div class="metric-label">Temp</div>
-            <div class="metric-value" id="temp-airport">–</div>
-          </div>
-          <div>
-            <div class="metric-label">RH</div>
-            <div class="metric-value" id="rh-airport">–</div>
-          </div>
-          <div>
-            <div class="metric-label">Wind</div>
-            <div class="metric-value" id="wind-airport">–</div>
-          </div>
-          <div>
-            <div class="metric-label">Rain (24h)</div>
-            <div class="metric-value" id="rain-airport">–</div>
-          </div>
-        </div>
-        <div class="sparkline-wrap">
-          <div class="sparkline-label">FFDI last 24 hours</div>
-          <canvas id="spark-airport" class="spark" width="240" height="40"></canvas>
-        </div>
-      </div>
+  const url = "https://api.open-meteo.com/v1/forecast?" +
+    new URLSearchParams({
+      latitude: lat,
+      longitude: lon,
+      current: "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
+      timezone: "Australia/Brisbane"
+    });
 
-      <div class="card" id="card-tewantin">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Tewantin RSL Park</div>
-            <div class="card-sub">AWS</div>
-          </div>
-          <div class="ffdi-value" id="ffdi-tewantin">–</div>
-        </div>
-        <div class="metrics">
-          <div>
-            <div class="metric-label">Temp</div>
-            <div class="metric-value" id="temp-tewantin">–</div>
-          </div>
-          <div>
-            <div class="metric-label">RH</div>
-            <div class="metric-value" id="rh-tewantin">–</div>
-          </div>
-          <div>
-            <div class="metric-label">Wind</div>
-            <div class="metric-value" id="wind-tewantin">–</div>
-          </div>
-          <div>
-            <div class="metric-label">Rain (24h)</div>
-            <div class="metric-value" id="rain-tewantin">–</div>
-          </div>
-        </div>
-        <div class="sparkline-wrap">
-          <div class="sparkline-label">FFDI last 24 hours</div>
-          <canvas id="spark-tewantin" class="spark" width="240" height="40"></canvas>
-        </div>
-      </div>
-    </div>
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch weather: " + res.status);
 
-    <div class="footer-note">
-      Fire weather data from Open‑Meteo. FFDI and AFDRS category computed locally using Beerburrum Forest as the AFDRS reference.
-    </div>
+  const data = await res.json();
+  return data.current;
+}
 
-    <script>
-      const stations = {
-        nambour:   { lat: -26.64, lon: 152.96, label: "nambour" },
-        beerburrum:{ lat: -26.95, lon: 153.06, label: "beerburrum" },
-        airport:   { lat: -26.60, lon: 153.09, label: "airport" },
-        tewantin:  { lat: -26.39, lon: 153.04, label: "tewantin" }
-      };
+(async () => {
+  try {
+    const w = await fetchWeather();
 
-      function computeFFDI(tempC, rh, windKmh, rain24h) {
-        const T = tempC;
-        const H = Math.max(1, Math.min(100, rh));
-        const V = Math.max(0.1, windKmh);
-        const D = Math.max(0, 10 - rain24h * 2);
-        const log10 = Math.log(10);
-        const ln10 = Math.log(10);
-        const lnV = Math.log(V);
-        const lnD = Math.log(Math.max(D, 0.1));
-        const lnH = Math.log(H);
+    document.getElementById("weather").textContent =
+      `Temperature: ${w.temperature_2m}°C\n` +
+      `Humidity: ${w.relative_humidity_2m}%\n` +
+      `Wind: ${w.wind_speed_10m} km/h\n` +
+      `Rain (current): ${w.precipitation} mm`;
+  } catch (err) {
+    document.getElementById("weather").textContent = "Error loading data";
+    console.error(err);
+  }
+})();
+</script>
 
-        const F =
-          -0.45 +
-          0.987 * T -
-          0.0345 * H +
-          0.0338 * V +
-          0.0234 * D;
-
-        const ffdi = Math.max(0, Math.exp(F * ln10));
-        return ffdi;
-      }
-
-      async function loadStation(name, lat, lon) {
-        const base = "https://api.open-meteo.com/v1/forecast";
-        const params = new URLSearchParams({
-          latitude: lat,
-          longitude: lon,
-          hourly: "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
-          timezone: "Australia/Brisbane",
-          past_days: "1"
-        });
-
-        const url = `${base}?${params.toString()}`;
-
-        try {
-          const res = await fetch(url);
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          const data = await res.json();
-          const temps = data.hourly.temperature_2m.slice(-24);
-          const rhs   = data.hourly.relative_humidity_2m.slice(-24);
-          const winds = data.hourly.wind_speed_10m.slice(-24).map(v => v * 3.6);
-          const rains = data.hourly.precipitation.slice(-24);
-
-          const ffdiSeries = temps.map((t, i) =>
-            computeFFDI(t, rhs[i], winds[i], rains[i])
-          );
-
-          const latestIndex = ffdiSeries.length - 1;
-          const latestFFDI  = ffdiSeries[latestIndex];
-          const latestTemp  = temps[latestIndex];
-          const latestRH    = rhs[latestIndex];
-          const latestWind  = winds[latestIndex];
-
-          const rain24 = rains.reduce((a, b) => a + b, 0);
-
-          const label = stations[name].label;
-
-          document.getElementById(`ffdi-${label}`).textContent  = latestFFDI.toFixed(1);
-          document.getElementById(`temp-${label}`).textContent  = `${latestTemp.toFixed(1)} °C`;
-          document.getElementById(`rh-${label}`).textContent    = `${latestRH.toFixed(0)} %`;
-          document.getElementById(`wind-${label}`).textContent  = `${latestWind.toFixed(1)} km/h`;
-          document.getElementById(`rain-${label}`).textContent  = `${rain24.toFixed(1)} mm`;
-
-          // Draw sparkline
-          const spark = document.getElementById(`spark-${label}`);
-          if (spark && spark.getContext) {
-            const ctx = spark.getContext("2d");
-            const maxVal = Math.max(...ffdiSeries);
-            const minVal = Math.min(...ffdiSeries);
-
-            ctx.clearRect(0, 0, spark.width, spark.height);
-
-            for (let i = 1; i < ffdiSeries.length; i++) {
-              const v1 = ffdiSeries[i - 1];
-              const v2 = ffdiSeries[i];
-
-              const x1 = ((i - 1) / 23) * spark.width;
-              const y1 = spark.height - ((v1 - minVal) / (maxVal - minVal + 0.01)) * spark.height;
-
-              const x2 = (i / 23) * spark.width;
-              const y2 = spark.height - ((v2 - minVal) / (maxVal - minVal + 0.01)) * spark.height;
-
-              let colour = "#ffffff";
-              if (v2 >= 5 && v2 < 12) colour = "#4caf50";
-              else if (v2 >= 12 && v2 < 25) colour = "#ffeb3b";
-              else if (v2 >= 25 && v2 < 50) colour = "#ff9800";
-              else if (v2 >= 50) colour = "#f44336";
-
-              ctx.strokeStyle = colour;
-              ctx.lineWidth = 2;
-              ctx.beginPath();
-              ctx.moveTo(x1, y1);
-              ctx.lineTo(x2, y2);
-              ctx.stroke();
-            }
-          }
-
-          // If this is Beerburrum, update the global AFDRS gauge
-          if (name === "beerburrum") {
-            updateGauge(latestFFDI);
-          }
-
-        } catch (err) {
-          console.error(name, err);
-        }
-      }
-
-      function updateGauge(ffdi) {
-        let category = "No rating";
-        let index = 0;
-
-        if (ffdi >= 5 && ffdi < 12) {
-          category = "Moderate"; index = 1;
-        } else if (ffdi >= 12 && ffdi < 25) {
-          category = "High"; index = 2;
-        } else if (ffdi >= 25 && ffdi < 50) {
-          category = "Extreme"; index = 3;
-        } else if (ffdi >= 50) {
-          category = "Catastrophic"; index = 4;
-        }
-
-        const pointer = document.getElementById("afdrs-pointer");
-        const labelEl = document.getElementById("afdrs-label-text");
-
-        if (pointer) {
-          const angle = -90 + index * 45; // -90, -45, 0, 45, 90
-          pointer.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-        }
-
-        if (labelEl) {
-          labelEl.textContent = category;
-        }
-      }
-      function loadAll() {
-        for (const [name, s] of Object.entries(stations)) {
-          loadStation(name, s.lat, s.lon);
-        }
-      }
-
-      loadAll();
-      setInterval(loadAll, 5 * 60 * 1000);
-    </script>
-  </div>
 </body>
 </html>
