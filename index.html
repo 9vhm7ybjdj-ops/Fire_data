@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fireground Tactical v4</title>
+<title>Fireground Tactical v5</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 
@@ -109,6 +109,7 @@ body::before {
   border-radius: 6px;
   position: relative;
   box-shadow: inset 0 0 12px #000, 0 0 12px #000;
+  transition: box-shadow 0.2s ease;
 }
 
 @media (max-width: 600px) {
@@ -190,9 +191,9 @@ body::before {
   }
 }
 
-/* GUST WARNING (STATIC GLOW) */
+/* TILE-ONLY RED GLOW */
 .gust-pulse {
-  box-shadow: 0 0 12px #ff4d4d;
+  box-shadow: 0 0 22px #ff4d4d !important;
 }
 
 /* MODE TOGGLES */
@@ -281,7 +282,6 @@ body.red.nvg {
   <!-- GRID -->
   <div class="grid">
 
-    <!-- TEMPLATE FOR EACH STATION -->
     <!-- NAMBOUR -->
     <div class="tile">
       <div class="station-name">NAMBOUR</div>
@@ -371,7 +371,6 @@ body.red.nvg {
     </div>
 
   </div> <!-- end grid -->
-
   <script>
     /* DEMO DATA */
     const demoData = {
@@ -394,10 +393,12 @@ body.red.nvg {
       document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
       document.getElementById(`updated-${id}`).textContent = `Updated: ${formatTime(new Date())}`;
 
-      /* GUST WARNING */
+      /* TILE-ONLY GUST GLOW */
       const tile = document.getElementById(`gust-${id}`).closest('.tile');
       tile.classList.remove('gust-pulse');
-      if (data.gust > data.wind && data.gust > 40) tile.classList.add('gust-pulse');
+
+      if (data.gust > data.wind && data.gust > 40)
+        tile.classList.add('gust-pulse');
 
       /* ARROW ROTATION */
       document.getElementById(`arrow-${id}`).style.transform = `rotate(${data.dir}deg)`;
@@ -424,8 +425,7 @@ body.red.nvg {
       }
     });
 
-    redToggle.addEventListener('change', () => {
-    redToggle.addEventListener('change', () => {
+      redToggle.addEventListener('change', () => {
       if (redToggle.checked) {
         nvgToggle.checked = false;
         document.body.classList.add('red');
