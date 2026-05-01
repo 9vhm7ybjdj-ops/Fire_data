@@ -27,11 +27,62 @@
   }
 
   h1 {
-    margin: 0 0 14px;
+    margin: 0 0 10px;
     font-size: 1.4rem;
     font-weight: 600;
     color: var(--accent);
     text-transform: uppercase;
+  }
+
+  /* Tactical hardware toggle switch */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    user-select: none;
+    font-family: Consolas, monospace;
+    color: var(--accent);
+  }
+
+  .toggle-wrap input {
+    display: none;
+  }
+
+  .toggle-switch {
+    width: 52px;
+    height: 26px;
+    background: #0f0f0f;
+    border: 2px solid #1f1f1f;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: inset 0 0 6px #000;
+    transition: background 0.2s ease;
+  }
+
+  .toggle-switch::after {
+    content: "";
+    width: 22px;
+    height: 22px;
+    background: #222;
+    border-radius: 50%;
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    transition: transform 0.2s ease, background 0.2s ease;
+    box-shadow: 0 0 4px #000;
+  }
+
+  .toggle-wrap input:checked + .toggle-switch {
+    background: #1a3f1a;
+    box-shadow: inset 0 0 10px #0f0;
+  }
+
+  .toggle-wrap input:checked + .toggle-switch::after {
+    transform: translateX(26px);
+    background: #4cff4c;
+    box-shadow: 0 0 8px #4cff4c;
   }
 
   .grid {
@@ -87,57 +138,203 @@
     transform-origin: 50% 85%;
     display: inline-block;
   }
+
+  /* NIGHT VISION MODE */
+  body.nvg {
+    --bg: #020f02;
+    --tile-bg: #031703;
+    --tile-edge: #0a2a0a;
+    --text: #9bff9b;
+    --muted: #4fa64f;
+    --accent: #b6ffb6;
+  }
+
+  body.nvg .station-tile {
+    box-shadow: 0 0 12px #0f3f0f inset;
+  }
+
+  body.nvg .wind-arrow polygon,
+  body.nvg .wind-arrow rect {
+    fill: #b6ffb6;
+    filter: drop-shadow(0 0 6px #6aff6a);
+  }
+
+  body.nvg h1,
+  body.nvg .station-name {
+    color: #b6ffb6;
+  }
 </style>
 </head>
 
 <body>
 <h1>Sunshine Coast Weather</h1>
 
+<label class="toggle-wrap">
+  <input type="checkbox" id="nvgCheck">
+  <div class="toggle-switch"></div>
+  <span>Night Vision Mode</span>
+</label>
+
 <div class="grid">
-<!-- Nambour -->
-<div class="station-tile" id="station-nambour">
-  <div class="station-name">Nambour</div>
-  <div class="station-time" data-role="time">Loading…</div>
 
-  <div class="wx-row">
-    <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
+  <!-- Nambour -->
+  <div class="station-tile" id="station-nambour">
+    <div class="station-name">Nambour</div>
+    <div class="station-time" data-role="time">Loading…</div>
+
+    <div class="wx-row">
+      <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
+    </div>
+
+    <div class="wx-row">
+      <span>
+        <svg class="wind-arrow" viewBox="0 0 100 100">
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
+          <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
+        </svg>
+      </span>
+      <span>Wind:</span>
+      <span data-role="wind-speed">–</span>
+      <span data-role="wind-dir">–</span>
+    </div>
+
+    <div class="wx-row">
+      <span>💨</span>
+      <span>Gust:</span>
+      <span data-role="gust-speed">–</span>
+      <span></span>
+    </div>
+
+    <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
+    <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
+    <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
+
+    <div class="loading" data-role="status">Loading data…</div>
   </div>
 
-  <div class="wx-row">
-    <span>
-      <svg class="wind-arrow" viewBox="0 0 100 100">
-        <defs>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-        <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-      </svg>
-    </span>
-    <span>Wind:</span>
-    <span data-role="wind-speed">–</span>
-    <span data-role="wind-dir">–</span>
+  <!-- Beerburrum -->
+  <div class="station-tile" id="station-beerburrum">
+    <div class="station-name">Beerburrum</div>
+    <div class="station-time" data-role="time">Loading…</div>
+
+    <div class="wx-row">
+      <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
+    </div>
+
+    <div class="wx-row">
+      <span>
+        <svg class="wind-arrow" viewBox="0 0 100 100">
+          <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
+          <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
+        </svg>
+      </span>
+      <span>Wind:</span>
+      <span data-role="wind-speed">–</span>
+      <span data-role="wind-dir">–</span>
+    </div>
+
+    <div class="wx-row">
+      <span>💨</span>
+      <span>Gust:</span>
+      <span data-role="gust-speed">–</span>
+      <span></span>
+    </div>
+
+    <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
+    <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
+    <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
+
+    <div class="loading" data-role="status">Loading data…</div>
   </div>
 
-  <div class="wx-row">
-    <span>💨</span>
-    <span>Gust:</span>
-    <span data-role="gust-speed">–</span>
-    <span></span>
+  <!-- Sunshine Coast Airport -->
+  <div class="station-tile" id="station-sca">
+    <div class="station-name">Sunshine Coast Airport</div>
+    <div class="station-time" data-role="time">Loading…</div>
+
+    <div class="wx-row">
+      <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
+    </div>
+
+    <div class="wx-row">
+      <span>
+        <svg class="wind-arrow" viewBox="0 0 100 100">
+          <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
+          <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
+        </svg>
+      </span>
+      <span>Wind:</span>
+      <span data-role="wind-speed">–</span>
+      <span data-role="wind-dir">–</span>
+    </div>
+
+    <div class="wx-row">
+      <span>💨</span>
+      <span>Gust:</span>
+      <span data-role="gust-speed">–</span>
+      <span></span>
+    </div>
+
+    <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
+    <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
+    <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
+
+    <div class="loading" data-role="status">Loading data…</div>
   </div>
 
-  <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
-  <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
-  <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
+  <!-- Tewantin -->
+  <div class="station-tile" id="station-tewantin">
+    <div class="station-name">Tewantin</div>
+    <div class="station-time" data-role="time">Loading…</div>
 
-  <div class="loading" data-role="status">Loading data…</div>
+    <div class="wx-row">
+      <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
+    </div>
+
+    <div class="wx-row">
+      <span>
+        <svg class="wind-arrow" viewBox="0 0 100 100">
+          <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
+          <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
+        </svg>
+      </span>
+      <span>Wind:</span>
+      <span data-role="wind-speed">–</span>
+      <span data-role="wind-dir">–</span>
+    </div>
+
+    <div class="wx-row">
+      <span>💨</span>
+      <span>Gust:</span>
+      <span data-role="gust-speed">–</span>
+      <span></span>
+    </div>
+
+    <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
+    <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
+    <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
+
+    <div class="loading" data-role="status">Loading data…</div>
+  </div>
+
 </div>
 
-<!-- Repeat the same structure for Beerburrum, SCA, Tewantin -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // Night vision toggle
+  document.getElementById("nvgCheck").addEventListener("change", (e) => {
+    if (e.target.checked) {
+      document.body.classList.add("nvg");
+    } else {
+      document.body.classList.remove("nvg");
+    }
+  });
 
   const stations = [
     { id: "nambour", name: "Nambour", lat: -26.63, lon: 152.96 },
@@ -192,6 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       windDirEl.textContent = `${degToCompass(c.wind_direction_10m)} (${c.wind_direction_10m}°)`;
 
+      // Arrow points FROM direction (BOM style: add 180 if you prefer)
       windArrowEl.style.transform = `rotate(${c.wind_direction_10m}deg)`;
 
       timeEl.textContent = `Updated: ${formatTime(new Date())}`;
@@ -204,7 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   stations.forEach(loadStation);
-
 });
 </script>
 </body>
