@@ -1,255 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Fireground Tactical v2</title>
+<title>Fireground Tactical v3</title>
 
-  <!-- DIN-Style Industrial Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --steel-bg: #0d0d0f;
-      --steel-grain: rgba(255,255,255,0.04);
-      --tile-bg: #141416;
-      --tile-edge: #1f1f22;
-      --text: #e6e6e6;
-      --muted: #888;
-      --amber: #ffb84d;
-      --red: #ff4d4d;
-      --yellow: #ffe066;
-      --accent: #ffb84d;
-      --rivet: #3a3a3d;
-    }
+<style>
+:root {
+  --steel-bg: #0d0d0f;
+  --steel-grain: rgba(255,255,255,0.04);
+  --tile-bg: #141416;
+  --tile-edge: #1f1f22;
+  --text: #e6e6e6;
+  --muted: #888;
+  --amber: #ffb84d;
+  --red: #ff4d4d;
+  --yellow: #ffe066;
+  --rivet: #3a3a3d;
 
-    body {
-      margin: 0;
-      background: var(--steel-bg);
-      font-family: 'Rajdhani', sans-serif;
-      color: var(--text);
-      letter-spacing: 0.5px;
-      user-select: none;
-    }
+  /* Icon colours (muted tactical gradients) */
+  --icon-temp: linear-gradient(180deg, #b34a4a, #3a2a2a);
+  --icon-hum: linear-gradient(180deg, #4a7fb3, #2a3a4a);
+  --icon-rain: linear-gradient(180deg, #4ab3a1, #2a3a38);
+  --icon-dew: linear-gradient(180deg, #6fb3d9, #2a3a44);
+  --icon-gust: linear-gradient(180deg, #7a8fa6, #2f3640);
+}
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%),
-        repeating-linear-gradient(
-          90deg,
-          var(--steel-grain) 0px,
-          var(--steel-grain) 1px,
-          transparent 2px,
-          transparent 4px
-        );
-      opacity: 0.25;
-      pointer-events: none;
-    }
+body {
+  margin: 0;
+  background: var(--steel-bg);
+  font-family: 'Rajdhani', sans-serif;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  user-select: none;
+}
 
-    .status-bar {
-      width: 100%;
-      padding: 12px 20px;
-      background: #0f0f11;
-      border-bottom: 2px solid #1c1c1e;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 20px;
-      color: var(--amber);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      position: relative;
-    }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%),
+    repeating-linear-gradient(
+      90deg,
+      var(--steel-grain) 0px,
+      var(--steel-grain) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+  opacity: 0.25;
+  pointer-events: none;
+}
 
-    .status-bar::before,
-    .status-bar::after {
-      content: "";
-      width: 10px;
-      height: 10px;
-      background: var(--rivet);
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      box-shadow: inset 0 0 3px #000;
-    }
-    .status-bar::before { left: 12px; }
-    .status-bar::after { right: 12px; }
+/* STATUS BAR */
+.status-bar {
+  width: 100%;
+  padding: 12px 20px;
+  background: #0f0f11;
+  border-bottom: 2px solid #1c1c1e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+}
 
-    .lamps {
-      display: flex;
-      gap: 10px;
-    }
-    .lamp {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #333;
-      box-shadow: inset 0 0 4px #000;
-    }
-    .lamp.green { background: #4dff4d; }
-    .lamp.amber { background: #ffb84d; }
-    .lamp.red { background: #ff4d4d; }
+.status-bar::before,
+.status-bar::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: var(--rivet);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: inset 0 0 3px #000;
+}
+.status-bar::before { left: 12px; }
+.status-bar::after { right: 12px; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 22px;
-      padding: 22px;
-      transform-origin: top center;
-      margin: 0 auto;
-    }
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+  padding: 22px;
+  transform-origin: top center;
+  margin: 0 auto;
+}
 
-    @media (max-width: 1200px) {
-      .grid {
-        transform: scale(calc(100vw / 1200));
-      }
-    }
+@media (max-width: 1200px) {
+  .grid {
+    transform: scale(calc(100vw / 1200));
+  }
+}
 
-    .tile {
-      background: var(--tile-bg);
-      border: 2px solid var(--tile-edge);
-      padding: 18px 22px;
-      border-radius: 6px;
-      position: relative;
-      box-shadow:
-        inset 0 0 12px #000,
-        0 0 12px #000;
-    }
+@media (max-width: 600px) {
+  .grid {
+    padding: 10px;
+    gap: 12px;
+  }
+}
 
-    .tile::before,
-    .tile::after {
-      content: "";
-      width: 12px;
-      height: 12px;
-      background: var(--rivet);
-      border-radius: 50%;
-      position: absolute;
-      box-shadow: inset 0 0 3px #000;
-    }
-    .tile::before { top: 8px; left: 8px; }
-    .tile::after { top: 8px; right: 8px; }
+/* TILE */
+.tile {
+  background: var(--tile-bg);
+  border: 2px solid var(--tile-edge);
+  padding: 18px 22px;
+  border-radius: 6px;
+  position: relative;
+  box-shadow: inset 0 0 12px #000, 0 0 12px #000;
+}
 
-    .tile .rivet-bl,
-    .tile .rivet-br {
-      width: 12px;
-      height: 12px;
-      background: var(--rivet);
-      border-radius: 50%;
-      position: absolute;
-      bottom: 8px;
-      box-shadow: inset 0 0 3px #000;
-    }
-    .tile .rivet-bl { left: 8px; }
-    .tile .rivet-br { right: 8px; }
+@media (max-width: 600px) {
+  .tile {
+    padding: 12px 14px;
+    box-shadow: inset 0 0 8px #000, 0 0 8px #000;
+  }
+}
 
-    .station-name {
-      font-size: 26px;
-      color: var(--amber);
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      letter-spacing: 1px;
-    }
+.tile::before,
+.tile::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: var(--rivet);
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: inset 0 0 3px #000;
+}
+.tile::before { top: 8px; left: 8px; }
+.tile::after { top: 8px; right: 8px; }
 
-    .updated {
-      color: var(--yellow);
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
+.tile .rivet-bl,
+.tile .rivet-br {
+  width: 12px;
+  height: 12px;
+  background: var(--rivet);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 8px;
+  box-shadow: inset 0 0 3px #000;
+}
+.tile .rivet-bl { left: 8px; }
+.tile .rivet-br { right: 8px; }
 
-    .row {
-      font-size: 20px;
-      margin: 6px 0;
-      display: flex;
-      justify-content: space-between;
-    }
+/* TEXT */
+.station-name {
+  font-size: 26px;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
 
-    .wind-arrow {
-      width: 42px;
-      height: 42px;
-      filter: drop-shadow(0 0 6px var(--amber));
-    }
+.updated {
+  color: var(--yellow);
+  font-size: 16px;
+  margin-bottom: 12px;
+}
 
-    .wind-amber {
-      color: var(--amber);
-      text-shadow: 0 0 8px var(--amber);
-    }
+.row {
+  font-size: 20px;
+  margin: 6px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .wind-red {
-      color: var(--red);
-      text-shadow: 0 0 10px var(--red);
-    }
+@media (max-width: 600px) {
+  .row { font-size: 16px; }
+}
 
-    @keyframes pulse-red {
-      0% { box-shadow: 0 0 8px var(--red); }
-      50% { box-shadow: 0 0 18px var(--red); }
-      100% { box-shadow: 0 0 8px var(--red); }
-    }
+/* ICONS (18–20px, tight spacing) */
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center;
+}
 
-    .gust-pulse {
-      animation: pulse-red 1.2s infinite;
-    }
+.icon-temp { background: var(--icon-temp); }
+.icon-hum { background: var(--icon-hum); }
+.icon-rain { background: var(--icon-rain); }
+.icon-dew { background: var(--icon-dew); }
+.icon-gust { background: var(--icon-gust); }
 
-    .toggle-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 20px;
-      font-size: 18px;
-      color: var(--amber);
-    }
+/* WIND ARROW */
+.wind-arrow {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px var(--amber));
+}
 
-    .toggle-switch {
-      width: 46px;
-      height: 24px;
-      background: #333;
-      border-radius: 20px;
-      position: relative;
-      cursor: pointer;
-    }
+@media (max-width: 600px) {
+  .wind-arrow {
+    width: 26px;
+    height: 26px;
+  }
+}
 
-    .toggle-switch::after {
-      content: "";
-      width: 20px;
-      height: 20px;
-      background: #999;
-      border-radius: 50%;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      transition: 0.2s;
-    }
+/* GUST WARNING (STATIC GLOW) */
+.gust-pulse {
+  box-shadow: 0 0 12px var(--red);
+}
 
-    input[type="checkbox"]:checked + .toggle-switch::after {
-      left: 24px;
-      background: var(--amber);
-    }
+/* MODE TOGGLES */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 20px;
+  font-size: 18px;
+  color: var(--amber);
+}
 
-    body.nvg {
-      --text: #00ff88;
-      --amber: #00ff88;
-      --yellow: #00ff88;
-      --red: #ff4d4d;
-      --tile-bg: #001b0f;
-      --tile-edge: #00331a;
-    }
+.toggle-switch {
+  width: 46px;
+  height: 24px;
+  background: #333;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+}
 
-    body.red {
-      --text: #ffb3b3;
-      --amber: #ff8080;
-      --yellow: #ff9999;
-      --red: #ff4d4d;
-      --tile-bg: #1a0000;
-      --tile-edge: #330000;
-    }
-  </style>
+.toggle-switch::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: #999;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: 0.2s;
+}
+
+input[type="checkbox"]:checked + .toggle-switch::after {
+  left: 24px;
+  background: var(--amber);
+}
+
+/* NVG MODE */
+body.nvg {
+  --text: #00ff88;
+  --amber: #00ff88;
+  --yellow: #00ff88;
+  --tile-bg: #001b0f;
+  --tile-edge: #00331a;
+}
+
+body.nvg .icon {
+  background: #00ff88 !important;
+}
+
+/* RED MODE */
+body.red {
+  --text: #ffb3b3;
+  --amber: #ff8080;
+  --yellow: #ff9999;
+  --tile-bg: #1a0000;
+  --tile-edge: #330000;
+}
+
+body.red .icon {
+  background: #ff8080 !important;
+}
+</style>
 </head>
 <body>
-  <!-- TOP STATUS BAR -->
+
+  <!-- STATUS BAR -->
   <div class="status-bar">
     <div>FIREGROUND WX DATA — SYSTEM ONLINE — QLD OPS</div>
     <div class="lamps">
@@ -281,12 +312,47 @@
       <div class="station-name">NAMBOUR</div>
       <div class="updated" id="updated-nambour">Updated: --:--</div>
 
-      <div class="row"><span>Temperature</span><span id="temp-nambour">--.- °C</span></div>
-      <div class="row"><span>Wind</span><span id="wind-nambour" class="wind-value">-- km/h</span></div>
-      <div class="row"><span>Gust</span><span id="gust-nambour" class="gust-value">-- km/h</span></div>
-      <div class="row"><span>Humidity</span><span id="hum-nambour">-- %</span></div>
-      <div class="row"><span>Rainfall</span><span id="rain-nambour">-- mm</span></div>
-      <div class="row"><span>Dew Point</span><span id="dew-nambour">-- °C</span></div>
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-temp"></div> Temperature
+        </div>
+        <span id="temp-nambour">--.- °C</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          Wind
+        </div>
+        <span id="wind-nambour" class="wind-value">-- km/h</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-gust"></div> Gust
+        </div>
+        <span id="gust-nambour" class="gust-value">-- km/h</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-hum"></div> Humidity
+        </div>
+        <span id="hum-nambour">-- %</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-rain"></div> Rainfall
+        </div>
+        <span id="rain-nambour">-- mm</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-dew"></div> Dew Point
+        </div>
+        <span id="dew-nambour">-- °C</span>
+      </div>
 
       <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
         <span style="font-size:16px; color:var(--muted);">Dir</span>
@@ -303,12 +369,45 @@
       <div class="station-name">BEERBURRUM</div>
       <div class="updated" id="updated-beerburrum">Updated: --:--</div>
 
-      <div class="row"><span>Temperature</span><span id="temp-beerburrum">--.- °C</span></div>
-      <div class="row"><span>Wind</span><span id="wind-beerburrum" class="wind-value">-- km/h</span></div>
-      <div class="row"><span>Gust</span><span id="gust-beerburrum" class="gust-value">-- km/h</span></div>
-      <div class="row"><span>Humidity</span><span id="hum-beerburrum">-- %</span></div>
-      <div class="row"><span>Rainfall</span><span id="rain-beerburrum">-- mm</span></div>
-      <div class="row"><span>Dew Point</span><span id="dew-beerburrum">-- °C</span></div>
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-temp"></div> Temperature
+        </div>
+        <span id="temp-beerburrum">--.- °C</span>
+      </div>
+
+      <div class="row">
+        Wind
+        <span id="wind-beerburrum" class="wind-value">-- km/h</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-gust"></div> Gust
+        </div>
+        <span id="gust-beerburrum" class="gust-value">-- km/h</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-hum"></div> Humidity
+        </div>
+        <span id="hum-beerburrum">-- %</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-rain"></div> Rainfall
+        </div>
+        <span id="rain-beerburrum">-- mm</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-dew"></div> Dew Point
+        </div>
+        <span id="dew-beerburrum">-- °C</span>
+      </div>
 
       <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
         <span style="font-size:16px; color:var(--muted);">Dir</span>
@@ -325,12 +424,45 @@
       <div class="station-name">SUNSHINE COAST AIRPORT</div>
       <div class="updated" id="updated-sunshine">Updated: --:--</div>
 
-      <div class="row"><span>Temperature</span><span id="temp-sunshine">--.- °C</span></div>
-      <div class="row"><span>Wind</span><span id="wind-sunshine" class="wind-value">-- km/h</span></div>
-      <div class="row"><span>Gust</span><span id="gust-sunshine" class="gust-value">-- km/h</span></div>
-      <div class="row"><span>Humidity</span><span id="hum-sunshine">-- %</span></div>
-      <div class="row"><span>Rainfall</span><span id="rain-sunshine">-- mm</span></div>
-      <div class="row"><span>Dew Point</span><span id="dew-sunshine">-- °C</span></div>
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-temp"></div> Temperature
+        </div>
+        <span id="temp-sunshine">--.- °C</span>
+      </div>
+
+      <div class="row">
+        Wind
+        <span id="wind-sunshine" class="wind-value">-- km/h</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-gust"></div> Gust
+        </div>
+        <span id="gust-sunshine" class="gust-value">-- km/h</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-hum"></div> Humidity
+        </div>
+        <span id="hum-sunshine">-- %</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-rain"></div> Rainfall
+        </div>
+        <span id="rain-sunshine">-- mm</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-dew"></div> Dew Point
+        </div>
+        <span id="dew-sunshine">-- °C</span>
+      </div>
 
       <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
         <span style="font-size:16px; color:var(--muted);">Dir</span>
@@ -347,12 +479,45 @@
       <div class="station-name">TEWANTIN</div>
       <div class="updated" id="updated-tewantin">Updated: --:--</div>
 
-      <div class="row"><span>Temperature</span><span id="temp-tewantin">--.- °C</span></div>
-      <div class="row"><span>Wind</span><span id="wind-tewantin" class="wind-value">-- km/h</span></div>
-      <div class="row"><span>Gust</span><span id="gust-tewantin" class="gust-value">-- km/h</span></div>
-      <div class="row"><span>Humidity</span><span id="hum-tewantin">-- %</span></div>
-      <div class="row"><span>Rainfall</span><span id="rain-tewantin">-- mm</span></div>
-      <div class="row"><span>Dew Point</span><span id="dew-tewantin">-- °C</span></div>
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-temp"></div> Temperature
+        </div>
+        <span id="temp-tewantin">--.- °C</span>
+      </div>
+
+      <div class="row">
+        Wind
+        <span id="wind-tewantin" class="wind-value">-- km/h</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-gust"></div> Gust
+        </div>
+        <span id="gust-tewantin" class="gust-value">-- km/h</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-hum"></div> Humidity
+        </div>
+        <span id="hum-tewantin">-- %</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-rain"></div> Rainfall
+        </div>
+        <span id="rain-tewantin">-- mm</span>
+      </div>
+
+      <div class="row">
+        <div style="display:flex;align-items:center;">
+          <div class="icon icon-dew"></div> Dew Point
+        </div>
+        <span id="dew-tewantin">-- °C</span>
+      </div>
 
       <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
         <span style="font-size:16px; color:var(--muted);">Dir</span>
@@ -367,7 +532,7 @@
   </div> <!-- end grid -->
 
   <script>
-    // DEMO DATA (replace with live feed later)
+    /* DEMO DATA */
     const demoData = {
       nambour:   { temp: 20.4, wind: 36, gust: 54.2, dir: 135, hum: 79, rain: 0.0, dew: 16.5 },
       beerburrum:{ temp: 19.8, wind: 28, gust: 46.4, dir: 135, hum: 81, rain: 0.0, dew: 16.1 },
@@ -388,18 +553,18 @@
       document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
       document.getElementById(`updated-${id}`).textContent = `Updated: ${formatTime(new Date())}`;
 
-      // Wind severity
+      /* WIND SEVERITY */
       const windSpan = document.getElementById(`wind-${id}`);
       windSpan.classList.remove('wind-amber','wind-red');
       if (data.wind > 50) windSpan.classList.add('wind-red');
       else if (data.wind > 30) windSpan.classList.add('wind-amber');
 
-      // Gust pulse
+      /* GUST WARNING */
       const tile = windSpan.closest('.tile');
       tile.classList.remove('gust-pulse');
       if (data.gust > data.wind && data.gust > 40) tile.classList.add('gust-pulse');
 
-      // Arrow rotation
+      /* ARROW ROTATION */
       document.getElementById(`arrow-${id}`).style.transform = `rotate(${data.dir}deg)`;
     }
 
@@ -410,7 +575,7 @@
       applyStation('tewantin', demoData.tewantin);
     }
 
-    // MODE TOGGLES
+    /* MODE TOGGLES */
     const nvgToggle = document.getElementById('nvgToggle');
     const redToggle = document.getElementById('redToggle');
 
@@ -432,5 +597,6 @@
 
     loadDemo();
   </script>
+
 </body>
 </html>
