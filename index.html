@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Open‑Meteo Test – Beerburrum</title>
+<title>Weathers for Sunshine Coast</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
@@ -11,58 +11,132 @@
     color: #fff;
     padding: 20px;
   }
-  h1 { margin-bottom: 0.5rem; }
-  pre {
+
+  h1 { margin-bottom: 1rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .card {
     background: #111628;
-    padding: 1rem;
+    padding: 15px;
     border-radius: 8px;
-    overflow-x: auto;
     border: 1px solid #222842;
+  }
+
+  .name {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    opacity: 0.9;
+  }
+
+  .wind-arrow {
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    transition: transform 0.4s ease;
+  }
+
+  .disclaimer {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: #aaa;
+    text-align: center;
   }
 </style>
 </head>
 <body>
 
-<h1>Open‑Meteo Test – Beerburrum</h1>
-<p>Simple test to confirm Open‑Meteo data loads correctly.</p>
+<h1>4‑Station Weather – Animated Wind Direction</h1>
 
-<h3>Current Weather:</h3>
-<pre id="weather">Loading…</pre>
+<div class="grid">
+  <div class="card"><div class="name">Nambour</div><div id="nambour">Loading…</div></div>
+  <div class="card"><div class="name">Beerburrum</div><div id="beerburrum">Loading…</div></div>
+  <div class="card"><div class="name">Sunshine Coast Airport</div><div id="sunshine">Loading…</div></div>
+  <div class="card"><div class="name">Tewantin</div><div id="tewantin">Loading…</div></div>
+</div>
+
+<p class="disclaimer">
+  ⚠️ Estimated model data — not official Bureau of Meteorology observations.
+</p>
 
 <script>
-async function fetchWeather() {
-  const lat = -26.95;
-  const lon = 153.06;
+function iconTemp() {
+  return `<img class="icon" src="data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'>
+    <path d='M13 15.07V5a1 1 0 10-2 0v10.07a4 4 0 102 0z'/>
+  </svg>">`;
+}
 
+function iconHumidity() {
+  return `<img class="icon" src="data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'>
+    <path d='M12 2.69l5.66 5.66a8 8 0 11-11.31 0L12 2.69z'/>
+  </svg>">`;
+}
+
+function iconRain() {
+  return `<img class="icon" src="data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'>
+    <path d='M8 19a2 2 0 104 0 2 2 0 00-4 0zm4-4a2 2 0 104 0 2 2 0 00-4 0z'/>
+  </svg>">`;
+}
+
+function iconWindArrow(deg) {
+  return `<img class="wind-arrow" style="transform: rotate(${deg}deg)" 
+    src="data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'>
+      <path d='M12 2l4 8h-3v12h-2V10H8l4-8z'/>
+    </svg>">`;
+}
+
+async function loadStation(elId, lat, lon) {
   const url = "https://api.open-meteo.com/v1/forecast?" +
     new URLSearchParams({
       latitude: lat,
       longitude: lon,
-      current: "temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
+      current: "temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,precipitation",
       timezone: "Australia/Brisbane"
     });
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch weather: " + res.status);
-
-  const data = await res.json();
-  return data.current;
-}
-
-(async () => {
   try {
-    const w = await fetchWeather();
+    const res = await fetch(url);
+    const data = await res.json();
+    const c = data.current;
 
-    document.getElementById("weather").textContent =
-      `Temperature: ${w.temperature_2m}°C\n` +
-      `Humidity: ${w.relative_humidity_2m}%\n` +
-      `Wind: ${w.wind_speed_10m} km/h\n` +
-      `Rain (current): ${w.precipitation} mm`;
+    document.getElementById(elId).innerHTML = `
+      <div class="row">${iconTemp()} ${c.temperature_2m}°C</div>
+      <div class="row">${iconHumidity()} ${c.relative_humidity_2m}%</div>
+      <div class="row">${iconWindArrow(c.wind_direction_10m)} ${c.wind_speed_10m} km/h</div>
+      <div class="row">${iconRain()} ${c.precipitation} mm</div>
+    `;
   } catch (err) {
-    document.getElementById("weather").textContent = "Error loading data";
+    document.getElementById(elId).textContent = "Error loading data";
     console.error(err);
   }
-})();
+}
+
+// Station coordinates
+loadStation("nambour",    -26.63, 152.96);
+loadStation("beerburrum", -26.95, 153.06);
+loadStation("sunshine",   -26.60, 153.09);
+loadStation("tewantin",   -26.39, 153.03);
 </script>
 
 </body>
