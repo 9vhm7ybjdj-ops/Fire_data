@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fireground Tactical v5</title>
+<title>Fireground Tactical v6</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 
@@ -54,29 +54,13 @@ body::before {
   background: #0f0f11;
   border-bottom: 2px solid #1c1c1e;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   font-size: 20px;
   color: var(--amber);
   text-transform: uppercase;
   letter-spacing: 2px;
-  position: relative;
 }
-
-.status-bar::before,
-.status-bar::after {
-  content: "";
-  width: 10px;
-  height: 10px;
-  background: var(--rivet);
-  border-radius: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  box-shadow: inset 0 0 3px #000;
-}
-.status-bar::before { left: 12px; }
-.status-bar::after { right: 12px; }
 
 /* GRID */
 .grid {
@@ -90,7 +74,7 @@ body::before {
 
 @media (max-width: 1200px) {
   .grid {
-    transform: scale(calc(100vw / 1200));
+    transform: scale(calc(100vw / 1400));
   }
 }
 
@@ -112,15 +96,10 @@ body::before {
   transition: box-shadow 0.2s ease;
 }
 
-@media (max-width: 600px) {
-  .tile {
-    padding: 12px 14px;
-    box-shadow: inset 0 0 8px #000, 0 0 8px #000;
-  }
-}
-
 .tile::before,
-.tile::after {
+.tile::after,
+.tile .rivet-bl,
+.tile .rivet-br {
   content: "";
   width: 12px;
   height: 12px;
@@ -129,21 +108,11 @@ body::before {
   position: absolute;
   box-shadow: inset 0 0 3px #000;
 }
+
 .tile::before { top: 8px; left: 8px; }
 .tile::after { top: 8px; right: 8px; }
-
-.tile .rivet-bl,
-.tile .rivet-br {
-  width: 12px;
-  height: 12px;
-  background: var(--rivet);
-  border-radius: 50%;
-  position: absolute;
-  bottom: 8px;
-  box-shadow: inset 0 0 3px #000;
-}
-.tile .rivet-bl { left: 8px; }
-.tile .rivet-br { right: 8px; }
+.tile .rivet-bl { bottom: 8px; left: 8px; }
+.tile .rivet-br { bottom: 8px; right: 8px; }
 
 /* TEXT */
 .station-name {
@@ -152,12 +121,6 @@ body::before {
   text-transform: uppercase;
   margin-bottom: 6px;
   letter-spacing: 1px;
-}
-
-.updated {
-  color: var(--yellow);
-  font-size: 16px;
-  margin-bottom: 12px;
 }
 
 .row {
@@ -172,28 +135,19 @@ body::before {
   margin-left: auto;
 }
 
-@media (max-width: 600px) {
-  .row { font-size: 16px; }
-}
-
-/* WIND ARROW */
+/* INLINE WIND ARROW */
 .wind-arrow {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin: 0 6px;
+  vertical-align: middle;
+  transform-origin: 50% 15%;
   filter: drop-shadow(0 0 6px var(--amber));
-}
-
-@media (max-width: 600px) {
-  .wind-arrow {
-    width: 26px;
-    height: 26px;
-  }
 }
 
 /* TILE-ONLY RED GLOW */
 .gust-pulse {
-  box-shadow: 0 0 22px #ff4d4d !important;
+  box-shadow: 0 0 18px #ff4d4d !important;
 }
 
 /* MODE TOGGLES */
@@ -250,11 +204,13 @@ body.red {
   --tile-edge: #330000;
 }
 
-/* SAFETY: prevent overlap */
-body.nvg.red,
-body.red.nvg {
-  background: var(--steel-bg);
-  color: var(--text);
+/* GLOBAL UPDATE TIME */
+.global-updated {
+  text-align: center;
+  margin: 20px 0 30px 0;
+  font-size: 18px;
+  color: var(--yellow);
+  letter-spacing: 1px;
 }
 </style>
 </head>
@@ -262,7 +218,7 @@ body.red.nvg {
 
   <!-- STATUS BAR -->
   <div class="status-bar">
-    <div>FIREGROUND WX DATA — SYSTEM ONLINE — QLD OPS</div>
+    FIREGROUND WX DATA — QLD OPS
   </div>
 
   <!-- MODE TOGGLES -->
@@ -281,25 +237,24 @@ body.red.nvg {
 
   <!-- GRID -->
   <div class="grid">
-
     <!-- NAMBOUR -->
     <div class="tile">
       <div class="station-name">NAMBOUR</div>
-      <div class="updated" id="updated-nambour">Updated: --:--</div>
 
       <div class="row">🌡 Temperature <span id="temp-nambour">--.- °C</span></div>
-      <div class="row">💨 Wind <span id="wind-nambour">-- km/h</span></div>
+
+      <div class="row">
+        Wind
+        <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
+          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+        </svg>
+        <span id="wind-nambour">-- km/h</span>
+      </div>
+
       <div class="row">🌬 Gust <span id="gust-nambour">-- km/h</span></div>
       <div class="row">💧 Humidity <span id="hum-nambour">-- %</span></div>
       <div class="row">🌧 Rainfall <span id="rain-nambour">-- mm</span></div>
       <div class="row">❄ Dew Point <span id="dew-nambour">-- °C</span></div>
-
-      <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
-        <span style="font-size:16px; color:var(--muted);">Dir</span>
-        <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
-        </svg>
-      </div>
 
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
@@ -307,21 +262,21 @@ body.red.nvg {
     <!-- BEERBURRUM -->
     <div class="tile">
       <div class="station-name">BEERBURRUM</div>
-      <div class="updated" id="updated-beerburrum">Updated: --:--</div>
 
       <div class="row">🌡 Temperature <span id="temp-beerburrum">--.- °C</span></div>
-      <div class="row">💨 Wind <span id="wind-beerburrum">-- km/h</span></div>
+
+      <div class="row">
+        Wind
+        <svg id="arrow-beerburrum" class="wind-arrow" viewBox="0 0 64 64">
+          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+        </svg>
+        <span id="wind-beerburrum">-- km/h</span>
+      </div>
+
       <div class="row">🌬 Gust <span id="gust-beerburrum">-- km/h</span></div>
       <div class="row">💧 Humidity <span id="hum-beerburrum">-- %</span></div>
       <div class="row">🌧 Rainfall <span id="rain-beerburrum">-- mm</span></div>
       <div class="row">❄ Dew Point <span id="dew-beerburrum">-- °C</span></div>
-
-      <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
-        <span style="font-size:16px; color:var(--muted);">Dir</span>
-        <svg id="arrow-beerburrum" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
-        </svg>
-      </div>
 
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
@@ -329,21 +284,21 @@ body.red.nvg {
     <!-- SUNSHINE COAST -->
     <div class="tile">
       <div class="station-name">SUNSHINE COAST AIRPORT</div>
-      <div class="updated" id="updated-sunshine">Updated: --:--</div>
 
       <div class="row">🌡 Temperature <span id="temp-sunshine">--.- °C</span></div>
-      <div class="row">💨 Wind <span id="wind-sunshine">-- km/h</span></div>
+
+      <div class="row">
+        Wind
+        <svg id="arrow-sunshine" class="wind-arrow" viewBox="0 0 64 64">
+          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+        </svg>
+        <span id="wind-sunshine">-- km/h</span>
+      </div>
+
       <div class="row">🌬 Gust <span id="gust-sunshine">-- km/h</span></div>
       <div class="row">💧 Humidity <span id="hum-sunshine">-- %</span></div>
       <div class="row">🌧 Rainfall <span id="rain-sunshine">-- mm</span></div>
       <div class="row">❄ Dew Point <span id="dew-sunshine">-- °C</span></div>
-
-      <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
-        <span style="font-size:16px; color:var(--muted);">Dir</span>
-        <svg id="arrow-sunshine" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
-        </svg>
-      </div>
 
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
@@ -351,92 +306,97 @@ body.red.nvg {
     <!-- TEWANTIN -->
     <div class="tile">
       <div class="station-name">TEWANTIN</div>
-      <div class="updated" id="updated-tewantin">Updated: --:--</div>
 
       <div class="row">🌡 Temperature <span id="temp-tewantin">--.- °C</span></div>
-      <div class="row">💨 Wind <span id="wind-tewantin">-- km/h</span></div>
+
+      <div class="row">
+        Wind
+        <svg id="arrow-tewantin" class="wind-arrow" viewBox="0 0 64 64">
+          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+        </svg>
+        <span id="wind-tewantin">-- km/h</span>
+      </div>
+
       <div class="row">🌬 Gust <span id="gust-tewantin">-- km/h</span></div>
       <div class="row">💧 Humidity <span id="hum-tewantin">-- %</span></div>
       <div class="row">🌧 Rainfall <span id="rain-tewantin">-- mm</span></div>
       <div class="row">❄ Dew Point <span id="dew-tewantin">-- °C</span></div>
 
-      <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
-        <span style="font-size:16px; color:var(--muted);">Dir</span>
-        <svg id="arrow-tewantin" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
-        </svg>
-      </div>
-
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
   </div> <!-- end grid -->
-  <script>
-    /* DEMO DATA */
-    const demoData = {
-      nambour:   { temp: 20.4, wind: 36, gust: 54.2, dir: 135, hum: 79, rain: 0.0, dew: 16.5 },
-      beerburrum:{ temp: 19.8, wind: 28, gust: 46.4, dir: 135, hum: 81, rain: 0.0, dew: 16.1 },
-      sunshine:  { temp: 21.5, wind: 42, gust: 57.6, dir: 180, hum: 78, rain: 0.0, dew: 17.5 },
-      tewantin:  { temp: 20.0, wind: 34, gust: 48.3, dir: 140, hum: 76, rain: 0.1, dew: 16.4 }
-    };
 
-    function formatTime(d) {
-      return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  <div class="global-updated" id="updated-global">Updated: --:--</div>
+<script>
+  /* DEMO DATA */
+  const demoData = {
+    nambour:   { temp: 20.4, wind: 36, gust: 54.2, dir: 135, hum: 79, rain: 0.0, dew: 16.5 },
+    beerburrum:{ temp: 19.8, wind: 28, gust: 46.4, dir: 135, hum: 81, rain: 0.0, dew: 16.1 },
+    sunshine:  { temp: 21.5, wind: 42, gust: 57.6, dir: 180, hum: 78, rain: 0.0, dew: 17.5 },
+    tewantin:  { temp: 20.0, wind: 34, gust: 48.3, dir: 140, hum: 76, rain: 0.1, dew: 16.4 }
+  };
+
+  function formatTime(d) {
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }
+
+  function applyStation(id, data) {
+    document.getElementById(`temp-${id}`).textContent = `${data.temp.toFixed(1)} °C`;
+    document.getElementById(`wind-${id}`).textContent = `${data.wind} km/h`;
+    document.getElementById(`gust-${id}`).textContent = `${data.gust.toFixed(1)} km/h`;
+    document.getElementById(`hum-${id}`).textContent  = `${data.hum}%`;
+    document.getElementById(`rain-${id}`).textContent = `${data.rain} mm`;
+    document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
+
+    /* TILE-ONLY GUST GLOW */
+    const tile = document.getElementById(`gust-${id}`).closest('.tile');
+    tile.classList.remove('gust-pulse');
+
+    if (data.gust > data.wind && data.gust > 40)
+      tile.classList.add('gust-pulse');
+
+    /* WIND ARROW — POINTS TO WHERE WIND IS BLOWING */
+    const arrow = document.getElementById(`arrow-${id}`);
+    arrow.style.transform = `rotate(${data.dir + 180}deg)`;
+  }
+
+  function loadDemo() {
+    applyStation('nambour', demoData.nambour);
+    applyStation('beerburrum', demoData.beerburrum);
+    applyStation('sunshine', demoData.sunshine);
+    applyStation('tewantin', demoData.tewantin);
+
+    document.getElementById("updated-global").textContent =
+      `Updated: ${formatTime(new Date())}`;
+  }
+
+  /* MODE TOGGLES — MUTUALLY EXCLUSIVE */
+  const nvgToggle = document.getElementById('nvgToggle');
+  const redToggle = document.getElementById('redToggle');
+
+  nvgToggle.addEventListener('change', () => {
+    if (nvgToggle.checked) {
+      redToggle.checked = false;
+      document.body.classList.add('nvg');
+      document.body.classList.remove('red');
+    } else {
+      document.body.classList.remove('nvg');
     }
+  });
 
-    function applyStation(id, data) {
-      document.getElementById(`temp-${id}`).textContent = `${data.temp.toFixed(1)} °C`;
-      document.getElementById(`wind-${id}`).textContent = `${data.wind} km/h`;
-      document.getElementById(`gust-${id}`).textContent = `${data.gust.toFixed(1)} km/h`;
-      document.getElementById(`hum-${id}`).textContent  = `${data.hum}%`;
-      document.getElementById(`rain-${id}`).textContent = `${data.rain} mm`;
-      document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
-      document.getElementById(`updated-${id}`).textContent = `Updated: ${formatTime(new Date())}`;
-
-      /* TILE-ONLY GUST GLOW */
-      const tile = document.getElementById(`gust-${id}`).closest('.tile');
-      tile.classList.remove('gust-pulse');
-
-      if (data.gust > data.wind && data.gust > 40)
-        tile.classList.add('gust-pulse');
-
-      /* ARROW ROTATION */
-      document.getElementById(`arrow-${id}`).style.transform = `rotate(${data.dir}deg)`;
+  redToggle.addEventListener('change', () => {
+    if (redToggle.checked) {
+      nvgToggle.checked = false;
+      document.body.classList.add('red');
+      document.body.classList.remove('nvg');
+    } else {
+      document.body.classList.remove('red');
     }
+  });
 
-    function loadDemo() {
-      applyStation('nambour', demoData.nambour);
-      applyStation('beerburrum', demoData.beerburrum);
-      applyStation('sunshine', demoData.sunshine);
-      applyStation('tewantin', demoData.tewantin);
-    }
-
-    /* MODE TOGGLES — FIXED */
-    const nvgToggle = document.getElementById('nvgToggle');
-    const redToggle = document.getElementById('redToggle');
-
-    nvgToggle.addEventListener('change', () => {
-      if (nvgToggle.checked) {
-        redToggle.checked = false;
-        document.body.classList.add('nvg');
-        document.body.classList.remove('red');
-      } else {
-        document.body.classList.remove('nvg');
-      }
-    });
-
-      redToggle.addEventListener('change', () => {
-      if (redToggle.checked) {
-        nvgToggle.checked = false;
-        document.body.classList.add('red');
-        document.body.classList.remove('nvg');
-      } else {
-        document.body.classList.remove('red');
-      }
-    });
-
-    loadDemo();
-  </script>
+  loadDemo();
+</script>
 
 </body>
 </html>
