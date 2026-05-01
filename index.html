@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Sunshine Coast Weather Stations</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
   body {
     font-family: system-ui, sans-serif;
@@ -73,17 +74,23 @@
     min-height:190px;
     text-align:left;
   }
+
+  /* FIX: force all station names to same height */
   .name {
     font-size:1.2rem;
     margin-bottom:8px;
     font-weight:bold;
     display:flex;
     align-items:center;
+    min-height:2.6em;
+    line-height:1.3em;
   }
+
   .station-icon {
     width:18px; height:18px;
     margin-right:8px;
   }
+
   .row { margin-bottom:6px; }
 
   /* ---------- COMPASS ---------- */
@@ -124,13 +131,7 @@
   #device-arrow { border-bottom-color:#ff5252; }
   #wind-arrow { border-bottom-color:#00e5ff; }
 
-  .disclaimer {
-    margin-top:20px;
-    font-size:0.85rem;
-    color:#aaa;
-  }
-
-  /* ---------- TILE-STYLE BUTTON ---------- */
+  /* ---------- TILE BUTTON ---------- */
   .tile-button {
     background:#111628;
     border:1px solid #222842;
@@ -197,10 +198,10 @@
   <h1>Sunshine Coast Weather Stations</h1>
 
   <div class="grid">
+
     <div class="card">
       <div class="name">
-        <img class="station-icon"
-             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23ff7043' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
+        <img class="station-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23ff7043' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
         Nambour
       </div>
       <div id="nambour"><div class="spinner"></div></div>
@@ -208,8 +209,7 @@
 
     <div class="card">
       <div class="name">
-        <img class="station-icon"
-             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
+        <img class="station-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2344aaff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
         Beerburrum
       </div>
       <div id="beerburrum"><div class="spinner"></div></div>
@@ -217,8 +217,7 @@
 
     <div class="card">
       <div class="name">
-        <img class="station-icon"
-             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2300e5ff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
+        <img class="station-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2300e5ff' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
         Sunshine Coast Airport
       </div>
       <div id="sunshine"><div class="spinner"></div></div>
@@ -226,12 +225,12 @@
 
     <div class="card">
       <div class="name">
-        <img class="station-icon"
-             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23ffeb3b' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
+        <img class="station-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23ffeb3b' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/></svg>">
         Tewantin
       </div>
       <div id="tewantin"><div class="spinner"></div></div>
     </div>
+
   </div>
 
   <div id="compass-container">
@@ -249,7 +248,7 @@
   <button id="change-station-btn" class="tile-button">Change Station</button>
 
   <p class="disclaimer">
-    ⚠️ Data sourced from Open‑Meteo.
+    ⚠️ Data sourced from Open‑Meteo — estimated model data, not official observations.
   </p>
 
 </div>
@@ -329,17 +328,22 @@ function initCompass(stationId){
     label.textContent = `Wind from: ${st.name} (no direction data)`;
   }
 
+  /* DEVICE COMPASS — THIS WAS MISSING ON YOUR LIVE PAGE */
   if(window.DeviceOrientationEvent){
     function handle(event){
       let heading = event.alpha;
+
+      /* iPhone uses webkitCompassHeading */
       if(typeof event.webkitCompassHeading === "number"){
         heading = event.webkitCompassHeading;
       }
+
       if(typeof heading === "number"){
         document.getElementById("device-arrow").style.transform =
           `translate(-50%, -100%) rotate(${heading}deg)`;
       }
     }
+
     window.addEventListener("deviceorientation", handle, true);
   }
 }
