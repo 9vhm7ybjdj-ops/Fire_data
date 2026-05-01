@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fireground Tactical v3</title>
+<title>Fireground Tactical v4</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 
@@ -17,16 +17,8 @@
   --text: #e6e6e6;
   --muted: #888;
   --amber: #ffb84d;
-  --red: #ff4d4d;
   --yellow: #ffe066;
   --rivet: #3a3a3d;
-
-  /* Icon colours (muted tactical gradients) */
-  --icon-temp: linear-gradient(180deg, #b34a4a, #3a2a2a);
-  --icon-hum: linear-gradient(180deg, #4a7fb3, #2a3a4a);
-  --icon-rain: linear-gradient(180deg, #4ab3a1, #2a3a38);
-  --icon-dew: linear-gradient(180deg, #6fb3d9, #2a3a44);
-  --icon-gust: linear-gradient(180deg, #7a8fa6, #2f3640);
 }
 
 body {
@@ -171,29 +163,17 @@ body::before {
   font-size: 20px;
   margin: 6px 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 6px;
+}
+
+.row span {
+  margin-left: auto;
 }
 
 @media (max-width: 600px) {
   .row { font-size: 16px; }
 }
-
-/* ICONS (18–20px, tight spacing) */
-.icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 6px;
-  border-radius: 4px;
-  background-size: cover;
-  background-position: center;
-}
-
-.icon-temp { background: var(--icon-temp); }
-.icon-hum { background: var(--icon-hum); }
-.icon-rain { background: var(--icon-rain); }
-.icon-dew { background: var(--icon-dew); }
-.icon-gust { background: var(--icon-gust); }
 
 /* WIND ARROW */
 .wind-arrow {
@@ -212,7 +192,7 @@ body::before {
 
 /* GUST WARNING (STATIC GLOW) */
 .gust-pulse {
-  box-shadow: 0 0 12px var(--red);
+  box-shadow: 0 0 12px #ff4d4d;
 }
 
 /* MODE TOGGLES */
@@ -260,10 +240,6 @@ body.nvg {
   --tile-edge: #00331a;
 }
 
-body.nvg .icon {
-  background: #00ff88 !important;
-}
-
 /* RED MODE */
 body.red {
   --text: #ffb3b3;
@@ -273,8 +249,11 @@ body.red {
   --tile-edge: #330000;
 }
 
-body.red .icon {
-  background: #ff8080 !important;
+/* SAFETY: prevent overlap */
+body.nvg.red,
+body.red.nvg {
+  background: var(--steel-bg);
+  color: var(--text);
 }
 </style>
 </head>
@@ -283,11 +262,6 @@ body.red .icon {
   <!-- STATUS BAR -->
   <div class="status-bar">
     <div>FIREGROUND WX DATA — SYSTEM ONLINE — QLD OPS</div>
-    <div class="lamps">
-      <div class="lamp green"></div>
-      <div class="lamp amber"></div>
-      <div class="lamp red"></div>
-    </div>
   </div>
 
   <!-- MODE TOGGLES -->
@@ -304,55 +278,21 @@ body.red .icon {
     </label>
   </div>
 
-  <!-- MAIN GRID -->
-  <div class="grid" id="wxGrid">
+  <!-- GRID -->
+  <div class="grid">
 
+    <!-- TEMPLATE FOR EACH STATION -->
     <!-- NAMBOUR -->
-    <div class="tile" data-station="nambour">
+    <div class="tile">
       <div class="station-name">NAMBOUR</div>
       <div class="updated" id="updated-nambour">Updated: --:--</div>
 
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-temp"></div> Temperature
-        </div>
-        <span id="temp-nambour">--.- °C</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          Wind
-        </div>
-        <span id="wind-nambour" class="wind-value">-- km/h</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-gust"></div> Gust
-        </div>
-        <span id="gust-nambour" class="gust-value">-- km/h</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-hum"></div> Humidity
-        </div>
-        <span id="hum-nambour">-- %</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-rain"></div> Rainfall
-        </div>
-        <span id="rain-nambour">-- mm</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-dew"></div> Dew Point
-        </div>
-        <span id="dew-nambour">-- °C</span>
-      </div>
+      <div class="row">🌡 Temperature <span id="temp-nambour">--.- °C</span></div>
+      <div class="row">💨 Wind <span id="wind-nambour">-- km/h</span></div>
+      <div class="row">🌬 Gust <span id="gust-nambour">-- km/h</span></div>
+      <div class="row">💧 Humidity <span id="hum-nambour">-- %</span></div>
+      <div class="row">🌧 Rainfall <span id="rain-nambour">-- mm</span></div>
+      <div class="row">❄ Dew Point <span id="dew-nambour">-- °C</span></div>
 
       <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
         <span style="font-size:16px; color:var(--muted);">Dir</span>
@@ -365,49 +305,16 @@ body.red .icon {
     </div>
 
     <!-- BEERBURRUM -->
-    <div class="tile" data-station="beerburrum">
+    <div class="tile">
       <div class="station-name">BEERBURRUM</div>
       <div class="updated" id="updated-beerburrum">Updated: --:--</div>
 
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-temp"></div> Temperature
-        </div>
-        <span id="temp-beerburrum">--.- °C</span>
-      </div>
-
-      <div class="row">
-        Wind
-        <span id="wind-beerburrum" class="wind-value">-- km/h</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-gust"></div> Gust
-        </div>
-        <span id="gust-beerburrum" class="gust-value">-- km/h</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-hum"></div> Humidity
-        </div>
-        <span id="hum-beerburrum">-- %</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-rain"></div> Rainfall
-        </div>
-        <span id="rain-beerburrum">-- mm</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-dew"></div> Dew Point
-        </div>
-        <span id="dew-beerburrum">-- °C</span>
-      </div>
+      <div class="row">🌡 Temperature <span id="temp-beerburrum">--.- °C</span></div>
+      <div class="row">💨 Wind <span id="wind-beerburrum">-- km/h</span></div>
+      <div class="row">🌬 Gust <span id="gust-beerburrum">-- km/h</span></div>
+      <div class="row">💧 Humidity <span id="hum-beerburrum">-- %</span></div>
+      <div class="row">🌧 Rainfall <span id="rain-beerburrum">-- mm</span></div>
+      <div class="row">❄ Dew Point <span id="dew-beerburrum">-- °C</span></div>
 
       <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
         <span style="font-size:16px; color:var(--muted);">Dir</span>
@@ -419,50 +326,17 @@ body.red .icon {
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
-    <!-- SUNSHINE COAST AIRPORT -->
-    <div class="tile" data-station="sunshine">
+    <!-- SUNSHINE COAST -->
+    <div class="tile">
       <div class="station-name">SUNSHINE COAST AIRPORT</div>
       <div class="updated" id="updated-sunshine">Updated: --:--</div>
 
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-temp"></div> Temperature
-        </div>
-        <span id="temp-sunshine">--.- °C</span>
-      </div>
-
-      <div class="row">
-        Wind
-        <span id="wind-sunshine" class="wind-value">-- km/h</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-gust"></div> Gust
-        </div>
-        <span id="gust-sunshine" class="gust-value">-- km/h</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-hum"></div> Humidity
-        </div>
-        <span id="hum-sunshine">-- %</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-rain"></div> Rainfall
-        </div>
-        <span id="rain-sunshine">-- mm</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-dew"></div> Dew Point
-        </div>
-        <span id="dew-sunshine">-- °C</span>
-      </div>
+      <div class="row">🌡 Temperature <span id="temp-sunshine">--.- °C</span></div>
+      <div class="row">💨 Wind <span id="wind-sunshine">-- km/h</span></div>
+      <div class="row">🌬 Gust <span id="gust-sunshine">-- km/h</span></div>
+      <div class="row">💧 Humidity <span id="hum-sunshine">-- %</span></div>
+      <div class="row">🌧 Rainfall <span id="rain-sunshine">-- mm</span></div>
+      <div class="row">❄ Dew Point <span id="dew-sunshine">-- °C</span></div>
 
       <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
         <span style="font-size:16px; color:var(--muted);">Dir</span>
@@ -475,49 +349,16 @@ body.red .icon {
     </div>
 
     <!-- TEWANTIN -->
-    <div class="tile" data-station="tewantin">
+    <div class="tile">
       <div class="station-name">TEWANTIN</div>
       <div class="updated" id="updated-tewantin">Updated: --:--</div>
 
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-temp"></div> Temperature
-        </div>
-        <span id="temp-tewantin">--.- °C</span>
-      </div>
-
-      <div class="row">
-        Wind
-        <span id="wind-tewantin" class="wind-value">-- km/h</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-gust"></div> Gust
-        </div>
-        <span id="gust-tewantin" class="gust-value">-- km/h</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-hum"></div> Humidity
-        </div>
-        <span id="hum-tewantin">-- %</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-rain"></div> Rainfall
-        </div>
-        <span id="rain-tewantin">-- mm</span>
-      </div>
-
-      <div class="row">
-        <div style="display:flex;align-items:center;">
-          <div class="icon icon-dew"></div> Dew Point
-        </div>
-        <span id="dew-tewantin">-- °C</span>
-      </div>
+      <div class="row">🌡 Temperature <span id="temp-tewantin">--.- °C</span></div>
+      <div class="row">💨 Wind <span id="wind-tewantin">-- km/h</span></div>
+      <div class="row">🌬 Gust <span id="gust-tewantin">-- km/h</span></div>
+      <div class="row">💧 Humidity <span id="hum-tewantin">-- %</span></div>
+      <div class="row">🌧 Rainfall <span id="rain-tewantin">-- mm</span></div>
+      <div class="row">❄ Dew Point <span id="dew-tewantin">-- °C</span></div>
 
       <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
         <span style="font-size:16px; color:var(--muted);">Dir</span>
@@ -553,14 +394,8 @@ body.red .icon {
       document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
       document.getElementById(`updated-${id}`).textContent = `Updated: ${formatTime(new Date())}`;
 
-      /* WIND SEVERITY */
-      const windSpan = document.getElementById(`wind-${id}`);
-      windSpan.classList.remove('wind-amber','wind-red');
-      if (data.wind > 50) windSpan.classList.add('wind-red');
-      else if (data.wind > 30) windSpan.classList.add('wind-amber');
-
       /* GUST WARNING */
-      const tile = windSpan.closest('.tile');
+      const tile = document.getElementById(`gust-${id}`).closest('.tile');
       tile.classList.remove('gust-pulse');
       if (data.gust > data.wind && data.gust > 40) tile.classList.add('gust-pulse');
 
@@ -575,7 +410,7 @@ body.red .icon {
       applyStation('tewantin', demoData.tewantin);
     }
 
-    /* MODE TOGGLES */
+    /* MODE TOGGLES — FIXED */
     const nvgToggle = document.getElementById('nvgToggle');
     const redToggle = document.getElementById('redToggle');
 
@@ -584,15 +419,20 @@ body.red .icon {
         redToggle.checked = false;
         document.body.classList.add('nvg');
         document.body.classList.remove('red');
-      } else document.body.classList.remove('nvg');
+      } else {
+        document.body.classList.remove('nvg');
+      }
     });
 
+    redToggle.addEventListener('change', () => {
     redToggle.addEventListener('change', () => {
       if (redToggle.checked) {
         nvgToggle.checked = false;
         document.body.classList.add('red');
         document.body.classList.remove('nvg');
-      } else document.body.classList.remove('red');
+      } else {
+        document.body.classList.remove('red');
+      }
     });
 
     loadDemo();
