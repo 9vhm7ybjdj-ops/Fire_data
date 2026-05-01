@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Simple Fire Danger Index – Beerburrum</title>
+<title>Simple Fire Danger Index – AFDRS Style</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
@@ -12,6 +12,44 @@
     padding: 20px;
   }
   h1 { margin-bottom: 0.5rem; }
+
+  /* Colour bar container */
+  .bar {
+    display: flex;
+    height: 40px;
+    margin: 20px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid #333;
+  }
+
+  .seg { flex: 1; }
+
+  .no-rating { background: #ffffff; }
+  .moderate  { background: #4CAF50; }
+  .high      { background: #FFEB3B; }
+  .extreme   { background: #FF9800; }
+  .cat       { background: #F44336; }
+
+  /* Pointer */
+  .pointer {
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 18px solid #fff;
+    margin: 0 auto;
+    position: relative;
+    top: -5px;
+  }
+
+  .label {
+    text-align: center;
+    margin-top: -10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
   pre {
     background: #111628;
     padding: 1rem;
@@ -23,11 +61,23 @@
 </head>
 <body>
 
-<h1>Simple Fire Danger Index – Beerburrum</h1>
-<p>Uses only today's weather: temp, humidity, wind, and recent rain.</p>
+<h1>Simple Fire Danger Index – AFDRS Style</h1>
+<p>Based on today's temperature, humidity, wind, and recent rain.</p>
 
-<h3>Category:</h3>
-<div id="category">Loading…</div>
+<!-- Colour bar -->
+<div class="bar">
+  <div class="seg no-rating"></div>
+  <div class="seg moderate"></div>
+  <div class="seg high"></div>
+  <div class="seg extreme"></div>
+  <div class="seg cat"></div>
+</div>
+
+<!-- Pointer -->
+<div id="pointer" class="pointer"></div>
+
+<!-- Category label -->
+<div id="category" class="label">Loading…</div>
 
 <h3>Details:</h3>
 <pre id="details">Loading…</pre>
@@ -110,18 +160,34 @@ function computeFireIndex(temp, rh, wind, rain24, rain72) {
 }
 
 // -------------------------------
-// 3. Map score → category
+// 3. Map score → AFDRS category
 // -------------------------------
 function scoreToCategory(score) {
-  if (score <= 2) return "Low";
-  if (score <= 4) return "Moderate";
-  if (score <= 6) return "High";
-  if (score <= 8) return "Extreme";
+  if (score <= 1) return "No Rating";
+  if (score <= 3) return "Moderate";
+  if (score <= 5) return "High";
+  if (score <= 7) return "Extreme";
   return "Catastrophic";
 }
 
 // -------------------------------
-// 4. Run everything
+// 4. Move pointer to correct segment
+// -------------------------------
+function movePointer(category) {
+  const pointer = document.getElementById("pointer");
+  const positions = {
+    "No Rating": 10,
+    "Moderate": 30,
+    "High": 50,
+    "Extreme": 70,
+    "Catastrophic": 90
+  };
+  pointer.style.left = positions[category] + "%";
+  pointer.style.position = "relative";
+}
+
+// -------------------------------
+// 5. Run everything
 // -------------------------------
 (async () => {
   try {
@@ -130,6 +196,7 @@ function scoreToCategory(score) {
     const category = scoreToCategory(score);
 
     document.getElementById("category").textContent = category;
+    movePointer(category);
 
     document.getElementById("details").textContent =
       `Temp: ${w.temp}°C\n` +
