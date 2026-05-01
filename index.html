@@ -1,408 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sunshine Coast Weather</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-  :root {
-    --bg: #0b0b0b;              /* tactical black */
-    --tile-bg: #141414;         /* equipment panel */
-    --tile-edge: #1f1f1f;       /* subtle bevel */
-    --text: #e6e6e6;            /* high contrast */
-    --muted: #7a7a7a;           /* dim labels */
-    --accent: #4cc3ff;          /* neon cyan (wind) */
-    --radius: 6px;              /* harder edges */
-    --shadow: 0 0 0 2px #0f0f0f inset; /* industrial inset */
-  }
+  <title>Fireground Tactical v2</title>
 
-  body {
-    margin: 0;
-    padding: 16px;
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Segoe UI", system-ui, sans-serif;
-    letter-spacing: 0.3px;
-  }
+  <!-- DIN-Style Industrial Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 
-  h1 {
-    margin: 0 0 10px;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--accent);
-    text-transform: uppercase;
-  }
+  <style>
+    :root {
+      --steel-bg: #0d0d0f;
+      --steel-grain: rgba(255,255,255,0.04);
+      --tile-bg: #141416;
+      --tile-edge: #1f1f22;
+      --text: #e6e6e6;
+      --muted: #888;
+      --amber: #ffb84d;
+      --red: #ff4d4d;
+      --yellow: #ffe066;
+      --accent: #ffb84d;
+      --rivet: #3a3a3d;
+    }
 
-  /* Tactical hardware toggle switch */
-  .toggle-wrap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-    cursor: pointer;
-    user-select: none;
-    font-family: Consolas, monospace;
-    color: var(--accent);
-  }
+    body {
+      margin: 0;
+      background: var(--steel-bg);
+      font-family: 'Rajdhani', sans-serif;
+      color: var(--text);
+      letter-spacing: 0.5px;
+      user-select: none;
+    }
 
-  .toggle-wrap input {
-    display: none;
-  }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%),
+        repeating-linear-gradient(
+          90deg,
+          var(--steel-grain) 0px,
+          var(--steel-grain) 1px,
+          transparent 2px,
+          transparent 4px
+        );
+      opacity: 0.25;
+      pointer-events: none;
+    }
 
-  .toggle-switch {
-    width: 52px;
-    height: 26px;
-    background: #0f0f0f;
-    border: 2px solid #1f1f1f;
-    border-radius: 20px;
-    position: relative;
-    box-shadow: inset 0 0 6px #000;
-    transition: background 0.2s ease;
-  }
+    .status-bar {
+      width: 100%;
+      padding: 12px 20px;
+      background: #0f0f11;
+      border-bottom: 2px solid #1c1c1e;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 20px;
+      color: var(--amber);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+    }
 
-  .toggle-switch::after {
-    content: "";
-    width: 22px;
-    height: 22px;
-    background: #222;
-    border-radius: 50%;
-    position: absolute;
-    top: 1px;
-    left: 1px;
-    transition: transform 0.2s ease, background 0.2s ease;
-    box-shadow: 0 0 4px #000;
-  }
+    .status-bar::before,
+    .status-bar::after {
+      content: "";
+      width: 10px;
+      height: 10px;
+      background: var(--rivet);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow: inset 0 0 3px #000;
+    }
+    .status-bar::before { left: 12px; }
+    .status-bar::after { right: 12px; }
 
-  .toggle-wrap input:checked + .toggle-switch {
-    background: #1a3f1a;
-    box-shadow: inset 0 0 10px #0f0;
-  }
+    .lamps {
+      display: flex;
+      gap: 10px;
+    }
+    .lamp {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #333;
+      box-shadow: inset 0 0 4px #000;
+    }
+    .lamp.green { background: #4dff4d; }
+    .lamp.amber { background: #ffb84d; }
+    .lamp.red { background: #ff4d4d; }
 
-  .toggle-wrap input:checked + .toggle-switch::after {
-    transform: translateX(26px);
-    background: #4cff4c;
-    box-shadow: 0 0 8px #4cff4c;
-  }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+      padding: 22px;
+      transform-origin: top center;
+      margin: 0 auto;
+    }
 
-  .grid {
-    display: grid;
-    gap: 18px;
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 1fr;
-  }
+    @media (max-width: 1200px) {
+      .grid {
+        transform: scale(calc(100vw / 1200));
+      }
+    }
 
-  .station-tile {
-    background: var(--tile-bg);
-    border-radius: var(--radius);
-    padding: 18px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--tile-edge);
-    position: relative;
-  }
+    .tile {
+      background: var(--tile-bg);
+      border: 2px solid var(--tile-edge);
+      padding: 18px 22px;
+      border-radius: 6px;
+      position: relative;
+      box-shadow:
+        inset 0 0 12px #000,
+        0 0 12px #000;
+    }
 
-  .station-tile::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
-    opacity: 0.15;
-    pointer-events: none;
-  }
+    .tile::before,
+    .tile::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      background: var(--rivet);
+      border-radius: 50%;
+      position: absolute;
+      box-shadow: inset 0 0 3px #000;
+    }
+    .tile::before { top: 8px; left: 8px; }
+    .tile::after { top: 8px; right: 8px; }
 
-  .station-name {
-    font-size: 1.1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
+    .tile .rivet-bl,
+    .tile .rivet-br {
+      width: 12px;
+      height: 12px;
+      background: var(--rivet);
+      border-radius: 50%;
+      position: absolute;
+      bottom: 8px;
+      box-shadow: inset 0 0 3px #000;
+    }
+    .tile .rivet-bl { left: 8px; }
+    .tile .rivet-br { right: 8px; }
 
-  .station-time {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 2px;
-  }
+    .station-name {
+      font-size: 26px;
+      color: var(--amber);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
 
-  .wx-row {
-    display: grid;
-    grid-template-columns: 1.6rem 7rem auto auto;
-    align-items: center;
-    font-size: 0.9rem;
-    margin: 6px 0;
-    font-family: "Consolas", monospace;
-  }
+    .updated {
+      color: var(--yellow);
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
 
-  .wind-arrow {
-    width: 28px;
-    height: 28px;
-    transform-origin: 50% 85%;
-    display: inline-block;
-  }
+    .row {
+      font-size: 20px;
+      margin: 6px 0;
+      display: flex;
+      justify-content: space-between;
+    }
 
-  /* NIGHT VISION MODE */
-  body.nvg {
-    --bg: #020f02;
-    --tile-bg: #031703;
-    --tile-edge: #0a2a0a;
-    --text: #9bff9b;
-    --muted: #4fa64f;
-    --accent: #b6ffb6;
-  }
+    .wind-arrow {
+      width: 42px;
+      height: 42px;
+      filter: drop-shadow(0 0 6px var(--amber));
+    }
 
-  body.nvg .station-tile {
-    box-shadow: 0 0 12px #0f3f0f inset;
-  }
+    .wind-amber {
+      color: var(--amber);
+      text-shadow: 0 0 8px var(--amber);
+    }
 
-  body.nvg .wind-arrow polygon,
-  body.nvg .wind-arrow rect {
-    fill: #b6ffb6;
-    filter: drop-shadow(0 0 6px #6aff6a);
-  }
+    .wind-red {
+      color: var(--red);
+      text-shadow: 0 0 10px var(--red);
+    }
 
-  body.nvg h1,
-  body.nvg .station-name {
-    color: #b6ffb6;
-  }
-</style>
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 8px var(--red); }
+      50% { box-shadow: 0 0 18px var(--red); }
+      100% { box-shadow: 0 0 8px var(--red); }
+    }
+
+    .gust-pulse {
+      animation: pulse-red 1.2s infinite;
+    }
+
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 20px;
+      font-size: 18px;
+      color: var(--amber);
+    }
+
+    .toggle-switch {
+      width: 46px;
+      height: 24px;
+      background: #333;
+      border-radius: 20px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .toggle-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      background: #999;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: 0.2s;
+    }
+
+    input[type="checkbox"]:checked + .toggle-switch::after {
+      left: 24px;
+      background: var(--amber);
+    }
+
+    body.nvg {
+      --text: #00ff88;
+      --amber: #00ff88;
+      --yellow: #00ff88;
+      --red: #ff4d4d;
+      --tile-bg: #001b0f;
+      --tile-edge: #00331a;
+    }
+
+    body.red {
+      --text: #ffb3b3;
+      --amber: #ff8080;
+      --yellow: #ff9999;
+      --red: #ff4d4d;
+      --tile-bg: #1a0000;
+      --tile-edge: #330000;
+    }
+  </style>
 </head>
-
 <body>
-<h1>Sunshine Coast Weather</h1>
-
-<label class="toggle-wrap">
-  <input type="checkbox" id="nvgCheck">
-  <div class="toggle-switch"></div>
-  <span>Night Vision Mode</span>
-</label>
-
-<div class="grid">
-
-  <!-- Nambour -->
-  <div class="station-tile" id="station-nambour">
-    <div class="station-name">Nambour</div>
-    <div class="station-time" data-role="time">Loading…</div>
-
-    <div class="wx-row">
-      <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
+  <!-- TOP STATUS BAR -->
+  <div class="status-bar">
+    <div>FIREGROUND WX DATA — SYSTEM ONLINE — QLD OPS</div>
+    <div class="lamps">
+      <div class="lamp green"></div>
+      <div class="lamp amber"></div>
+      <div class="lamp red"></div>
     </div>
-
-    <div class="wx-row">
-      <span>
-        <svg class="wind-arrow" viewBox="0 0 100 100">
-          <defs>
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-          <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-        </svg>
-      </span>
-      <span>Wind:</span>
-      <span data-role="wind-speed">–</span>
-      <span data-role="wind-dir">–</span>
-    </div>
-
-    <div class="wx-row">
-      <span>💨</span>
-      <span>Gust:</span>
-      <span data-role="gust-speed">–</span>
-      <span></span>
-    </div>
-
-    <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
-    <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
-    <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
-
-    <div class="loading" data-role="status">Loading data…</div>
   </div>
 
-  <!-- Beerburrum -->
-  <div class="station-tile" id="station-beerburrum">
-    <div class="station-name">Beerburrum</div>
-    <div class="station-time" data-role="time">Loading…</div>
-
-    <div class="wx-row">
-      <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
-    </div>
-
-    <div class="wx-row">
-      <span>
-        <svg class="wind-arrow" viewBox="0 0 100 100">
-          <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-          <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
-        </svg>
-      </span>
-      <span>Wind:</span>
-      <span data-role="wind-speed">–</span>
-      <span data-role="wind-dir">–</span>
-    </div>
-
-    <div class="wx-row">
-      <span>💨</span>
-      <span>Gust:</span>
-      <span data-role="gust-speed">–</span>
-      <span></span>
-    </div>
-
-    <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
-    <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
-    <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
-
-    <div class="loading" data-role="status">Loading data…</div>
+  <!-- MODE TOGGLES -->
+  <div class="toggle-wrap">
+    <label>
+      NVG
+      <input id="nvgToggle" type="checkbox" hidden>
+      <span class="toggle-switch"></span>
+    </label>
+    <label>
+      RED
+      <input id="redToggle" type="checkbox" hidden>
+      <span class="toggle-switch"></span>
+    </label>
   </div>
 
-  <!-- Sunshine Coast Airport -->
-  <div class="station-tile" id="station-sca">
-    <div class="station-name">Sunshine Coast Airport</div>
-    <div class="station-time" data-role="time">Loading…</div>
+  <!-- MAIN GRID -->
+  <div class="grid" id="wxGrid">
 
-    <div class="wx-row">
-      <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
-    </div>
+    <!-- NAMBOUR -->
+    <div class="tile" data-station="nambour">
+      <div class="station-name">NAMBOUR</div>
+      <div class="updated" id="updated-nambour">Updated: --:--</div>
 
-    <div class="wx-row">
-      <span>
-        <svg class="wind-arrow" viewBox="0 0 100 100">
-          <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-          <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
+      <div class="row"><span>Temperature</span><span id="temp-nambour">--.- °C</span></div>
+      <div class="row"><span>Wind</span><span id="wind-nambour" class="wind-value">-- km/h</span></div>
+      <div class="row"><span>Gust</span><span id="gust-nambour" class="gust-value">-- km/h</span></div>
+      <div class="row"><span>Humidity</span><span id="hum-nambour">-- %</span></div>
+      <div class="row"><span>Rainfall</span><span id="rain-nambour">-- mm</span></div>
+      <div class="row"><span>Dew Point</span><span id="dew-nambour">-- °C</span></div>
+
+      <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
+        <span style="font-size:16px; color:var(--muted);">Dir</span>
+        <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
+          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
         </svg>
-      </span>
-      <span>Wind:</span>
-      <span data-role="wind-speed">–</span>
-      <span data-role="wind-dir">–</span>
+      </div>
+
+      <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
-    <div class="wx-row">
-      <span>💨</span>
-      <span>Gust:</span>
-      <span data-role="gust-speed">–</span>
-      <span></span>
-    </div>
+    <!-- BEERBURRUM -->
+    <div class="tile" data-station="beerburrum">
+      <div class="station-name">BEERBURRUM</div>
+      <div class="updated" id="updated-beerburrum">Updated: --:--</div>
 
-    <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
-    <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
-    <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
+      <div class="row"><span>Temperature</span><span id="temp-beerburrum">--.- °C</span></div>
+      <div class="row"><span>Wind</span><span id="wind-beerburrum" class="wind-value">-- km/h</span></div>
+      <div class="row"><span>Gust</span><span id="gust-beerburrum" class="gust-value">-- km/h</span></div>
+      <div class="row"><span>Humidity</span><span id="hum-beerburrum">-- %</span></div>
+      <div class="row"><span>Rainfall</span><span id="rain-beerburrum">-- mm</span></div>
+      <div class="row"><span>Dew Point</span><span id="dew-beerburrum">-- °C</span></div>
 
-    <div class="loading" data-role="status">Loading data…</div>
-  </div>
-
-  <!-- Tewantin -->
-  <div class="station-tile" id="station-tewantin">
-    <div class="station-name">Tewantin</div>
-    <div class="station-time" data-role="time">Loading…</div>
-
-    <div class="wx-row">
-      <span>🌡️</span><span>Temperature:</span><span data-role="temp">–</span>
-    </div>
-
-    <div class="wx-row">
-      <span>
-        <svg class="wind-arrow" viewBox="0 0 100 100">
-          <polygon points="50,10 60,40 50,35 40,40" fill="#4cc3ff" filter="url(#glow)"/>
-          <rect x="47" y="40" width="6" height="45" fill="#4cc3ff" filter="url(#glow)"/>
+      <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
+        <span style="font-size:16px; color:var(--muted);">Dir</span>
+        <svg id="arrow-beerburrum" class="wind-arrow" viewBox="0 0 64 64">
+          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
         </svg>
-      </span>
-      <span>Wind:</span>
-      <span data-role="wind-speed">–</span>
-      <span data-role="wind-dir">–</span>
+      </div>
+
+      <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
-    <div class="wx-row">
-      <span>💨</span>
-      <span>Gust:</span>
-      <span data-role="gust-speed">–</span>
-      <span></span>
+    <!-- SUNSHINE COAST AIRPORT -->
+    <div class="tile" data-station="sunshine">
+      <div class="station-name">SUNSHINE COAST AIRPORT</div>
+      <div class="updated" id="updated-sunshine">Updated: --:--</div>
+
+      <div class="row"><span>Temperature</span><span id="temp-sunshine">--.- °C</span></div>
+      <div class="row"><span>Wind</span><span id="wind-sunshine" class="wind-value">-- km/h</span></div>
+      <div class="row"><span>Gust</span><span id="gust-sunshine" class="gust-value">-- km/h</span></div>
+      <div class="row"><span>Humidity</span><span id="hum-sunshine">-- %</span></div>
+      <div class="row"><span>Rainfall</span><span id="rain-sunshine">-- mm</span></div>
+      <div class="row"><span>Dew Point</span><span id="dew-sunshine">-- °C</span></div>
+
+      <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
+        <span style="font-size:16px; color:var(--muted);">Dir</span>
+        <svg id="arrow-sunshine" class="wind-arrow" viewBox="0 0 64 64">
+          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+        </svg>
+      </div>
+
+      <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
-    <div class="wx-row"><span>💧</span><span>Humidity:</span><span data-role="humidity">–</span></div>
-    <div class="wx-row"><span>🌧️</span><span>Rainfall:</span><span data-role="rain">–</span></div>
-    <div class="wx-row"><span>❄️</span><span>Dew Point:</span><span data-role="dewpoint">–</span></div>
+    <!-- TEWANTIN -->
+    <div class="tile" data-station="tewantin">
+      <div class="station-name">TEWANTIN</div>
+      <div class="updated" id="updated-tewantin">Updated: --:--</div>
 
-    <div class="loading" data-role="status">Loading data…</div>
-  </div>
+      <div class="row"><span>Temperature</span><span id="temp-tewantin">--.- °C</span></div>
+      <div class="row"><span>Wind</span><span id="wind-tewantin" class="wind-value">-- km/h</span></div>
+      <div class="row"><span>Gust</span><span id="gust-tewantin" class="gust-value">-- km/h</span></div>
+      <div class="row"><span>Humidity</span><span id="hum-tewantin">-- %</span></div>
+      <div class="row"><span>Rainfall</span><span id="rain-tewantin">-- mm</span></div>
+      <div class="row"><span>Dew Point</span><span id="dew-tewantin">-- °C</span></div>
 
-</div>
+      <div class="row" style="margin-top:10px; justify-content:flex-end; gap:10px;">
+        <span style="font-size:16px; color:var(--muted);">Dir</span>
+        <svg id="arrow-tewantin" class="wind-arrow" viewBox="0 0 64 64">
+          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+        </svg>
+      </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Night vision toggle
-  document.getElementById("nvgCheck").addEventListener("change", (e) => {
-    if (e.target.checked) {
-      document.body.classList.add("nvg");
-    } else {
-      document.body.classList.remove("nvg");
+      <div class="rivet-bl"></div><div class="rivet-br"></div>
+    </div>
+
+  </div> <!-- end grid -->
+
+  <script>
+    // DEMO DATA (replace with live feed later)
+    const demoData = {
+      nambour:   { temp: 20.4, wind: 36, gust: 54.2, dir: 135, hum: 79, rain: 0.0, dew: 16.5 },
+      beerburrum:{ temp: 19.8, wind: 28, gust: 46.4, dir: 135, hum: 81, rain: 0.0, dew: 16.1 },
+      sunshine:  { temp: 21.5, wind: 42, gust: 57.6, dir: 180, hum: 78, rain: 0.0, dew: 17.5 },
+      tewantin:  { temp: 20.0, wind: 34, gust: 48.3, dir: 140, hum: 76, rain: 0.1, dew: 16.4 }
+    };
+
+    function formatTime(d) {
+      return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
     }
-  });
 
-  const stations = [
-    { id: "nambour", name: "Nambour", lat: -26.63, lon: 152.96 },
-    { id: "beerburrum", name: "Beerburrum", lat: -26.95, lon: 152.95 },
-    { id: "sca", name: "Sunshine Coast Airport", lat: -26.60, lon: 153.09 },
-    { id: "tewantin", name: "Tewantin", lat: -26.39, lon: 153.03 }
-  ];
+    function applyStation(id, data) {
+      document.getElementById(`temp-${id}`).textContent = `${data.temp.toFixed(1)} °C`;
+      document.getElementById(`wind-${id}`).textContent = `${data.wind} km/h`;
+      document.getElementById(`gust-${id}`).textContent = `${data.gust.toFixed(1)} km/h`;
+      document.getElementById(`hum-${id}`).textContent  = `${data.hum}%`;
+      document.getElementById(`rain-${id}`).textContent = `${data.rain} mm`;
+      document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
+      document.getElementById(`updated-${id}`).textContent = `Updated: ${formatTime(new Date())}`;
 
-  function degToCompass(deg) {
-    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
-    return dirs[Math.round(deg / 45) % 8];
-  }
+      // Wind severity
+      const windSpan = document.getElementById(`wind-${id}`);
+      windSpan.classList.remove('wind-amber','wind-red');
+      if (data.wind > 50) windSpan.classList.add('wind-red');
+      else if (data.wind > 30) windSpan.classList.add('wind-amber');
 
-  function formatTime(d) {
-    return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  }
+      // Gust pulse
+      const tile = windSpan.closest('.tile');
+      tile.classList.remove('gust-pulse');
+      if (data.gust > data.wind && data.gust > 40) tile.classList.add('gust-pulse');
 
-  async function loadStation(st) {
-    const el = document.getElementById(`station-${st.id}`);
-
-    const timeEl = el.querySelector('[data-role="time"]');
-    const statusEl = el.querySelector('[data-role="status"]');
-
-    const tempEl = el.querySelector('[data-role="temp"]');
-    const humEl = el.querySelector('[data-role="humidity"]');
-    const rainEl = el.querySelector('[data-role="rain"]');
-    const dewEl = el.querySelector('[data-role="dewpoint"]');
-
-    const windSpeedEl = el.querySelector('[data-role="wind-speed"]');
-    const windDirEl = el.querySelector('[data-role="wind-dir"]');
-    const gustSpeedEl = el.querySelector('[data-role="gust-speed"]');
-
-    const windArrowEl = el.querySelector('.wind-arrow');
-
-    try {
-      const url =
-        `https://api.open-meteo.com/v1/forecast?latitude=${st.lat}&longitude=${st.lon}` +
-        `&current=temperature_2m,relative_humidity_2m,dew_point_2m,precipitation,` +
-        `wind_speed_10m,wind_gusts_10m,wind_direction_10m&timezone=auto`;
-
-      const res = await fetch(url);
-      const data = await res.json();
-      const c = data.current;
-
-      tempEl.textContent = `${c.temperature_2m.toFixed(1)}°C`;
-      humEl.textContent = `${c.relative_humidity_2m}%`;
-      dewEl.textContent = `${c.dew_point_2m.toFixed(1)}°C`;
-      rainEl.textContent = `${c.precipitation.toFixed(1)} mm`;
-
-      windSpeedEl.textContent = `${c.wind_speed_10m.toFixed(1)} km/h`;
-      gustSpeedEl.textContent = `${c.wind_gusts_10m.toFixed(1)} km/h`;
-
-      windDirEl.textContent = `${degToCompass(c.wind_direction_10m)} (${c.wind_direction_10m}°)`;
-
-      // Arrow points FROM direction (BOM style: add 180 if you prefer)
-      windArrowEl.style.transform = `rotate(${c.wind_direction_10m}deg)`;
-
-      timeEl.textContent = `Updated: ${formatTime(new Date())}`;
-      statusEl.textContent = "";
-
-    } catch (err) {
-      statusEl.textContent = "Error loading data";
-      statusEl.style.color = "#ff4d4d";
+      // Arrow rotation
+      document.getElementById(`arrow-${id}`).style.transform = `rotate(${data.dir}deg)`;
     }
-  }
 
-  stations.forEach(loadStation);
-});
-</script>
+    function loadDemo() {
+      applyStation('nambour', demoData.nambour);
+      applyStation('beerburrum', demoData.beerburrum);
+      applyStation('sunshine', demoData.sunshine);
+      applyStation('tewantin', demoData.tewantin);
+    }
+
+    // MODE TOGGLES
+    const nvgToggle = document.getElementById('nvgToggle');
+    const redToggle = document.getElementById('redToggle');
+
+    nvgToggle.addEventListener('change', () => {
+      if (nvgToggle.checked) {
+        redToggle.checked = false;
+        document.body.classList.add('nvg');
+        document.body.classList.remove('red');
+      } else document.body.classList.remove('nvg');
+    });
+
+    redToggle.addEventListener('change', () => {
+      if (redToggle.checked) {
+        nvgToggle.checked = false;
+        document.body.classList.add('red');
+        document.body.classList.remove('nvg');
+      } else document.body.classList.remove('red');
+    });
+
+    loadDemo();
+  </script>
 </body>
 </html>
