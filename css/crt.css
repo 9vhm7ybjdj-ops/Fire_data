@@ -10,6 +10,9 @@
   /* Slight curvature */
   border-radius: 8px;
   transform: perspective(900px) translateZ(0);
+
+  /* Flicker animation */
+  animation: crt-flicker 0.12s infinite;
 }
 
 /* ===========================================================
@@ -25,6 +28,7 @@
   background:
     radial-gradient(circle at 50% 50%, rgba(0,255,0,0.08), transparent 70%);
   mix-blend-mode: screen;
+  z-index: 1;
 }
 
 /* ===========================================================
@@ -99,10 +103,6 @@
   90%  { opacity: 0.98; }
   95%  { opacity: 1.00; }
   100% { opacity: 0.97; }
-}
-
-#crt {
-  animation: crt-flicker 0.12s infinite;
 }
 
 /* ===========================================================
