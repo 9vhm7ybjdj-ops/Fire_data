@@ -1,11 +1,24 @@
 /* ===========================================================
-   LCD FONT + CRT TEXT RENDERING
+   LCD TEXT SYSTEM — MODE AWARE
 =========================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
+.lcd, 
+#crt, 
 #crt * {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 18px;
-  color: #0f0;
+  font-family: monospace;
+  color: #ffffff; /* NORMAL MODE = PURE WHITE */
+}
+
+/* NVG MODE — GREEN PHOSPHOR */
+body.nvg #crt,
+body.nvg #crt * {
+  color: #00ff66;
+  text-shadow: 0 0 6px #00ff66;
+}
+
+/* RED MODE — RED PHOSPHOR */
+body.red #crt,
+body.red #crt * {
+  color: #ff4444;
+  text-shadow: 0 0 6px #ff4444;
 }
