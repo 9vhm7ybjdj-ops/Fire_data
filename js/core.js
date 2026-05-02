@@ -39,10 +39,17 @@ document.querySelectorAll(".page-btn").forEach(btn => {
 });
 
 /* ===========================================================
-   INITIAL PAGE SELECTION (WX)
+   INITIALISE DEFAULT PAGE (WX) — AFTER DOM IS READY
 =========================================================== */
 
 window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("page-wx").classList.add("active");
-  document.querySelector('.page-btn[data-page="wx"]').classList.add("active-page");
+  // Set WX page active
+  const wxPage = document.getElementById("page-wx");
+  if (wxPage) wxPage.classList.add("active");
+
+  const wxBtn = document.querySelector('.page-btn[data-page="wx"]');
+  if (wxBtn) wxBtn.classList.add("active-page");
+
+  // Tell modes.js that the DOM is ready so it can set NORMAL mode
+  document.dispatchEvent(new Event("mfd-ready"));
 });
