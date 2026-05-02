@@ -1,6 +1,5 @@
 /* ===========================================================
-   FULL-PANEL PROPORTIONAL SCALING
-   Fits all iPhones, iPads, desktops
+   SCALING ENGINE — FIT 1024×768 INTO ANY SCREEN
 =========================================================== */
 
 function scaleMFD() {
@@ -12,10 +11,9 @@ function scaleMFD() {
 
   const scale = Math.min(scaleX, scaleY);
 
-  const mfd = document.getElementById("mfd-container");
-  mfd.style.transform = `scale(${scale})`;
+  const wrapper = document.getElementById("scale-wrapper");
+  wrapper.style.transform = `scale(${scale})`;
 }
 
 window.addEventListener("resize", scaleMFD);
-window.addEventListener("orientationchange", scaleMFD);
-document.addEventListener("DOMContentLoaded", scaleMFD);
+window.addEventListener("DOMContentLoaded", scaleMFD);
