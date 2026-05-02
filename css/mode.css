@@ -1,19 +1,7 @@
 /* ===========================================================
-   NVG + RED MODES (GLOBAL CRT FILTERS)
+   MODE BUTTONS — NO COLOUR CHANGE, ONLY DEPRESSED STATE
 =========================================================== */
 
-body.nvg #crt {
-  filter:
-    brightness(var(--brightness-level, 1))
-    hue-rotate(90deg)
-    saturate(2)
-    contrast(1.2);
-}
-
-body.red #crt {
-  filter:
-    brightness(var(--brightness-level, 1))
-    hue-rotate(-60deg)
-    saturate(1.8)
-    contrast(1.1);
+.mode-btn.active-mode {
+  /* Depressed handled in buttons.css */
 }
