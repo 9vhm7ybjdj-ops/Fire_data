@@ -16,12 +16,12 @@
   /* Raised mechanical look */
   box-shadow:
     0 4px 0 #000,
-    0 0 8px #000 inset;
+    0 0 6px #000 inset;
 
+  /* REDUCED GLOW — stays inside bezel */
   text-shadow:
-    0 0 4px #ffb000,
-    0 0 8px #ffb000,
-    0 0 12px #ffb000;
+    0 0 2px #ffb000,
+    0 0 4px #ffb000;
 
   transition: transform 0.08s linear, box-shadow 0.08s linear;
 }
@@ -35,7 +35,7 @@
   transform: translateY(4px);
   box-shadow:
     0 1px 0 #000,
-    0 0 4px #000 inset;
+    0 0 3px #000 inset;
   background: #111;
 }
 
