@@ -1,32 +1,31 @@
 /* ===========================================================
-   WX TILE GRID — RESPONSIVE 2×2 LAYOUT
+   WX TILE GRID — 2×2 LAYOUT
 =========================================================== */
 
 #wx-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 12px;
   width: 100%;
   height: 100%;
-  flex: 1;
 }
 
 /* ===========================================================
-   INDIVIDUAL WX TILES — RESPONSIVE, CRT GLOW
+   WX TILE STYLE — CRT LOOK
 =========================================================== */
 
 .wx-tile {
-  background: #1a1a1a;
-  border: 3px solid #0c0c0c;
+  background: #0a0a0a;
+  border: 3px solid #111;
   border-radius: 6px;
   padding: 10px;
-  color: #0ff;
   font-family: monospace;
   font-size: clamp(12px, 2.5vw, 18px);
+  color: #ffffff; /* ✅ white text */
   box-shadow:
-    inset 0 0 20px rgba(0,255,255,0.08),
-    inset 0 0 40px rgba(0,255,255,0.05);
+    inset 0 0 20px rgba(255,255,255,0.08),
+    inset 0 0 40px rgba(255,255,255,0.05);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -34,61 +33,24 @@
 }
 
 /* ===========================================================
-   MAP SURFACES (RADAR / SAT / COMBO) — RESPONSIVE
+   TILE TEXT COLOR BY MODE
 =========================================================== */
 
-.map-surface {
-  width: 100%;
-  height: 100%;
-  background: #000;
-  border: 3px solid #0c0c0c;
-  border-radius: 6px;
+body.nvg-mode .wx-tile {
+  color: #00ff66; /* phosphor green */
+}
+
+body.red-mode .wx-tile {
+  color: #ff1a1a; /* deep red */
+}
+
+/* ===========================================================
+   TILE ACTIVE STATE (OPTIONAL)
+=========================================================== */
+
+.wx-tile.active {
+  border-color: #b36b00;
   box-shadow:
-    inset 0 0 20px rgba(0,255,255,0.08),
-    inset 0 0 40px rgba(0,255,255,0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-/* ===========================================================
-   SAT CHANNEL BAR (VIS / IR / WV)
-=========================================================== */
-
-#sat-channel-bar {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-  z-index: 10;
-}
-
-.sat-channel-btn {
-  min-width: 50px;
-  height: 28px;
-  background: #333;
-  border: 2px solid #111;
-  border-radius: 4px;
-  color: #ddd;
-  font-family: monospace;
-  font-size: clamp(10px, 2vw, 14px);
-  cursor: pointer;
-}
-
-.sat-channel-btn.active-channel {
-  background: #0a84ff;
-  color: #fff;
-  border-color: #0a84ff;
-}
-
-/* ===========================================================
-   COMBO OPACITY SLIDER
-=========================================================== */
-
-#combo-opacity-bar {
-  margin-bottom: 8px;
-  color: #0ff;
-  font-family: monospace;
-  font-size: clamp(10px, 2vw, 14px);
+    0 0 12px rgba(255,170,0,0.6),
+    inset 0 0 6px rgba(0,0,0,0.8);
 }
