@@ -35,12 +35,10 @@ html, body {
   height: 768px;
   position: relative;
 
-  /* DARK ANODIZED ALUMINUM */
-  background: #141414; /* deep charcoal base */
+  background: #141414;
   border: 14px solid #0d0d0d;
   border-radius: 10px;
 
-  /* Subtle anodized sheen */
   background-image:
     linear-gradient(
       to bottom,
@@ -51,64 +49,13 @@ html, body {
 
   background-blend-mode: overlay;
 
-  /* Depth + shadow */
   box-shadow:
     inset 0 0 18px #000,
     0 0 22px #000;
 }
 
 /* ===========================================================
-   BUTTON COLUMNS — ADJUSTED FOR PROPER CONTAINMENT
-=========================================================== */
-
-.button-column {
-  position: absolute;
-  top: 110px;        /* moved down from 80px */
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.left-buttons {
-  left: 40px;        /* moved inward from 20px */
-}
-
-.right-buttons {
-  right: 40px;       /* moved inward from 20px */
-}
-
-/* ===========================================================
-   CRT FRAME — CENTERED + PROPORTIONAL
-=========================================================== */
-
-#crt-frame {
-  position: absolute;
-  top: 60px;         /* balanced vertical spacing */
-  left: 180px;       /* balanced horizontal spacing */
-  width: 664px;      /* adjusted to maintain bezel symmetry */
-  height: 648px;     /* adjusted to maintain bezel symmetry */
-
-  background: #000 !important;
-  border: 6px solid #222;
-  border-radius: 8px;
-
-  box-shadow:
-    inset 0 0 12px #000,
-    0 0 12px #000;
-}
-
-/* ===========================================================
-   CRT INNER AREA
-=========================================================== */
-
-#crt {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-/* ===========================================================
-   PAGE SYSTEM
+   PAGE SYSTEM (GLOBAL)
 =========================================================== */
 
 .page {
