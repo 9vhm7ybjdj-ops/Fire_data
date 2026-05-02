@@ -1,7 +1,5 @@
 /* ===========================================================
-   CRT DISPLAY CONTAINER
-   - Contains ALL glow, tint, scanlines, curvature
-   - Prevents bleed into bezel or buttons
+   CRT DISPLAY CONTAINER — CONTAINED INSIDE SCREEN
 =========================================================== */
 
 #crt {
@@ -11,15 +9,13 @@
   background: #000;
   border-radius: 8px;
   overflow: hidden;
-
-  /* Subtle CRT bloom */
   box-shadow:
     inset 0 0 25px rgba(0,255,255,0.08),
     inset 0 0 60px rgba(0,255,255,0.05);
 }
 
 /* ===========================================================
-   PHOSPHOR GLOW LAYER
+   PHOSPHOR GLOW
 =========================================================== */
 
 #crt::before {
@@ -27,7 +23,6 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-
   background: radial-gradient(
     circle at center,
     rgba(0,255,255,0.06),
@@ -37,7 +32,7 @@
 }
 
 /* ===========================================================
-   SCANLINES (subtle, authentic)
+   SCANLINES
 =========================================================== */
 
 #crt::after {
@@ -45,7 +40,6 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-
   background: repeating-linear-gradient(
     to bottom,
     rgba(255,255,255,0.03) 0px,
@@ -53,13 +47,12 @@
     rgba(0,0,0,0.05) 2px,
     rgba(0,0,0,0.05) 3px
   );
-
   opacity: 0.25;
   mix-blend-mode: overlay;
 }
 
 /* ===========================================================
-   OPTIONAL CURVATURE (subtle barrel distortion)
+   CURVATURE (SUBTLE BARREL DISTORTION)
 =========================================================== */
 
 #crt {
