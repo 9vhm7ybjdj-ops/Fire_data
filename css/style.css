@@ -61,19 +61,24 @@ html, body {
 }
 
 /* ===========================================================
-   BUTTON COLUMNS
+   BUTTON COLUMNS (adjusted inward + downward)
 =========================================================== */
 
 .button-column {
   position: absolute;
-  top: 80px;
+  top: 110px;        /* moved down from 80px */
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.left-buttons { left: 20px; }
-.right-buttons { right: 20px; }
+.left-buttons {
+  left: 40px;        /* moved inward from 20px */
+}
+
+.right-buttons {
+  right: 40px;       /* moved inward from 20px */
+}
 
 /* ===========================================================
    CRT FRAME
@@ -81,12 +86,12 @@ html, body {
 
 #crt-frame {
   position: absolute;
-  top: 40px;
-  left: 160px;
-  width: 704px;
-  height: 688px;
+  top: 60px;         /* moved up slightly to balance spacing */
+  left: 180px;       /* moved inward to match button shift */
+  width: 664px;      /* reduced width to maintain bezel symmetry */
+  height: 648px;     /* reduced height to maintain bezel symmetry */
 
-  background: #000 !important; /* OPAQUE */
+  background: #000 !important;
   border: 6px solid #222;
   border-radius: 8px;
 
