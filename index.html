@@ -16,6 +16,8 @@
       --steel-light: #5a5a5a;
       --steel-dark: #2e2e2e;
       --bezel-metal: #1a1a1a;
+      --btn-off: #d0d0d0;
+      --btn-on: #ffffff;
     }
 
     * {
@@ -23,7 +25,7 @@
     }
 
     /* -----------------------------------------------------------
-       GLOBAL BACKGROUND — BRUSHED STEEL (RESTORED)
+       GLOBAL BACKGROUND — BRUSHED STEEL
     ----------------------------------------------------------- */
     body {
       margin: 0;
@@ -49,7 +51,7 @@
     }
 
     /* -----------------------------------------------------------
-       NVG + RED MODES (NO BACKGROUND CHANGE)
+       NVG + RED MODES
     ----------------------------------------------------------- */
     body.nvg {
       filter: brightness(0.85) contrast(0.85) hue-rotate(80deg);
@@ -64,10 +66,10 @@
     ----------------------------------------------------------- */
     #layout {
       display: grid;
-      grid-template-columns: 120px minmax(0, 1fr);
+      grid-template-columns: 140px minmax(0, 1fr);
       gap: 24px;
       width: 100%;
-      max-width: 1500px;
+      max-width: 1600px;
       padding: 24px;
     }
 
@@ -77,7 +79,7 @@
     #mode-buttons {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       align-items: stretch;
       justify-content: flex-start;
       padding-top: 10px;
@@ -88,7 +90,7 @@
       border: 2px solid #000;
       border-radius: 4px;
       padding: 12px 14px;
-      color: #d0d0d0;
+      color: var(--btn-off);
       font-size: 14px;
       letter-spacing: 1px;
       cursor: pointer;
@@ -99,6 +101,14 @@
         inset 0 0 6px rgba(0,0,0,0.8),
         0 2px 4px rgba(0,0,0,0.6);
       transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+    }
+
+    .mfd-button.active {
+      color: var(--btn-on);
+      background: #222;
+      box-shadow:
+        inset 0 0 10px rgba(255,255,255,0.2),
+        0 0 6px rgba(255,255,255,0.2);
     }
 
     .mfd-button .led {
@@ -121,7 +131,7 @@
     }
 
     /* -----------------------------------------------------------
-       THICK MILITARY-GRADE BEZEL (WRAPS ONLY THE 2×2 GRID)
+       THICK MILITARY-GRADE BEZEL
     ----------------------------------------------------------- */
     #bezel {
       background: var(--bezel-metal);
@@ -134,7 +144,6 @@
         0 12px 28px rgba(0,0,0,0.9);
     }
 
-    /* Deep screws */
     .screw {
       position: absolute;
       width: 26px;
@@ -146,25 +155,13 @@
         0 0 4px rgba(0,0,0,0.7);
     }
 
-    .screw::after {
-      content: "";
-      position: absolute;
-      inset: 6px;
-      border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.7);
-      box-shadow:
-        inset 0 0 2px rgba(255,255,255,0.4),
-        0 0 2px rgba(0,0,0,0.8);
-      transform: rotate(18deg);
-    }
-
     .screw.tl { top: 6px; left: 6px; }
     .screw.tr { top: 6px; right: 6px; }
     .screw.bl { bottom: 6px; left: 6px; }
     .screw.br { bottom: 6px; right: 6px; }
 
     /* -----------------------------------------------------------
-       CRT MODULE INSIDE BEZEL
+       CRT INTERIOR
     ----------------------------------------------------------- */
     #crt {
       background: #050505;
@@ -177,7 +174,6 @@
       overflow: hidden;
     }
 
-    /* Subtle scanlines */
     #crt::before {
       content: "";
       position: absolute;
@@ -195,143 +191,109 @@
     }
 
     /* -----------------------------------------------------------
-       TILE GRID (2×2)
+       PAGE SYSTEM
     ----------------------------------------------------------- */
-    #tiles-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 20px;
+    .page {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .page.active {
+      display: block;
     }
 
     /* -----------------------------------------------------------
-       TILES — TRUE CRT DISPLAYS
+       MAP CONTAINER (RADAR / SAT / COMBO)
     ----------------------------------------------------------- */
-    .tile {
-      background: #0a0a0a;
-      border: 2px solid #1a1a1a;
-      border-radius: 8px;
-      padding: 16px 16px 14px;
+    #map-container {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       position: relative;
-      box-shadow:
-        inset 0 0 10px rgba(0,255,0,0.05),
-        inset 0 0 18px rgba(0,255,0,0.03),
-        0 0 6px rgba(0,0,0,0.7);
+      background: #000;
     }
 
-    .tile::after {
-      content: "";
+    #map {
       position: absolute;
-      inset: 0;
-      border-radius: 8px;
-      pointer-events: none;
-      background:
-        linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(255,255,255,0)),
-        linear-gradient(to right, rgba(255,255,255,0.02), rgba(255,255,255,0));
-      opacity: 0.18;
-    }
-
-    .station-name {
-      font-size: 18px;
-      color: var(--amber);
-      margin-bottom: 10px;
-      letter-spacing: 1px;
-    }
-
-    /* -----------------------------------------------------------
-       ROW GRID — EMOJI | LABEL | ARROW | VALUE
-    ----------------------------------------------------------- */
-    .row {
-      display: grid;
-      grid-template-columns: 32px 110px 32px auto;
-      align-items: center;
-      gap: 6px;
-      font-size: 16px;
-      margin: 3px 0;
-    }
-
-    /* EMOJI — FULL COLOUR IN NORMAL MODE */
-    .emoji {
-      justify-self: center;
-      filter: none !important;
-      color: inherit !important;
-      mix-blend-mode: normal !important;
-    }
-
-    /* NVG emoji recolour */
-    body.nvg .emoji {
-      filter: grayscale(1) brightness(1.4) hue-rotate(80deg);
-    }
-
-    /* RED emoji recolour */
-    body.red .emoji {
-      filter: grayscale(1) brightness(1.2) sepia(1) hue-rotate(-20deg) saturate(8);
-    }
-
-    .label {
-      color: var(--amber);
-    }
-
-    .value {
-      color: var(--amber);
-      text-align: left;
-      position: relative;
-    }
-
-    /* WIND ARROW */
-    .wind-arrow {
-      width: 22px;
-      height: 22px;
-      justify-self: center;
-      transform-origin: 50% 15%;
-      fill: var(--amber);
-    }
-
-    body.nvg .wind-arrow {
-      fill: var(--crt-green);
-      filter: drop-shadow(0 0 4px var(--crt-green));
-    }
-
-    body.red .wind-arrow {
-      fill: var(--crt-red);
-      filter: drop-shadow(0 0 4px var(--crt-red));
-    }
-
-    /* NVG ghosting */
-    body.nvg .value,
-    body.nvg .label {
-      position: relative;
-    }
-
-    body.nvg .value::after,
-    body.nvg .label::after {
-      content: attr(data-last);
-      position: absolute;
-      left: 2px;
       top: 0;
-      opacity: 0.15;
-      color: var(--crt-green);
-      filter: blur(1px);
-      pointer-events: none;
+      left: 0;
+      transform-origin: 0 0;
+      image-rendering: pixelated;
     }
 
-    /* Responsive */
+    /* -----------------------------------------------------------
+       MAP CONTROLS
+    ----------------------------------------------------------- */
+    .map-controls {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .map-btn {
+      background: #111;
+      border: 2px solid #000;
+      border-radius: 4px;
+      padding: 6px 10px;
+      color: var(--amber);
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      box-shadow:
+        inset 0 0 6px rgba(0,0,0,0.8),
+        0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .opacity-slider {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      width: 160px;
+    }
+
+    /* -----------------------------------------------------------
+       SATELLITE CHANNEL SELECTOR
+    ----------------------------------------------------------- */
+    .sat-channels {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .sat-btn {
+      background: #111;
+      border: 2px solid #000;
+      border-radius: 4px;
+      padding: 6px 10px;
+      color: var(--amber);
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow:
+        inset 0 0 6px rgba(0,0,0,0.8),
+        0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .sat-btn.active {
+      background: #222;
+      color: #fff;
+    }
+
+    /* -----------------------------------------------------------
+       RESPONSIVE
+    ----------------------------------------------------------- */
     @media (max-width: 900px) {
       #layout {
         grid-template-columns: 1fr;
       }
       #mode-buttons {
         flex-direction: row;
-        justify-content: flex-start;
-      }
-      .mfd-button {
-        flex: 1;
-        justify-content: center;
-      }
-    }
-
-    @media (max-width: 700px) {
-      #tiles-grid {
-        grid-template-columns: 1fr;
+        flex-wrap: wrap;
       }
     }
   </style>
@@ -340,22 +302,38 @@
 
   <div id="layout">
 
-    <!-- LEFT-SIDE BUTTON STACK (OUTSIDE BEZEL) -->
+    <!-- LEFT-SIDE BUTTON STACK -->
     <div id="mode-buttons">
 
       <button class="mfd-button nvg" onclick="toggleNVG()">
         <div class="led"></div>
-        NVG MODE
+        NVG
       </button>
 
       <button class="mfd-button red" onclick="toggleRED()">
         <div class="led"></div>
-        RED MODE
+        RED
+      </button>
+
+      <button class="mfd-button page-btn" id="btn-wx" onclick="showPage('wx')">
+        WX
+      </button>
+
+      <button class="mfd-button page-btn" id="btn-radar" onclick="showPage('radar')">
+        RADAR
+      </button>
+
+      <button class="mfd-button page-btn" id="btn-sat" onclick="showPage('sat')">
+        SAT
+      </button>
+
+      <button class="mfd-button page-btn" id="btn-combo" onclick="showPage('combo')">
+        COMBO
       </button>
 
     </div>
 
-    <!-- RIGHT-SIDE BEZEL (WRAPS ONLY THE 2×2 TILE GRID) -->
+    <!-- RIGHT-SIDE BEZEL -->
     <div id="bezel">
 
       <!-- Bezel screws -->
@@ -367,213 +345,300 @@
       <!-- CRT interior -->
       <div id="crt">
 
-        <!-- 2×2 tile grid (tiles come in Part 3) -->
-        <div id="tiles-grid">
-          <!-- NAMBOUR -->
-          <div class="tile">
-            <div class="station-name">NAMBOUR</div>
+        <!-- PAGE SYSTEM -->
+        <div id="page-wx" class="page active">
+          <!-- WX tiles will be inserted in Part 3 -->
+        </div>
 
-            <div class="row">
-              <span class="emoji">🌡️</span>
-              <span class="label" id="label-temp-nambour">Temperature</span>
-              <span></span>
-              <span class="value" id="temp-nambour">-- °C</span>
-            </div>
+        <div id="page-radar" class="page">
+          <div id="map-container">
+            <div id="map"></div>
 
-            <div class="row">
-              <span class="emoji"></span>
-              <span class="label" id="label-wind-nambour">Wind</span>
-              <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
-                <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-              </svg>
-              <span class="value" id="wind-nambour">-- km/h (--°)</span>
-            </div>
+            <!-- Radar opacity slider -->
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="70"
+              class="opacity-slider"
+              id="radar-opacity"
+              oninput="updateRadarOpacity(this.value)"
+            />
 
-            <div class="row">
-              <span class="emoji">💨</span>
-              <span class="label" id="label-gust-nambour">Gust</span>
-              <span></span>
-              <span class="value" id="gust-nambour">-- km/h</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">💧</span>
-              <span class="label" id="label-hum-nambour">Humidity</span>
-              <span></span>
-              <span class="value" id="hum-nambour">-- %</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">🌧️</span>
-              <span class="label" id="label-rain-nambour">Rainfall</span>
-              <span></span>
-              <span class="value" id="rain-nambour">-- mm</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">❄️</span>
-              <span class="label" id="label-dew-nambour">Dew Point</span>
-              <span></span>
-              <span class="value" id="dew-nambour">-- °C</span>
+            <!-- Map controls -->
+            <div class="map-controls">
+              <div class="map-btn" onclick="zoomIn()">+</div>
+              <div class="map-btn" onclick="zoomOut()">−</div>
+              <div class="map-btn" onclick="resetView()">RESET</div>
             </div>
           </div>
+        </div>
 
-          <!-- BEERBURRUM -->
-          <div class="tile">
-            <div class="station-name">BEERBURRUM</div>
+        <div id="page-sat" class="page">
+          <div id="map-container">
+            <div id="map-sat"></div>
 
-            <div class="row">
-              <span class="emoji">🌡️</span>
-              <span class="label" id="label-temp-beer">Temperature</span>
-              <span></span>
-              <span class="value" id="temp-beer">-- °C</span>
+            <!-- Satellite channel selector -->
+            <div class="sat-channels">
+              <div class="sat-btn active" id="sat-vis" onclick="setSatChannel('vis')">VIS</div>
+              <div class="sat-btn" id="sat-ir" onclick="setSatChannel('ir')">IR</div>
+              <div class="sat-btn" id="sat-wv" onclick="setSatChannel('wv')">WV</div>
             </div>
 
-            <div class="row">
-              <span class="emoji"></span>
-              <span class="label" id="label-wind-beer">Wind</span>
-              <svg id="arrow-beer" class="wind-arrow" viewBox="0 0 64 64">
-                <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-              </svg>
-              <span class="value" id="wind-beer">-- km/h (--°)</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">💨</span>
-              <span class="label" id="label-gust-beer">Gust</span>
-              <span></span>
-              <span class="value" id="gust-beer">-- km/h</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">💧</span>
-              <span class="label" id="label-hum-beer">Humidity</span>
-              <span></span>
-              <span class="value" id="hum-beer">-- %</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">🌧️</span>
-              <span class="label" id="label-rain-beer">Rainfall</span>
-              <span></span>
-              <span class="value" id="rain-beer">-- mm</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">❄️</span>
-              <span class="label" id="label-dew-beer">Dew Point</span>
-              <span></span>
-              <span class="value" id="dew-beer">-- °C</span>
+            <!-- Map controls -->
+            <div class="map-controls">
+              <div class="map-btn" onclick="zoomInSat()">+</div>
+              <div class="map-btn" onclick="zoomOutSat()">−</div>
+              <div class="map-btn" onclick="resetViewSat()">RESET</div>
             </div>
           </div>
+        </div>
 
-          <!-- SUNSHINE COAST AIRPORT -->
-          <div class="tile">
-            <div class="station-name">SUNSHINE COAST AIRPORT</div>
+        <div id="page-combo" class="page">
+          <div id="map-container">
+            <div id="map-sat-combo"></div>
+            <div id="map-radar-combo"></div>
 
-            <div class="row">
-              <span class="emoji">🌡️</span>
-              <span class="label" id="label-temp-sca">Temperature</span>
-              <span></span>
-              <span class="value" id="temp-sca">-- °C</span>
-            </div>
+            <!-- Combo opacity slider -->
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="60"
+              class="opacity-slider"
+              id="combo-opacity"
+              oninput="updateComboOpacity(this.value)"
+            />
 
-            <div class="row">
-              <span class="emoji"></span>
-              <span class="label" id="label-wind-sca">Wind</span>
-              <svg id="arrow-sca" class="wind-arrow" viewBox="0 0 64 64">
-                <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-              </svg>
-              <span class="value" id="wind-sca">-- km/h (--°)</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">💨</span>
-              <span class="label" id="label-gust-sca">Gust</span>
-              <span></span>
-              <span class="value" id="gust-sca">-- km/h</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">💧</span>
-              <span class="label" id="label-hum-sca">Humidity</span>
-              <span></span>
-              <span class="value" id="hum-sca">-- %</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">🌧️</span>
-              <span class="label" id="label-rain-sca">Rainfall</span>
-              <span></span>
-              <span class="value" id="rain-sca">-- mm</span>
-            </div>
-
-            <div class="row">
-              <span class="emoji">❄️</span>
-              <span class="label" id="label-dew-sca">Dew Point</span>
-              <span></span>
-              <span class="value" id="dew-sca">-- °C</span>
+            <!-- Map controls -->
+            <div class="map-controls">
+              <div class="map-btn" onclick="zoomInCombo()">+</div>
+              <div class="map-btn" onclick="zoomOutCombo()">−</div>
+              <div class="map-btn" onclick="resetViewCombo()">RESET</div>
             </div>
           </div>
+        </div>
 
-          <!-- TEWANTIN -->
-          <div class="tile">
-            <div class="station-name">TEWANTIN</div>
+      </div> <!-- end CRT -->
 
-            <div class="row">
-              <span class="emoji">🌡️</span>
-              <span class="label" id="label-temp-tew">Temperature</span>
-              <span></span>
-              <span class="value" id="temp-tew">-- °C</span>
-            </div>
+    </div> <!-- end BEZEL -->
 
-            <div class="row">
-              <span class="emoji"></span>
-              <span class="label" id="label-wind-tew">Wind</span>
-              <svg id="arrow-tew" class="wind-arrow" viewBox="0 0 64 64">
-                <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-              </svg>
-              <span class="value" id="wind-tew">-- km/h (--°)</span>
-            </div>
+  </div> <!-- end LAYOUT -->
+<!-- 2×2 WX TILE GRID -->
+<div id="tiles-grid">
 
-            <div class="row">
-              <span class="emoji">💨</span>
-              <span class="label" id="label-gust-tew">Gust</span>
-              <span></span>
-              <span class="value" id="gust-tew">-- km/h</span>
-            </div>
+  <!-- NAMBOUR -->
+  <div class="tile">
+    <div class="station-name">NAMBOUR</div>
 
-            <div class="row">
-              <span class="emoji">💧</span>
-              <span class="label" id="label-hum-tew">Humidity</span>
-              <span></span>
-              <span class="value" id="hum-tew">-- %</span>
-            </div>
+    <div class="row">
+      <span class="emoji">🌡️</span>
+      <span class="label" id="label-temp-nambour">Temperature</span>
+      <span></span>
+      <span class="value" id="temp-nambour">-- °C</span>
+    </div>
 
-            <div class="row">
-              <span class="emoji">🌧️</span>
-              <span class="label" id="label-rain-tew">Rainfall</span>
-              <span></span>
-              <span class="value" id="rain-tew">-- mm</span>
-            </div>
+    <div class="row">
+      <span class="emoji"></span>
+      <span class="label" id="label-wind-nambour">Wind</span>
+      <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
+        <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+      </svg>
+      <span class="value" id="wind-nambour">-- km/h (--°)</span>
+    </div>
 
-            <div class="row">
-              <span class="emoji">❄️</span>
-              <span class="label" id="label-dew-tew">Dew Point</span>
-              <span></span>
-              <span class="value" id="dew-tew">-- °C</span>
-            </div>
-          </div>
-        </div> <!-- end #tiles-grid -->
-      </div> <!-- end #crt -->
-    </div> <!-- end #bezel -->
+    <div class="row">
+      <span class="emoji">💨</span>
+      <span class="label" id="label-gust-nambour">Gust</span>
+      <span></span>
+      <span class="value" id="gust-nambour">-- km/h</span>
+    </div>
 
-  </div> <!-- end #layout -->
+    <div class="row">
+      <span class="emoji">💧</span>
+      <span class="label" id="label-hum-nambour">Humidity</span>
+      <span></span>
+      <span class="value" id="hum-nambour">-- %</span>
+    </div>
 
+    <div class="row">
+      <span class="emoji">🌧️</span>
+      <span class="label" id="label-rain-nambour">Rainfall</span>
+      <span></span>
+      <span class="value" id="rain-nambour">-- mm</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">❄️</span>
+      <span class="label" id="label-dew-nambour">Dew Point</span>
+      <span></span>
+      <span class="value" id="dew-nambour">-- °C</span>
+    </div>
+  </div>
+
+  <!-- BEERBURRUM -->
+  <div class="tile">
+    <div class="station-name">BEERBURRUM</div>
+
+    <div class="row">
+      <span class="emoji">🌡️</span>
+      <span class="label" id="label-temp-beer">Temperature</span>
+      <span></span>
+      <span class="value" id="temp-beer">-- °C</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji"></span>
+      <span class="label" id="label-wind-beer">Wind</span>
+      <svg id="arrow-beer" class="wind-arrow" viewBox="0 0 64 64">
+        <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+      </svg>
+      <span class="value" id="wind-beer">-- km/h (--°)</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">💨</span>
+      <span class="label" id="label-gust-beer">Gust</span>
+      <span></span>
+      <span class="value" id="gust-beer">-- km/h</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">💧</span>
+      <span class="label" id="label-hum-beer">Humidity</span>
+      <span></span>
+      <span class="value" id="hum-beer">-- %</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">🌧️</span>
+      <span class="label" id="label-rain-beer">Rainfall</span>
+      <span></span>
+      <span class="value" id="rain-beer">-- mm</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">❄️</span>
+      <span class="label" id="label-dew-beer">Dew Point</span>
+      <span></span>
+      <span class="value" id="dew-beer">-- °C</span>
+    </div>
+  </div>
+
+  <!-- SUNSHINE COAST AIRPORT -->
+  <div class="tile">
+    <div class="station-name">SUNSHINE COAST AIRPORT</div>
+
+    <div class="row">
+      <span class="emoji">🌡️</span>
+      <span class="label" id="label-temp-sca">Temperature</span>
+      <span></span>
+      <span class="value" id="temp-sca">-- °C</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji"></span>
+      <span class="label" id="label-wind-sca">Wind</span>
+      <svg id="arrow-sca" class="wind-arrow" viewBox="0 0 64 64">
+        <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+      </svg>
+      <span class="value" id="wind-sca">-- km/h (--°)</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">💨</span>
+      <span class="label" id="label-gust-sca">Gust</span>
+      <span></span>
+      <span class="value" id="gust-sca">-- km/h</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">💧</span>
+      <span class="label" id="label-hum-sca">Humidity</span>
+      <span></span>
+      <span class="value" id="hum-sca">-- %</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">🌧️</span>
+      <span class="label" id="label-rain-sca">Rainfall</span>
+      <span></span>
+      <span class="value" id="rain-sca">-- mm</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">❄️</span>
+      <span class="label" id="label-dew-sca">Dew Point</span>
+      <span></span>
+      <span class="value" id="dew-sca">-- °C</span>
+    </div>
+  </div>
+
+  <!-- TEWANTIN -->
+  <div class="tile">
+    <div class="station-name">TEWANTIN</div>
+
+    <div class="row">
+      <span class="emoji">🌡️</span>
+      <span class="label" id="label-temp-tew">Temperature</span>
+      <span></span>
+      <span class="value" id="temp-tew">-- °C</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji"></span>
+      <span class="label" id="label-wind-tew">Wind</span>
+      <svg id="arrow-tew" class="wind-arrow" viewBox="0 0 64 64">
+        <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+      </svg>
+      <span class="value" id="wind-tew">-- km/h (--°)</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">💨</span>
+      <span class="label" id="label-gust-tew">Gust</span>
+      <span></span>
+      <span class="value" id="gust-tew">-- km/h</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">💧</span>
+      <span class="label" id="label-hum-tew">Humidity</span>
+      <span></span>
+      <span class="value" id="hum-tew">-- %</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">🌧️</span>
+      <span class="label" id="label-rain-tew">Rainfall</span>
+      <span></span>
+      <span class="value" id="rain-tew">-- mm</span>
+    </div>
+
+    <div class="row">
+      <span class="emoji">❄️</span>
+      <span class="label" id="label-dew-tew">Dew Point</span>
+      <span></span>
+      <span class="value" id="dew-tew">-- °C</span>
+    </div>
+  </div>
+
+</div>
   <script>
-    /* -----------------------------------------------------------
-       MODE TOGGLES
-    ----------------------------------------------------------- */
+    /* ===========================================================
+       PAGE SWITCHING
+    =========================================================== */
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+
+      document.getElementById('page-' + name).classList.add('active');
+      document.getElementById('btn-' + name).classList.add('active');
+    }
+
+    /* ===========================================================
+       NVG / RED MODES
+    =========================================================== */
     function toggleNVG() {
       document.body.classList.toggle("nvg");
       document.body.classList.remove("red");
@@ -584,9 +649,9 @@
       document.body.classList.remove("nvg");
     }
 
-    /* -----------------------------------------------------------
-       UPDATE VALUE WITH GHOSTING SUPPORT
-    ----------------------------------------------------------- */
+    /* ===========================================================
+       WX PAGE — VALUE UPDATER + GHOSTING
+    =========================================================== */
     function updateValue(id, newValue) {
       const el = document.getElementById(id);
       if (!el) return;
@@ -594,18 +659,15 @@
       el.innerText = newValue;
     }
 
-    /* -----------------------------------------------------------
-       WIND ARROW ROTATION
-    ----------------------------------------------------------- */
     function setWindArrow(id, degrees) {
       const arrow = document.getElementById(id);
       if (!arrow) return;
       arrow.style.transform = "rotate(" + degrees + "deg)";
     }
 
-    /* -----------------------------------------------------------
-       STATION DEFINITIONS
-    ----------------------------------------------------------- */
+    /* ===========================================================
+       WX PAGE — STATION DEFINITIONS
+    =========================================================== */
     const stations = [
       {
         name: "nambour",
@@ -665,9 +727,9 @@
       }
     ];
 
-    /* -----------------------------------------------------------
-       FETCH OPEN-METEO DATA
-    ----------------------------------------------------------- */
+    /* ===========================================================
+       WX PAGE — FETCH OPEN-METEO
+    =========================================================== */
     async function fetchStation(station) {
       const url =
         `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}` +
@@ -697,20 +759,199 @@
       }
     }
 
-    /* -----------------------------------------------------------
-       REFRESH ALL STATIONS
-    ----------------------------------------------------------- */
-    async function refreshAll() {
-      for (const s of stations) {
-        fetchStation(s);
+    function refreshAll() {
+      stations.forEach(fetchStation);
+    }
+
+    refreshAll();
+    setInterval(refreshAll, 15 * 60 * 1000);
+
+    /* ===========================================================
+       MAP ENGINE — PAN + ZOOM (GENERIC)
+    =========================================================== */
+    function createMapController(mapElement) {
+      return {
+        x: 0,
+        y: 0,
+        zoom: 1,
+        element: mapElement,
+        apply() {
+          this.element.style.transform =
+            `translate(${this.x}px, ${this.y}px) scale(${this.zoom})`;
+        }
+      };
+    }
+
+    /* Radar map */
+    const radarMap = createMapController(document.getElementById("map"));
+    /* Satellite map */
+    const satMap = createMapController(document.getElementById("map-sat"));
+    /* Combo maps */
+    const comboSatMap = createMapController(document.getElementById("map-sat-combo"));
+    const comboRadarMap = createMapController(document.getElementById("map-radar-combo"));
+
+    /* ===========================================================
+       DRAG TO PAN (GENERIC)
+    =========================================================== */
+    function enableDragging(container, controller) {
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+
+      container.addEventListener("pointerdown", e => {
+        dragging = true;
+        startX = e.clientX - controller.x;
+        startY = e.clientY - controller.y;
+      });
+
+      container.addEventListener("pointermove", e => {
+        if (!dragging) return;
+        controller.x = e.clientX - startX;
+        controller.y = e.clientY - startY;
+        controller.apply();
+      });
+
+      container.addEventListener("pointerup", () => dragging = false);
+      container.addEventListener("pointerleave", () => dragging = false);
+    }
+
+    enableDragging(document.querySelector("#page-radar #map-container"), radarMap);
+    enableDragging(document.querySelector("#page-sat #map-container"), satMap);
+    enableDragging(document.querySelector("#page-combo #map-container"), comboSatMap);
+    enableDragging(document.querySelector("#page-combo #map-container"), comboRadarMap);
+
+    /* ===========================================================
+       ZOOM CONTROLS
+    =========================================================== */
+    function zoomIn() { radarMap.zoom *= 1.2; radarMap.apply(); }
+    function zoomOut() { radarMap.zoom /= 1.2; radarMap.apply(); }
+    function resetView() { radarMap.x = radarMap.y = 0; radarMap.zoom = 1; radarMap.apply(); }
+
+    function zoomInSat() { satMap.zoom *= 1.2; satMap.apply(); }
+    function zoomOutSat() { satMap.zoom /= 1.2; satMap.apply(); }
+    function resetViewSat() { satMap.x = satMap.y = 0; satMap.zoom = 1; satMap.apply(); }
+
+    function zoomInCombo() {
+      comboSatMap.zoom *= 1.2;
+      comboRadarMap.zoom *= 1.2;
+      comboSatMap.apply();
+      comboRadarMap.apply();
+    }
+    function zoomOutCombo() {
+      comboSatMap.zoom /= 1.2;
+      comboRadarMap.zoom /= 1.2;
+      comboSatMap.apply();
+      comboRadarMap.apply();
+    }
+    function resetViewCombo() {
+      comboSatMap.x = comboSatMap.y = 0;
+      comboRadarMap.x = comboRadarMap.y = 0;
+      comboSatMap.zoom = comboRadarMap.zoom = 1;
+      comboSatMap.apply();
+      comboRadarMap.apply();
+    }
+
+    /* ===========================================================
+       RADAR TILES (RAINVIEWER)
+    =========================================================== */
+    function loadRadarTiles() {
+      const base = "https://tilecache.rainviewer.com/v2/radar/nowcast_0/256/{z}/{x}/{y}/2/1_1.png";
+
+      // We don't need to generate tiles manually — browser loads them as <img> via JS
+      // For simplicity, we load a single large tile grid at zoom 4
+      const map = document.getElementById("map");
+      map.innerHTML = "";
+
+      for (let x = 7; x <= 9; x++) {
+        for (let y = 11; y <= 13; y++) {
+          const img = document.createElement("img");
+          img.src = base
+            .replace("{z}", 4)
+            .replace("{x}", x)
+            .replace("{y}", y);
+          img.style.position = "absolute";
+          img.style.left = (x - 7) * 256 + "px";
+          img.style.top = (y - 11) * 256 + "px";
+          map.appendChild(img);
+        }
       }
     }
 
-    /* -----------------------------------------------------------
-       INITIAL LOAD + 15-MIN REFRESH
-    ----------------------------------------------------------- */
-    refreshAll();
-    setInterval(refreshAll, 15 * 60 * 1000);
+    loadRadarTiles();
+
+    function updateRadarOpacity(v) {
+      document.getElementById("map").style.opacity = v / 100;
+    }
+
+    /* ===========================================================
+       SATELLITE TILES (HIMAWARI-8)
+    =========================================================== */
+    function himawariURL(channel) {
+      const base = "https://himawari8.nict.go.jp/img/D531106";
+      const file = channel === "vis" ? "0" : channel === "ir" ? "1" : "2";
+      return `${base}/${file}/550/000000_0_0.png`;
+    }
+
+    function loadSatellite(channel) {
+      const map = document.getElementById("map-sat");
+      map.innerHTML = "";
+
+      const img = document.createElement("img");
+      img.src = himawariURL(channel);
+      img.style.position = "absolute";
+      img.style.left = "0px";
+      img.style.top = "0px";
+      map.appendChild(img);
+    }
+
+    loadSatellite("vis");
+
+    function setSatChannel(ch) {
+      document.querySelectorAll(".sat-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("sat-" + ch).classList.add("active");
+      loadSatellite(ch);
+    }
+
+    /* ===========================================================
+       COMBO PAGE — SAT + RADAR OVERLAY
+    =========================================================== */
+    function loadCombo() {
+      const sat = document.getElementById("map-sat-combo");
+      const rad = document.getElementById("map-radar-combo");
+
+      sat.innerHTML = "";
+      rad.innerHTML = "";
+
+      // Satellite base
+      const imgSat = document.createElement("img");
+      imgSat.src = himawariURL("ir");
+      imgSat.style.position = "absolute";
+      sat.appendChild(imgSat);
+
+      // Radar overlay
+      const base = "https://tilecache.rainviewer.com/v2/radar/nowcast_0/256/{z}/{x}/{y}/2/1_1.png";
+
+      for (let x = 7; x <= 9; x++) {
+        for (let y = 11; y <= 13; y++) {
+          const img = document.createElement("img");
+          img.src = base
+            .replace("{z}", 4)
+            .replace("{x}", x)
+            .replace("{y}", y);
+          img.style.position = "absolute";
+          img.style.left = (x - 7) * 256 + "px";
+          img.style.top = (y - 11) * 256 + "px";
+          rad.appendChild(img);
+        }
+      }
+    }
+
+    loadCombo();
+
+    function updateComboOpacity(v) {
+      document.getElementById("map-radar-combo").style.opacity = v / 100;
+    }
+
   </script>
 
 </body>
