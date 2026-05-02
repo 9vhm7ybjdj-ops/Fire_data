@@ -1,597 +1,733 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fireground WX Panel</title>
+  <meta charset="UTF-8" />
+  <title>Fireground WX Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
+  <!-- Avionics font -->
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-<style>
-:root {
-  --text: #e6e6e6;
-  --amber: #ff9933;
-  --yellow: #ffe066;
-  --crt-glow-normal: rgba(255,255,255,0.7);
-  --crt-glow-nvg: rgba(0,255,136,0.9);
-  --crt-glow-red: rgba(255,80,80,0.9);
-}
+  <style>
+    :root {
+      --amber: #ffd27a;
+      --bg-main: #111111;
+      --panel-grey: #3f3f3f;
+      --panel-border: #2a2a2a;
+      --screw-metal: #c0c0c0;
+    }
 
-/* BODY BACKGROUND — DARK BRUSHED METAL */
-body {
-  margin: 0;
-  background:
-    radial-gradient(circle at center, #0a0a0c 0%, #000000 100%),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255,255,255,0.06) 0px,
-      rgba(255,255,255,0.06) 1px,
-      transparent 2px,
-      transparent 6px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255,255,255,0.02) 0px,
-      rgba(255,255,255,0.02) 0.5px,
-      transparent 1px,
-      transparent 4px
-    );
-  background-blend-mode: overlay;
-  font-family: 'Rajdhani', sans-serif;
-  color: var(--text);
-  user-select: none;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-/* STATUS BAR */
-.status-bar {
-  width: 100%;
-  padding: 12px 0;
-  background: rgba(20,20,22,0.9);
-  border-bottom: 2px solid #333;
-  text-align: center;
-  font-size: 20px;
-  color: var(--amber);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #222 0, #050505 55%, #000 100%);
+      color: var(--amber);
+      font-family: 'Share Tech Mono', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.25s ease, filter 0.25s ease;
+    }
 
-/* TOGGLES */
-.toggle-wrap {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin: 14px 0 6px 0;
-  font-size: 18px;
-  color: var(--amber);
-}
+    /* NVG mode */
+    body.nvg {
+      background: radial-gradient(circle at top, #041b05 0, #010a02 55%, #000 100%);
+      filter: brightness(0.85) contrast(0.85);
+    }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+    /* RED mode */
+    body.red {
+      background: radial-gradient(circle at top, #2a0202 0, #050000 55%, #000 100%);
+      filter: brightness(0.75) contrast(0.8);
+    }
 
-.toggle-switch {
-  width: 46px;
-  height: 24px;
-  background: #333;
-  border-radius: 20px;
-  position: relative;
-  cursor: pointer;
-}
+    /* Main container: left MFD buttons + right avionics module */
+    #shell {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 18px;
+      padding: 24px;
+      max-width: 1400px;
+      width: 100%;
+    }
 
-.toggle-switch::after {
-  content: "";
-  width: 20px;
-  height: 20px;
-  background: #999;
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  transition: 0.2s;
-}
+    /* Left MFD button column */
+    #mode-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: stretch;
+      justify-content: flex-start;
+      padding-top: 10px;
+    }
 
-input[type="checkbox"]:checked + .toggle-switch::after {
-  left: 24px;
-  background: var(--amber);
-}
+    .mfd-button {
+      background: #1a1a1a;
+      border: 2px solid #0d0d0d;
+      border-radius: 4px;
+      padding: 10px 12px;
+      color: #d0d0d0;
+      font-size: 14px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow:
+        inset 0 0 6px rgba(0,0,0,0.8),
+        0 2px 4px rgba(0,0,0,0.6);
+      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+      text-align: left;
+    }
 
-/* GRID — TRUE 2×2 */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 22px;
-  padding: 22px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
+    .mfd-button .led {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #222;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+      flex-shrink: 0;
+    }
 
-/* TILES — LIGHTER BRUSHED METAL */
-.tile {
-  background:
-    linear-gradient(180deg, #1a1a1c 0%, #0f0f11 100%),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255,255,255,0.05) 0px,
-      rgba(255,255,255,0.05) 1px,
-      transparent 2px,
-      transparent 6px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255,255,255,0.02) 0px,
-      rgba(255,255,255,0.02) 0.5px,
-      transparent 1px,
-      transparent 4px
-    );
-  background-blend-mode: overlay;
-  border: 2px solid #2a2a2d;
-  border-radius: 6px;
-  padding: 16px 20px;
-  position: relative;
-  box-shadow:
-    inset 0 0 12px #000,
-    0 0 14px rgba(255,255,255,0.05);
-}
+    .mfd-button:active {
+      background: #111;
+      box-shadow:
+        inset 0 0 10px rgba(0,0,0,0.9),
+        0 1px 2px rgba(0,0,0,0.5);
+    }
 
-/* RIVETS */
-.tile::before,
-.tile::after,
-.tile .rivet-bl,
-.tile .rivet-br {
-  content: "";
-  width: 10px;
-  height: 10px;
-  background: #2b2b2d;
-  border-radius: 50%;
-  position: absolute;
-  box-shadow: inset 0 0 3px #000, 0 0 2px rgba(255,255,255,0.1);
-}
+    /* Active LEDs */
+    body.nvg .mfd-button.nvg .led {
+      background: #8aff6c;
+      box-shadow: 0 0 6px #8aff6c;
+    }
 
-.tile::before { top: 8px; left: 8px; }
-.tile::after { top: 8px; right: 8px; }
-.tile .rivet-bl { bottom: 8px; left: 8px; }
-.tile .rivet-br { bottom: 8px; right: 8px; }
+    body.red .mfd-button.red .led {
+      background: #ff3b3b;
+      box-shadow: 0 0 6px #ff3b3b;
+    }
 
-/* CRT SCREEN (INNER) */
-.crt-screen {
-  position: relative;
-  margin: 10px 4px 6px 4px;
-  padding: 10px 12px;
-  background: radial-gradient(circle at center, #050608 0%, #000000 80%);
-  border-radius: 12px;
-  border: 2px solid #000; /* thin bezel */
-  overflow: hidden;
-  transform: perspective(900px) translateZ(0) scale(1.01);
-  box-shadow:
-    0 0 10px rgba(0,0,0,0.9),
-    inset 0 0 18px rgba(0,0,0,0.9);
-  animation: crtFlicker 0.12s infinite;
-}
+    /* Right avionics wrapper (bezel + screws) */
+    #avionics-wrapper {
+      position: relative;
+      padding: 18px;
+      background: #202020;
+      border-radius: 12px;
+      box-shadow:
+        0 0 0 3px #050505,
+        0 0 0 6px #2a2a2a,
+        0 18px 30px rgba(0,0,0,0.9);
+      overflow: hidden;
+    }
 
-/* CRT SCANLINES + MASK (BASE, COLOUR MODE) */
-.crt-screen::before,
-.crt-screen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
+    /* Screws */
+    .screw {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffffff 0, #c0c0c0 25%, #777 60%, #111 100%);
+      box-shadow:
+        inset 0 0 2px rgba(0,0,0,0.8),
+        0 0 3px rgba(0,0,0,0.7);
+    }
 
-/* Scanlines — VERY SUBTLE */
-.crt-screen::before {
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.25) 0px,
-    rgba(0,0,0,0.25) 1px,
-    transparent 2px,
-    transparent 3px
-  );
-  mix-blend-mode: multiply;
-  opacity: 0.08;
-}
+    .screw::after {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.7);
+      box-shadow:
+        inset 0 0 2px rgba(255,255,255,0.4),
+        0 0 2px rgba(0,0,0,0.8);
+      transform: rotate(18deg);
+    }
 
-/* RGB subpixel mask — VERY SUBTLE */
-.crt-screen::after {
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(255,0,0,0.18) 0px,
-    rgba(0,255,0,0.18) 1px,
-    rgba(0,0,255,0.18) 2px,
-    rgba(0,0,0,0) 3px
-  );
-  mix-blend-mode: screen;
-  opacity: 0.08;
-}
+    .screw.tl { top: 6px; left: 6px; }
+    .screw.tr { top: 6px; right: 6px; }
+    .screw.bl { bottom: 6px; left: 6px; }
+    .screw.br { bottom: 6px; right: 6px; }
 
-/* CRT FLICKER */
-@keyframes crtFlicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.97; }
-}
+    /* Panel wear overlay */
+    #avionics-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 45%),
+        radial-gradient(circle at top right, rgba(255,255,255,0.06), transparent 45%),
+        radial-gradient(circle at bottom left, rgba(255,255,255,0.05), transparent 45%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,0.07), transparent 45%),
+        linear-gradient(135deg, rgba(255,255,255,0.04) 0, transparent 40%),
+        linear-gradient(-135deg, rgba(255,255,255,0.03) 0, transparent 40%);
+      opacity: 0.22;
+      mix-blend-mode: screen;
+    }
 
-/* TEXT + ROWS */
-.station-name {
-  font-size: 22px;
-  color: var(--amber);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-  letter-spacing: 1px;
-}
+    /* CRT screen area */
+    #avionics-module {
+      position: relative;
+      background: #050505;
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow:
+        inset 0 0 18px rgba(0,0,0,0.9),
+        0 0 18px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
 
-.row {
-  font-size: 18px;
-  margin: 4px 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: flex-start;
-}
+    /* CRT scanlines */
+    #avionics-module::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.08) 0px,
+          rgba(255,255,255,0.02) 1px,
+          rgba(0,0,0,0.0) 2px
+        );
+      opacity: 0.08;
+      mix-blend-mode: soft-light;
+    }
 
-.row span {
-  margin-left: 0;
-}
+    /* NVG scanline tint */
+    body.nvg #avionics-module::before {
+      background-image:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0,255,0,0.12) 0px,
+          rgba(0,255,0,0.04) 1px,
+          rgba(0,0,0,0.0) 2px
+        );
+      opacity: 0.12;
+    }
 
-/* WIND ARROW — LEFT, NEON BLUE IN NORMAL MODE */
-.wind-arrow {
-  width: 22px;
-  height: 22px;
-  margin-right: 8px;
-  transform-origin: 50% 15%;
-}
+    /* RED scanline tint */
+    body.red #avionics-module::before {
+      background-image:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,0,0,0.12) 0px,
+          rgba(255,0,0,0.04) 1px,
+          rgba(0,0,0,0.0) 2px
+        );
+      opacity: 0.12;
+    }
 
-.wind-arrow polygon {
-  fill: #66d9ff;
-  filter: drop-shadow(0 0 6px #66d9ff);
-}
+    /* Tiles grid */
+    #tiles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
 
-/* EMOJI WRAPPER — FORCE FULL COLOUR IN NORMAL MODE */
-.emoji {
-  display: inline-block;
-  position: relative;
-  z-index: 3;
-}
+    .tile {
+      background-color: var(--panel-grey);
+      border: 3px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 16px 16px 14px;
+      position: relative;
+      box-shadow:
+        inset 0 0 6px rgba(0,0,0,0.6),
+        0 2px 6px rgba(255,255,255,0.08),
+        0 6px 12px rgba(0,0,0,0.7);
+      overflow: hidden;
+    }
 
-/* NORMAL MODE — NATURAL COLOUR, COLOUR CRT */
-body:not(.nvg):not(.red) .crt-screen {
-  color: var(--text);
-  text-shadow:
-    0 0 4px var(--crt-glow-normal),
-    0 0 8px rgba(255,255,255,0.4);
-}
+    .tile::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      pointer-events: none;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(255,255,255,0)),
+        linear-gradient(to right, rgba(255,255,255,0.03), rgba(255,255,255,0));
+      opacity: 0.25;
+    }
 
-body:not(.nvg):not(.red) .emoji {
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  color: inherit;
-  text-shadow: none;
-}
+    .station-name {
+      font-size: 18px;
+      color: var(--amber);
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
 
-body:not(.nvg):not(.red) .wind-arrow polygon {
-  fill: #66d9ff;
-  filter: drop-shadow(0 0 6px #66d9ff);
-}
+    /* Global row grid: emoji | label | arrow | value */
+    .row {
+      display: grid;
+      grid-template-columns: 32px 110px 32px auto;
+      align-items: center;
+      gap: 6px;
+      font-size: 16px;
+      margin: 3px 0;
+    }
 
-/* NVG MODE — GREEN MONO CRT */
-body.nvg {
-  --text: #00ff88;
-  --amber: #00ff88;
-  --yellow: #00ff88;
-}
+    .emoji {
+      justify-self: center;
+      filter: none !important;
+      mix-blend-mode: normal !important;
+    }
 
-body.nvg .crt-screen {
-  color: #00ff88;
-  text-shadow:
-    0 0 4px var(--crt-glow-nvg),
-    0 0 10px var(--crt-glow-nvg);
-}
+    .label {
+      color: var(--amber);
+    }
 
-/* NVG: green-only mask + scanlines tint */
-body.nvg .crt-screen::before {
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.35) 0px,
-    rgba(0,0,0,0.35) 1px,
-    transparent 2px,
-    transparent 3px
-  );
-  opacity: 0.10;
-}
+    .value {
+      color: var(--amber);
+      text-align: left;
+      position: relative;
+    }
 
-body.nvg .crt-screen::after {
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(0,255,136,0.25) 0px,
-    rgba(0,255,136,0.25) 2px,
-    rgba(0,0,0,0) 3px
-  );
-  opacity: 0.10;
-}
+    .wind-arrow {
+      width: 22px;
+      height: 22px;
+      justify-self: center;
+      transform-origin: 50% 15%;
+      fill: var(--amber);
+    }
 
-body.nvg .emoji {
-  filter: brightness(0) saturate(100%) invert(75%) sepia(90%) hue-rotate(80deg) saturate(600%) brightness(120%);
-}
+    /* NVG text + glow */
+    body.nvg .station-name,
+    body.nvg .label,
+    body.nvg .value {
+      color: #8aff6c;
+      text-shadow:
+        0 0 4px rgba(138,255,108,0.6),
+        0 0 8px rgba(138,255,108,0.4);
+    }
 
-body.nvg .wind-arrow polygon {
-  fill: #00ff88;
-  filter: drop-shadow(0 0 6px #00ff88);
-}
+    body.nvg .wind-arrow {
+      fill: #8aff6c;
+      filter: drop-shadow(0 0 4px rgba(138,255,108,0.7));
+    }
 
-/* RED MODE — RED MONO CRT */
-body.red {
-  --text: #ffb3b3;
-  --amber: #ff8080;
-  --yellow: #ff9999;
-}
+    /* NVG ghosting */
+    body.nvg .value,
+    body.nvg .label {
+      position: relative;
+    }
 
-body.red .crt-screen {
-  color: #ff8080;
-  text-shadow:
-    0 0 4px var(--crt-glow-red),
-    0 0 10px var(--crt-glow-red);
-}
+    body.nvg .value::after,
+    body.nvg .label::after {
+      content: attr(data-last);
+      position: absolute;
+      left: 2px;
+      top: 0;
+      opacity: 0.15;
+      color: #8aff6c;
+      filter: blur(1px);
+      pointer-events: none;
+    }
 
-/* RED: red-only mask + scanlines tint */
-body.red .crt-screen::before {
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.35) 0px,
-    rgba(0,0,0,0.35) 1px,
-    transparent 2px,
-    transparent 3px
-  );
-  opacity: 0.10;
-}
+    /* NVG emoji recolour */
+    body.nvg .emoji {
+      filter: grayscale(1) brightness(1.4) hue-rotate(80deg);
+    }
 
-body.red .crt-screen::after {
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(255,80,80,0.25) 0px,
-    rgba(255,80,80,0.25) 2px,
-    rgba(0,0,0,0) 3px
-  );
-  opacity: 0.10;
-}
+    /* RED text + glow */
+    body.red .station-name,
+    body.red .label,
+    body.red .value {
+      color: #ff3b3b;
+      text-shadow:
+        0 0 4px rgba(255,60,60,0.5),
+        0 0 8px rgba(255,60,60,0.3);
+    }
 
-body.red .emoji {
-  filter: brightness(0) saturate(100%) invert(25%) sepia(90%) hue-rotate(-10deg) saturate(800%) brightness(140%);
-}
+    body.red .wind-arrow {
+      fill: #ff3b3b;
+      filter: drop-shadow(0 0 4px rgba(255,60,60,0.7));
+    }
 
-body.red .wind-arrow polygon {
-  fill: #ff4d4d;
-  filter: drop-shadow(0 0 6px #ff4d4d);
-}
+    /* RED emoji recolour */
+    body.red .emoji {
+      filter: grayscale(1) brightness(1.2) sepia(1) hue-rotate(-20deg) saturate(8);
+    }
 
-.global-updated {
-  text-align: center;
-  margin: 20px 0 30px 0;
-  font-size: 18px;
-  color: var(--yellow);
-}
-</style>
+    /* Responsive */
+    @media (max-width: 900px) {
+      #shell {
+        grid-template-columns: 1fr;
+      }
+      #mode-buttons {
+        flex-direction: row;
+        justify-content: flex-start;
+      }
+      .mfd-button {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 700px) {
+      #tiles-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div id="shell">
 
-  <div class="status-bar">
-    FIREGROUND WX DATA — SYSTEM ONLINE — QLD OPS
-  </div>
+    <!-- Left MFD buttons -->
+    <div id="mode-buttons">
+      <button class="mfd-button nvg" onclick="toggleNVG()">
+        <div class="led"></div>
+        NVG MODE
+      </button>
 
-  <div class="toggle-wrap">
-    <label class="toggle">
-      NVG
-      <input id="nvgToggle" type="checkbox" hidden>
-      <span class="toggle-switch"></span>
-    </label>
-
-    <label class="toggle">
-      RED
-      <input id="redToggle" type="checkbox" hidden>
-      <span class="toggle-switch"></span>
-    </label>
-  </div>
-
-  <div class="grid">
-    <!-- NAMBOUR -->
-    <div class="tile">
-      <div class="crt-screen">
-        <div class="station-name">NAMBOUR</div>
-
-        <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-nambour">--.- °C</span></div>
-
-        <div class="row">
-          <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
-            <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-          </svg>
-          Wind
-          <span id="wind-nambour">-- km/h (--°)</span>
-        </div>
-
-        <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-nambour">-- km/h</span></div>
-        <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-nambour">-- %</span></div>
-        <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-nambour">-- mm</span></div>
-        <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-nambour">-- °C</span></div>
-      </div>
-      <div class="rivet-bl"></div><div class="rivet-br"></div>
+      <button class="mfd-button red" onclick="toggleRED()">
+        <div class="led"></div>
+        RED MODE
+      </button>
     </div>
 
-    <!-- BEERBURRUM -->
-    <div class="tile">
-      <div class="crt-screen">
-        <div class="station-name">BEERBURRUM</div>
+    <!-- Right avionics wrapper -->
+    <div id="avionics-wrapper">
+      <div class="screw tl"></div>
+      <div class="screw tr"></div>
+      <div class="screw bl"></div>
+      <div class="screw br"></div>
 
-        <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-beerburrum">--.- °C</span></div>
+      <!-- CRT module -->
+      <div id="avionics-module">
 
-        <div class="row">
-          <svg id="arrow-beerburrum" class="wind-arrow" viewBox="0 0 64 64">
-            <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-          </svg>
-          Wind
-          <span id="wind-beerburrum">-- km/h (--°)</span>
-        </div>
+        <!-- Tiles grid (tiles appear in Part 3) -->
+        <div id="tiles-grid">
+          <!-- NAMBOUR -->
+          <div class="tile">
+            <div class="station-name">NAMBOUR</div>
 
-        <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-beerburrum">-- km/h</span></div>
-        <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-beerburrum">-- %</span></div>
-        <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-beerburrum">-- mm</span></div>
-        <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-beerburrum">-- °C</span></div>
-      </div>
-      <div class="rivet-bl"></div><div class="rivet-br"></div>
-    </div>
+            <div class="row">
+              <span class="emoji">🌡</span>
+              <span class="label" id="label-temp-nambour">Temperature</span>
+              <span></span>
+              <span class="value" id="temp-nambour">-- °C</span>
+            </div>
 
-    <!-- SUNSHINE COAST AIRPORT -->
-    <div class="tile">
-      <div class="crt-screen">
-        <div class="station-name">SUNSHINE COAST AIRPORT</div>
+            <div class="row">
+              <span class="emoji">🌬</span>
+              <span class="label" id="label-wind-nambour">Wind</span>
+              <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
+                <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+              </svg>
+              <span class="value" id="wind-nambour">-- km/h (--°)</span>
+            </div>
 
-        <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-sunshine">--.- °C</span></div>
+            <div class="row">
+              <span class="emoji">💨</span>
+              <span class="label" id="label-gust-nambour">Gust</span>
+              <span></span>
+              <span class="value" id="gust-nambour">-- km/h</span>
+            </div>
 
-        <div class="row">
-          <svg id="arrow-sunshine" class="wind-arrow" viewBox="0 0 64 64">
-            <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-          </svg>
-          Wind
-          <span id="wind-sunshine">-- km/h (--°)</span>
-        </div>
+            <div class="row">
+              <span class="emoji">💧</span>
+              <span class="label" id="label-hum-nambour">Humidity</span>
+              <span></span>
+              <span class="value" id="hum-nambour">-- %</span>
+            </div>
 
-        <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-sunshine">-- km/h</span></div>
-        <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-sunshine">-- %</span></div>
-        <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-sunshine">-- mm</span></div>
-        <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-sunshine">-- °C</span></div>
-      </div>
-      <div class="rivet-bl"></div><div class="rivet-br"></div>
-    </div>
+            <div class="row">
+              <span class="emoji">🌧</span>
+              <span class="label" id="label-rain-nambour">Rainfall</span>
+              <span></span>
+              <span class="value" id="rain-nambour">-- mm</span>
+            </div>
 
-    <!-- TEWANTIN -->
-    <div class="tile">
-      <div class="crt-screen">
-        <div class="station-name">TEWANTIN</div>
+            <div class="row">
+              <span class="emoji">❄</span>
+              <span class="label" id="label-dew-nambour">Dew Point</span>
+              <span></span>
+              <span class="value" id="dew-nambour">-- °C</span>
+            </div>
+          </div>
 
-        <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-tewantin">--.- °C</span></div>
+          <!-- BEERBURRUM -->
+          <div class="tile">
+            <div class="station-name">BEERBURRUM</div>
 
-        <div class="row">
-          <svg id="arrow-tewantin" class="wind-arrow" viewBox="0 0 64 64">
-            <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-          </svg>
-          Wind
-          <span id="wind-tewantin">-- km/h (--°)</span>
-        </div>
+            <div class="row">
+              <span class="emoji">🌡</span>
+              <span class="label" id="label-temp-beer">Temperature</span>
+              <span></span>
+              <span class="value" id="temp-beer">-- °C</span>
+            </div>
 
-        <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-tewantin">-- km/h</span></div>
-        <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-tewantin">-- %</span></div>
-        <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-tewantin">-- mm</span></div>
-        <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-tewantin">-- °C</span></div>
-      </div>
-      <div class="rivet-bl"></div><div class="rivet-br"></div>
-    </div>
+            <div class="row">
+              <span class="emoji">🌬</span>
+              <span class="label" id="label-wind-beer">Wind</span>
+              <svg id="arrow-beer" class="wind-arrow" viewBox="0 0 64 64">
+                <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+              </svg>
+              <span class="value" id="wind-beer">-- km/h (--°)</span>
+            </div>
 
-  </div>
+            <div class="row">
+              <span class="emoji">💨</span>
+              <span class="label" id="label-gust-beer">Gust</span>
+              <span></span>
+              <span class="value" id="gust-beer">-- km/h</span>
+            </div>
 
-  <div class="global-updated" id="updated-global">Updated: --:--</div>
-<script>
-  const stations = {
-    nambour: {
-      lat: -26.63,
-      lon: 152.96
-    },
-    beerburrum: {
-      lat: -26.93,
-      lon: 152.95
-    },
-    sunshine: {
-      lat: -26.60,
-      lon: 153.09
-    },
-    tewantin: {
-      lat: -26.39,
-      lon: 153.03
+            <div class="row">
+              <span class="emoji">💧</span>
+              <span class="label" id="label-hum-beer">Humidity</span>
+              <span></span>
+              <span class="value" id="hum-beer">-- %</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">🌧</span>
+              <span class="label" id="label-rain-beer">Rainfall</span>
+              <span></span>
+              <span class="value" id="rain-beer">-- mm</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">❄</span>
+              <span class="label" id="label-dew-beer">Dew Point</span>
+              <span></span>
+              <span class="value" id="dew-beer">-- °C</span>
+            </div>
+          </div>
+
+          <!-- SUNSHINE COAST AIRPORT -->
+          <div class="tile">
+            <div class="station-name">SUNSHINE COAST AIRPORT</div>
+
+            <div class="row">
+              <span class="emoji">🌡</span>
+              <span class="label" id="label-temp-sca">Temperature</span>
+              <span></span>
+              <span class="value" id="temp-sca">-- °C</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">🌬</span>
+              <span class="label" id="label-wind-sca">Wind</span>
+              <svg id="arrow-sca" class="wind-arrow" viewBox="0 0 64 64">
+                <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+              </svg>
+              <span class="value" id="wind-sca">-- km/h (--°)</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">💨</span>
+              <span class="label" id="label-gust-sca">Gust</span>
+              <span></span>
+              <span class="value" id="gust-sca">-- km/h</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">💧</span>
+              <span class="label" id="label-hum-sca">Humidity</span>
+              <span></span>
+              <span class="value" id="hum-sca">-- %</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">🌧</span>
+              <span class="label" id="label-rain-sca">Rainfall</span>
+              <span></span>
+              <span class="value" id="rain-sca">-- mm</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">❄</span>
+              <span class="label" id="label-dew-sca">Dew Point</span>
+              <span></span>
+              <span class="value" id="dew-sca">-- °C</span>
+            </div>
+          </div>
+
+          <!-- TEWANTIN -->
+          <div class="tile">
+            <div class="station-name">TEWANTIN</div>
+
+            <div class="row">
+              <span class="emoji">🌡</span>
+              <span class="label" id="label-temp-tew">Temperature</span>
+              <span></span>
+              <span class="value" id="temp-tew">-- °C</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">🌬</span>
+              <span class="label" id="label-wind-tew">Wind</span>
+              <svg id="arrow-tew" class="wind-arrow" viewBox="0 0 64 64">
+                <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+              </svg>
+              <span class="value" id="wind-tew">-- km/h (--°)</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">💨</span>
+              <span class="label" id="label-gust-tew">Gust</span>
+              <span></span>
+              <span class="value" id="gust-tew">-- km/h</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">💧</span>
+              <span class="label" id="label-hum-tew">Humidity</span>
+              <span></span>
+              <span class="value" id="hum-tew">-- %</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">🌧</span>
+              <span class="label" id="label-rain-tew">Rainfall</span>
+              <span></span>
+              <span class="value" id="rain-tew">-- mm</span>
+            </div>
+
+            <div class="row">
+              <span class="emoji">❄</span>
+              <span class="label" id="label-dew-tew">Dew Point</span>
+              <span></span>
+              <span class="value" id="dew-tew">-- °C</span>
+            </div>
+          </div>
+        </div> <!-- end #tiles-grid -->
+      </div> <!-- end #avionics-module -->
+    </div> <!-- end #avionics-wrapper -->
+  </div> <!-- end #shell -->
+
+  <script>
+    // Mode toggles
+    function toggleNVG() {
+      document.body.classList.toggle("nvg");
+      document.body.classList.remove("red");
     }
-  };
 
-  function formatTime(d) {
-    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-  }
-
-  function dirToText(deg) {
-    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
-    return dirs[Math.round(deg / 45) % 8];
-  }
-
-  function applyStation(id, data) {
-    document.getElementById(`temp-${id}`).textContent = `${data.temp.toFixed(1)} °C`;
-    document.getElementById(`wind-${id}`).textContent =
-      `${data.wind.toFixed(0)} km/h ${dirToText(data.dir)} (${data.dir.toFixed(0)}°)`;
-    document.getElementById(`gust-${id}`).textContent = `${data.gust.toFixed(1)} km/h`;
-    document.getElementById(`hum-${id}`).textContent  = `${data.hum.toFixed(0)}%`;
-    document.getElementById(`rain-${id}`).textContent = `${data.rain.toFixed(1)} mm`;
-    document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
-
-    const arrow = document.getElementById(`arrow-${id}`);
-    arrow.style.transform = `rotate(${data.dir + 180}deg)`;
-  }
-
-  async function fetchStation(id, cfg) {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${cfg.lat}&longitude=${cfg.lon}` +
-      `&current=temperature_2m,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,rain`;
-
-    const res = await fetch(url);
-    const json = await res.json();
-    const c = json.current;
-
-    const mapped = {
-      temp: c.temperature_2m,
-      wind: c.wind_speed_10m,
-      gust: c.wind_gusts_10m ?? c.wind_speed_10m,
-      dir:  c.wind_direction_10m,
-      hum:  c.relative_humidity_2m,
-      rain: c.rain ?? 0,
-      dew:  c.dew_point_2m
-    };
-
-    applyStation(id, mapped);
-  }
-
-  async function refreshAll() {
-    try {
-      await Promise.all([
-        fetchStation('nambour', stations.nambour),
-        fetchStation('beerburrum', stations.beerburrum),
-        fetchStation('sunshine', stations.sunshine),
-        fetchStation('tewantin', stations.tewantin)
-      ]);
-      document.getElementById("updated-global").textContent =
-        `Updated: ${formatTime(new Date())}`;
-    } catch (e) {
-      console.error("WX fetch error", e);
+    function toggleRED() {
+      document.body.classList.toggle("red");
+      document.body.classList.remove("nvg");
     }
-  }
 
-  /* MODE TOGGLES — MUTUALLY EXCLUSIVE */
-  const nvgToggle = document.getElementById('nvgToggle');
-  const redToggle = document.getElementById('redToggle');
-
-  nvgToggle.addEventListener('change', () => {
-    if (nvgToggle.checked) {
-      redToggle.checked = false;
-      document.body.classList.add('nvg');
-      document.body.classList.remove('red');
-    } else {
-      document.body.classList.remove('nvg');
+    // Helper: update value with NVG ghosting support
+    function updateValue(id, newValue) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.setAttribute("data-last", el.innerText);
+      el.innerText = newValue;
     }
-  });
 
-  redToggle.addEventListener('change', () => {
-    if (redToggle.checked) {
-      nvgToggle.checked = false;
-      document.body.classList.add('red');
-      document.body.classList.remove('nvg');
-    } else {
-      document.body.classList.remove('red');
+    // Helper: rotate wind arrow
+    function setWindArrow(id, degrees) {
+      const arrow = document.getElementById(id);
+      if (!arrow) return;
+      arrow.style.transform = "rotate(" + degrees + "deg)";
     }
-  });
 
-  /* INITIAL LOAD + 15-MIN REFRESH */
-  refreshAll();
-  setInterval(refreshAll, 15 * 60 * 1000);
-</script>
+    // Station definitions
+    const stations = [
+      {
+        name: "nambour",
+        lat: -26.63,
+        lon: 152.96,
+        ids: {
+          temp: "temp-nambour",
+          wind: "wind-nambour",
+          gust: "gust-nambour",
+          hum: "hum-nambour",
+          rain: "rain-nambour",
+          dew: "dew-nambour",
+          arrow: "arrow-nambour"
+        }
+      },
+      {
+        name: "beer",
+        lat: -26.90,
+        lon: 152.95,
+        ids: {
+          temp: "temp-beer",
+          wind: "wind-beer",
+          gust: "gust-beer",
+          hum: "hum-beer",
+          rain: "rain-beer",
+          dew: "dew-beer",
+          arrow: "arrow-beer"
+        }
+      },
+      {
+        name: "sca",
+        lat: -26.60,
+        lon: 153.09,
+        ids: {
+          temp: "temp-sca",
+          wind: "wind-sca",
+          gust: "gust-sca",
+          hum: "hum-sca",
+          rain: "rain-sca",
+          dew: "dew-sca",
+          arrow: "arrow-sca"
+        }
+      },
+      {
+        name: "tew",
+        lat: -26.39,
+        lon: 153.03,
+        ids: {
+          temp: "temp-tew",
+          wind: "wind-tew",
+          gust: "gust-tew",
+          hum: "hum-tew",
+          rain: "rain-tew",
+          dew: "dew-tew",
+          arrow: "arrow-tew"
+        }
+      }
+    ];
+
+    // Fetch Open-Meteo data for a station
+    async function fetchStation(station) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,dew_point_2m,precipitation&timezone=auto`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const c = data.current;
+
+        updateValue(station.ids.temp, `${Math.round(c.temperature_2m)} °C`);
+        updateValue(station.ids.hum, `${Math.round(c.relative_humidity_2m)} %`);
+        updateValue(station.ids.gust, `${Math.round(c.wind_gusts_10m)} km/h`);
+        updateValue(station.ids.rain, `${(c.precipitation ?? 0).toFixed(1)} mm`);
+        updateValue(station.ids.dew, `${Math.round(c.dew_point_2m)} °C`);
+
+        const windText = `${Math.round(c.wind_speed_10m)} km/h (${Math.round(c.wind_direction_10m)}°)`;
+        updateValue(station.ids.wind, windText);
+
+        setWindArrow(station.ids.arrow, c.wind_direction_10m);
+      } catch (e) {
+        console.error("Open-Meteo error for", station.name, e);
+      }
+    }
+
+    // Refresh all stations
+    async function refreshAll() {
+      for (const s of stations) {
+        fetchStation(s);
+      }
+    }
+
+    // Initial load + 15-minute refresh
+    refreshAll();
+    setInterval(refreshAll, 15 * 60 * 1000);
+  </script>
+
 </body>
 </html>
