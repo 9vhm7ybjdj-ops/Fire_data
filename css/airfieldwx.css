@@ -1,5 +1,5 @@
 /* ===========================================================
-   AIRFIELD WX PAGE
+   AIRFIELD WX PAGE — MODE-AWARE, NO FORCED COLOURS
 =========================================================== */
 
 #airfieldwx-container {
@@ -7,6 +7,17 @@
   font-size: 18px;
   overflow-y: auto;
 
-  /* REMOVE hard‑coded colour */
-  color: inherit;
+  /* IMPORTANT: allow mode system to control colour */
+  color: inherit !important;
+}
+
+/* Ensure ALL children inherit mode colour */
+#airfieldwx-container * {
+  color: inherit !important;
+}
+
+/* Optional: spacing + layout polish */
+.wx-row {
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
 }
