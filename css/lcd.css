@@ -1,39 +1,9 @@
 /* ===========================================================
-   LCD TEXT — MODE-AWARE
+   LCD TEXT / SMALL READOUTS
 =========================================================== */
 
-#crt *:not(.mfd-button) {
-  font-family: 'Share Tech Mono', monospace;
-  letter-spacing: 2px;
-  font-weight: 600;
-  color: #ffffff;
-  text-shadow:
-    0 0 4px rgba(255,255,255,0.6),
-    0 0 8px rgba(255,255,255,0.4),
-    0 0 12px rgba(255,255,255,0.2);
-  animation: lcd-flicker 2s infinite;
-}
-
-/* NVG */
-body.nvg #crt *:not(.mfd-button) {
-  color: #8aff6c;
-  text-shadow:
-    0 0 4px rgba(138,255,108,0.7),
-    0 0 10px rgba(138,255,108,0.5),
-    0 0 14px rgba(138,255,108,0.3);
-}
-
-/* RED */
-body.red #crt *:not(.mfd-button) {
-  color: #ff3b3b;
-  text-shadow:
-    0 0 4px rgba(255,59,59,0.7),
-    0 0 10px rgba(255,59,59,0.5),
-    0 0 14px rgba(255,59,59,0.3);
-}
-
-/* Flicker */
-@keyframes lcd-flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.97; }
+.lcd {
+  font-family: monospace;
+  color: #0f0;
+  font-size: 18px;
 }
