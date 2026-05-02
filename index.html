@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/style.css?v=10" />
 <link rel="stylesheet" href="css/airfieldwx.css?v=10" />
 <link rel="stylesheet" href="css/bezel.css?v=10" />
+<link rel="stylesheet" href="css/crt.css?v=10" />
 <link rel="stylesheet" href="css/tiles.css?v=10" />
 <link rel="stylesheet" href="css/modes.css?v=10" />
 
@@ -16,7 +17,7 @@
 <body>
 
 <!-- ==========================================================
-     OUTER BEZEL
+     OUTER BEZEL (GRID: 100px | 1fr | 100px)
 ========================================================== -->
 <div id="mfd-bezel">
 
@@ -30,6 +31,66 @@
   </div>
 
   <!-- ========================================================
+       MAIN SCREEN AREA (CENTER COLUMN)
+  ========================================================= -->
+  <div id="mfd-screen">
+
+    <!-- ⭐ CRT CONTAINER (contains glow, scanlines, tint) -->
+    <div id="crt">
+
+      <!-- ======================================================
+           PAGE: WX (2×2 TILE GRID)
+      ======================================================= -->
+      <div id="page-wx" class="page">
+        <div id="wx-grid"></div>
+      </div>
+
+      <!-- ======================================================
+           PAGE: RADAR
+      ======================================================= -->
+      <div id="page-radar" class="page">
+        <div id="radar-map" class="map-surface"></div>
+      </div>
+
+      <!-- ======================================================
+           PAGE: SATELLITE
+      ======================================================= -->
+      <div id="page-satellite" class="page">
+
+        <div id="sat-channel-bar">
+          <button class="sat-channel-btn" data-ch="vis">VIS</button>
+          <button class="sat-channel-btn" data-ch="ir">IR</button>
+          <button class="sat-channel-btn" data-ch="wv">WV</button>
+        </div>
+
+        <div id="satellite-map" class="map-surface"></div>
+      </div>
+
+      <!-- ======================================================
+           PAGE: COMBO (RADAR + SAT OVERLAY)
+      ======================================================= -->
+      <div id="page-combo" class="page">
+
+        <div id="combo-opacity-bar">
+          <label>Radar Opacity</label>
+          <input id="combo-opacity" type="range" min="0" max="1" step="0.05" value="0.6" />
+        </div>
+
+        <div id="combo-map" class="map-surface"></div>
+      </div>
+
+      <!-- ======================================================
+           PAGE: AIRFIELD WX (DECODED METAR)
+      ======================================================= -->
+      <div id="page-airfield" class="page">
+        <div id="airfieldwx-container"></div>
+      </div>
+
+    </div> <!-- end CRT -->
+
+  </div> <!-- end mfd-screen -->
+
+  <!-- ========================================================
        RIGHT VERTICAL PAGE BUTTON STACK
   ========================================================= -->
   <div id="page-buttons">
@@ -39,61 +100,6 @@
     <button class="page-btn" data-page="combo">COMBO</button>
     <button class="page-btn" data-page="airfield">AIRFIELD WX</button>
   </div>
-
-  <!-- ========================================================
-       MAIN SCREEN AREA
-  ========================================================= -->
-  <div id="mfd-screen">
-
-    <!-- ======================================================
-         PAGE: WX (2×2 TILE GRID)
-    ======================================================= -->
-    <div id="page-wx" class="page">
-      <div id="wx-grid"></div>
-    </div>
-
-    <!-- ======================================================
-         PAGE: RADAR
-    ======================================================= -->
-    <div id="page-radar" class="page">
-      <div id="radar-map" class="map-surface"></div>
-    </div>
-
-    <!-- ======================================================
-         PAGE: SATELLITE (VIS/IR/WV SELECTOR INSIDE BEZEL)
-    ======================================================= -->
-    <div id="page-satellite" class="page">
-
-      <div id="sat-channel-bar">
-        <button class="sat-channel-btn" data-ch="vis">VIS</button>
-        <button class="sat-channel-btn" data-ch="ir">IR</button>
-        <button class="sat-channel-btn" data-ch="wv">WV</button>
-      </div>
-
-      <div id="satellite-map" class="map-surface"></div>
-    </div>
-
-    <!-- ======================================================
-         PAGE: COMBO (RADAR + SAT OVERLAY)
-    ======================================================= -->
-    <div id="page-combo" class="page">
-
-      <div id="combo-opacity-bar">
-        <label>Radar Opacity</label>
-        <input id="combo-opacity" type="range" min="0" max="1" step="0.05" value="0.6" />
-      </div>
-
-      <div id="combo-map" class="map-surface"></div>
-    </div>
-
-    <!-- ======================================================
-         PAGE: AIRFIELD WX (DECODED METAR)
-    ======================================================= -->
-    <div id="page-airfield" class="page">
-      <div id="airfieldwx-container"></div>
-    </div>
-
-  </div> <!-- end screen -->
 
 </div> <!-- end bezel -->
 
