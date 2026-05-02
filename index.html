@@ -30,31 +30,26 @@
   </div>
 
   <!-- ========================================================
+       RIGHT VERTICAL PAGE BUTTON STACK
+  ========================================================= -->
+  <div id="page-buttons">
+    <button class="page-btn" data-page="wx">WX</button>
+    <button class="page-btn" data-page="radar">RADAR</button>
+    <button class="page-btn" data-page="satellite">SAT</button>
+    <button class="page-btn" data-page="combo">COMBO</button>
+    <button class="page-btn" data-page="airfield">AIRFIELD WX</button>
+  </div>
+
+  <!-- ========================================================
        MAIN SCREEN AREA
   ========================================================= -->
   <div id="mfd-screen">
 
     <!-- ======================================================
-         TOP PAGE BUTTON BAR
-    ======================================================= -->
-    <div id="page-buttons">
-      <button class="page-btn" data-page="wx">WX</button>
-      <button class="page-btn" data-page="radar">RADAR</button>
-      <button class="page-btn" data-page="satellite">SAT</button>
-      <button class="page-btn" data-page="combo">COMBO</button>
-      <button class="page-btn" data-page="airfield">AIRFIELD WX</button>
-    </div>
-
-    <!-- ======================================================
          PAGE: WX (2×2 TILE GRID)
     ======================================================= -->
     <div id="page-wx" class="page">
-      <div id="wx-grid">
-        <div class="wx-tile" id="wx-tile-1"></div>
-        <div class="wx-tile" id="wx-tile-2"></div>
-        <div class="wx-tile" id="wx-tile-3"></div>
-        <div class="wx-tile" id="wx-tile-4"></div>
-      </div>
+      <div id="wx-grid"></div>
     </div>
 
     <!-- ======================================================
@@ -70,9 +65,9 @@
     <div id="page-satellite" class="page">
 
       <div id="sat-channel-bar">
-        <button class="mfd-button sat-channel-btn" data-ch="vis">VIS</button>
-        <button class="mfd-button sat-channel-btn" data-ch="ir">IR</button>
-        <button class="mfd-button sat-channel-btn" data-ch="wv">WV</button>
+        <button class="sat-channel-btn" data-ch="vis">VIS</button>
+        <button class="sat-channel-btn" data-ch="ir">IR</button>
+        <button class="sat-channel-btn" data-ch="wv">WV</button>
       </div>
 
       <div id="satellite-map" class="map-surface"></div>
