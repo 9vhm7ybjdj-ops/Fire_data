@@ -4,7 +4,9 @@
 
 #airfieldwx-container {
   padding: 20px;
-  color: #0f0;
   font-size: 18px;
   overflow-y: auto;
+
+  /* REMOVE hard‑coded colour */
+  color: inherit;
 }
