@@ -3,40 +3,31 @@
 =========================================================== */
 
 const body = document.body;
-const modeButtons = {
-  normal: document.getElementById("btn-normal"),
-  nvg: document.getElementById("btn-nvg"),
-  red: document.getElementById("btn-red")
-};
 
-/* ===========================================================
-   CLEAR EXISTING MODE CLASSES
-=========================================================== */
+const btnNormal = document.getElementById("btn-normal");
+const btnNVG = document.getElementById("btn-nvg");
+const btnRed = document.getElementById("btn-red");
+
+/* Remove all mode classes */
 function clearModes() {
   body.classList.remove("normal-mode", "nvg-mode", "red-mode");
 }
 
-/* ===========================================================
-   APPLY SELECTED MODE
-=========================================================== */
+/* Apply selected mode */
 function setMode(mode) {
   clearModes();
   body.classList.add(`${mode}-mode`);
 
   // Update active button highlight
-  Object.keys(modeButtons).forEach(key => {
-    modeButtons[key].classList.toggle("active-mode", key === mode);
-  });
+  btnNormal.classList.toggle("active-mode", mode === "normal");
+  btnNVG.classList.toggle("active-mode", mode === "nvg");
+  btnRed.classList.toggle("active-mode", mode === "red");
 }
 
-/* ===========================================================
-   EVENT LISTENERS
-=========================================================== */
-modeButtons.normal.addEventListener("click", () => setMode("normal"));
-modeButtons.nvg.addEventListener("click", () => setMode("nvg"));
-modeButtons.red.addEventListener("click", () => setMode("red"));
+/* Button listeners */
+btnNormal.addEventListener("click", () => setMode("normal"));
+btnNVG.addEventListener("click", () => setMode("nvg"));
+btnRed.addEventListener("click", () => setMode("red"));
 
-/* ===========================================================
-   INITIALIZE DEFAULT MODE
-=========================================================== */
+/* Default mode on load */
 setMode("normal");
