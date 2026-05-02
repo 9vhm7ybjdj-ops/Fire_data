@@ -1,27 +1,42 @@
 /* ===========================================================
-   CRT DISPLAY
+   CRT BASE
 =========================================================== */
 
 #crt {
-  flex: 1;
-  margin: 10px;
-  background: #000;
-  border: 4px solid #111;
-  border-radius: 10px;
-  overflow: hidden;
+  background: #0a0f08;
   position: relative;
-
-  /* Brightness controlled via JS */
-  filter: brightness(var(--brightness-level, 1));
+  overflow: hidden;
 }
 
-/* Page containers */
-.page {
-  display: none;
-  width: 100%;
-  height: 100%;
+/* CRT glow */
+#crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(0,255,0,0.08), transparent 70%);
+  pointer-events: none;
 }
 
-.page.active {
-  display: block;
+/* ===========================================================
+   NVG MODE (CRT ONLY)
+=========================================================== */
+
+body.nvg #crt {
+  background: #001900;
+}
+
+body.nvg #crt::after {
+  background: radial-gradient(circle, rgba(0,255,0,0.15), transparent 70%);
+}
+
+/* ===========================================================
+   RED MODE (CRT ONLY)
+=========================================================== */
+
+body.red #crt {
+  background: #190000;
+}
+
+body.red #crt::after {
+  background: radial-gradient(circle, rgba(255,0,0,0.15), transparent 70%);
 }
