@@ -5,7 +5,6 @@
   <title>Fireground WX Data</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Avionics font -->
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <style>
@@ -13,20 +12,13 @@
       --amber: #ffd27a;
       --crt-green: #8aff6c;
       --crt-red: #ff3b3b;
-      --steel-light: #5a5a5a;
-      --steel-dark: #2e2e2e;
-      --bezel-metal: #1a1a1a;
       --btn-off: #d0d0d0;
       --btn-on: #ffffff;
+      --bezel-metal: #1a1a1a;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    /* -----------------------------------------------------------
-       GLOBAL BACKGROUND — BRUSHED STEEL
-    ----------------------------------------------------------- */
     body {
       margin: 0;
       padding: 0;
@@ -39,7 +31,6 @@
           #2e2e2e 1px,
           #2e2e2e 3px
         );
-      background-size: cover;
       color: var(--amber);
       font-family: 'Share Tech Mono', monospace;
       display: flex;
@@ -50,20 +41,9 @@
       transition: filter 0.25s ease;
     }
 
-    /* -----------------------------------------------------------
-       NVG + RED MODES
-    ----------------------------------------------------------- */
-    body.nvg {
-      filter: brightness(0.85) contrast(0.85) hue-rotate(80deg);
-    }
+    body.nvg { filter: brightness(0.85) contrast(0.85) hue-rotate(80deg); }
+    body.red { filter: brightness(0.75) contrast(0.8) sepia(1) hue-rotate(-20deg) saturate(4); }
 
-    body.red {
-      filter: brightness(0.75) contrast(0.8) sepia(1) hue-rotate(-20deg) saturate(4);
-    }
-
-    /* -----------------------------------------------------------
-       MAIN LAYOUT — BUTTONS LEFT, BEZEL RIGHT
-    ----------------------------------------------------------- */
     #layout {
       display: grid;
       grid-template-columns: 140px minmax(0, 1fr);
@@ -73,15 +53,11 @@
       padding: 24px;
     }
 
-    /* -----------------------------------------------------------
-       LEFT BUTTON STACK (OUTSIDE BEZEL)
-    ----------------------------------------------------------- */
+    /* LEFT BUTTON STACK */
     #mode-buttons {
       display: flex;
       flex-direction: column;
       gap: 14px;
-      align-items: stretch;
-      justify-content: flex-start;
       padding-top: 10px;
     }
 
@@ -100,7 +76,6 @@
       box-shadow:
         inset 0 0 6px rgba(0,0,0,0.8),
         0 2px 4px rgba(0,0,0,0.6);
-      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
     }
 
     .mfd-button.active {
@@ -117,7 +92,6 @@
       border-radius: 50%;
       background: #222;
       box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
-      flex-shrink: 0;
     }
 
     body.nvg .mfd-button.nvg .led {
@@ -130,9 +104,7 @@
       box-shadow: 0 0 6px var(--crt-red);
     }
 
-    /* -----------------------------------------------------------
-       THICK MILITARY-GRADE BEZEL
-    ----------------------------------------------------------- */
+    /* BEZEL */
     #bezel {
       background: var(--bezel-metal);
       border: 12px solid #000;
@@ -160,9 +132,7 @@
     .screw.bl { bottom: 6px; left: 6px; }
     .screw.br { bottom: 6px; right: 6px; }
 
-    /* -----------------------------------------------------------
-       CRT INTERIOR
-    ----------------------------------------------------------- */
+    /* CRT */
     #crt {
       background: #050505;
       border-radius: 10px;
@@ -190,23 +160,60 @@
       mix-blend-mode: soft-light;
     }
 
-    /* -----------------------------------------------------------
-       PAGE SYSTEM
-    ----------------------------------------------------------- */
-    .page {
-      display: none;
+    /* PAGE SYSTEM */
+    .page { display: none; width: 100%; height: 100%; }
+    .page.active { display: block; }
+
+    /* WX TILE GRID — RESTORED */
+    #tiles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 16px;
       width: 100%;
       height: 100%;
     }
 
-    .page.active {
-      display: block;
+    .tile {
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: radial-gradient(circle at 20% 0%, #202020 0, #050505 55%);
+      box-shadow:
+        inset 0 0 10px rgba(0,0,0,0.9),
+        0 0 8px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      color: var(--amber);
     }
 
-    /* -----------------------------------------------------------
-       MAP CONTAINER (RADAR / SAT / COMBO)
-    ----------------------------------------------------------- */
-    #map-container {
+    .station-name {
+      font-size: 14px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 22px 1fr 40px auto;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      margin: 2px 0;
+    }
+
+    .wind-arrow {
+      width: 26px;
+      height: 26px;
+      fill: var(--amber);
+      transform-origin: 50% 50%;
+    }
+
+    /* MAP CONTAINERS — FIXED UNIQUE IDs */
+    #map-container-radar,
+    #map-container-sat,
+    #map-container-combo {
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -214,7 +221,10 @@
       background: #000;
     }
 
-    #map {
+    #map,
+    #map-sat,
+    #map-sat-combo,
+    #map-radar-combo {
       position: absolute;
       top: 0;
       left: 0;
@@ -222,9 +232,6 @@
       image-rendering: pixelated;
     }
 
-    /* -----------------------------------------------------------
-       MAP CONTROLS
-    ----------------------------------------------------------- */
     .map-controls {
       position: absolute;
       bottom: 12px;
@@ -242,10 +249,6 @@
       color: var(--amber);
       cursor: pointer;
       font-size: 14px;
-      text-align: center;
-      box-shadow:
-        inset 0 0 6px rgba(0,0,0,0.8),
-        0 2px 4px rgba(0,0,0,0.6);
     }
 
     .opacity-slider {
@@ -255,9 +258,6 @@
       width: 160px;
     }
 
-    /* -----------------------------------------------------------
-       SATELLITE CHANNEL SELECTOR
-    ----------------------------------------------------------- */
     .sat-channels {
       position: absolute;
       top: 12px;
@@ -274,28 +274,10 @@
       color: var(--amber);
       cursor: pointer;
       font-size: 14px;
-      box-shadow:
-        inset 0 0 6px rgba(0,0,0,0.8),
-        0 2px 4px rgba(0,0,0,0.6);
     }
 
-    .sat-btn.active {
-      background: #222;
-      color: #fff;
-    }
+    .sat-btn.active { background: #222; color: #fff; }
 
-    /* -----------------------------------------------------------
-       RESPONSIVE
-    ----------------------------------------------------------- */
-    @media (max-width: 900px) {
-      #layout {
-        grid-template-columns: 1fr;
-      }
-      #mode-buttons {
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
-    }
   </style>
 </head>
 <body>
@@ -315,7 +297,7 @@
         RED
       </button>
 
-      <button class="mfd-button page-btn" id="btn-wx" onclick="showPage('wx')">
+      <button class="mfd-button page-btn active" id="btn-wx" onclick="showPage('wx')">
         WX
       </button>
 
@@ -345,13 +327,14 @@
       <!-- CRT interior -->
       <div id="crt">
 
-        <!-- PAGE SYSTEM -->
+        <!-- PAGE: WX -->
         <div id="page-wx" class="page active">
-          <!-- WX tiles will be inserted in Part 3 -->
+          <!-- WX tiles inserted in Part 3 -->
         </div>
 
+        <!-- PAGE: RADAR -->
         <div id="page-radar" class="page">
-          <div id="map-container">
+          <div id="map-container-radar">
             <div id="map"></div>
 
             <!-- Radar opacity slider -->
@@ -374,8 +357,9 @@
           </div>
         </div>
 
+        <!-- PAGE: SATELLITE -->
         <div id="page-sat" class="page">
-          <div id="map-container">
+          <div id="map-container-sat">
             <div id="map-sat"></div>
 
             <!-- Satellite channel selector -->
@@ -394,8 +378,9 @@
           </div>
         </div>
 
+        <!-- PAGE: COMBO -->
         <div id="page-combo" class="page">
-          <div id="map-container">
+          <div id="map-container-combo">
             <div id="map-sat-combo"></div>
             <div id="map-radar-combo"></div>
 
@@ -432,47 +417,47 @@
     <div class="station-name">NAMBOUR</div>
 
     <div class="row">
-      <span class="emoji">🌡️</span>
-      <span class="label" id="label-temp-nambour">Temperature</span>
+      <span>🌡️</span>
+      <span>Temperature</span>
       <span></span>
-      <span class="value" id="temp-nambour">-- °C</span>
+      <span id="temp-nambour">-- °C</span>
     </div>
 
     <div class="row">
-      <span class="emoji"></span>
-      <span class="label" id="label-wind-nambour">Wind</span>
+      <span></span>
+      <span>Wind</span>
       <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
         <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
       </svg>
-      <span class="value" id="wind-nambour">-- km/h (--°)</span>
+      <span id="wind-nambour">-- km/h (--°)</span>
     </div>
 
     <div class="row">
-      <span class="emoji">💨</span>
-      <span class="label" id="label-gust-nambour">Gust</span>
+      <span>💨</span>
+      <span>Gust</span>
       <span></span>
-      <span class="value" id="gust-nambour">-- km/h</span>
+      <span id="gust-nambour">-- km/h</span>
     </div>
 
     <div class="row">
-      <span class="emoji">💧</span>
-      <span class="label" id="label-hum-nambour">Humidity</span>
+      <span>💧</span>
+      <span>Humidity</span>
       <span></span>
-      <span class="value" id="hum-nambour">-- %</span>
+      <span id="hum-nambour">-- %</span>
     </div>
 
     <div class="row">
-      <span class="emoji">🌧️</span>
-      <span class="label" id="label-rain-nambour">Rainfall</span>
+      <span>🌧️</span>
+      <span>Rainfall</span>
       <span></span>
-      <span class="value" id="rain-nambour">-- mm</span>
+      <span id="rain-nambour">-- mm</span>
     </div>
 
     <div class="row">
-      <span class="emoji">❄️</span>
-      <span class="label" id="label-dew-nambour">Dew Point</span>
+      <span>❄️</span>
+      <span>Dew Point</span>
       <span></span>
-      <span class="value" id="dew-nambour">-- °C</span>
+      <span id="dew-nambour">-- °C</span>
     </div>
   </div>
 
@@ -481,47 +466,47 @@
     <div class="station-name">BEERBURRUM</div>
 
     <div class="row">
-      <span class="emoji">🌡️</span>
-      <span class="label" id="label-temp-beer">Temperature</span>
+      <span>🌡️</span>
+      <span>Temperature</span>
       <span></span>
-      <span class="value" id="temp-beer">-- °C</span>
+      <span id="temp-beer">-- °C</span>
     </div>
 
     <div class="row">
-      <span class="emoji"></span>
-      <span class="label" id="label-wind-beer">Wind</span>
+      <span></span>
+      <span>Wind</span>
       <svg id="arrow-beer" class="wind-arrow" viewBox="0 0 64 64">
         <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
       </svg>
-      <span class="value" id="wind-beer">-- km/h (--°)</span>
+      <span id="wind-beer">-- km/h (--°)</span>
     </div>
 
     <div class="row">
-      <span class="emoji">💨</span>
-      <span class="label" id="label-gust-beer">Gust</span>
+      <span>💨</span>
+      <span>Gust</span>
       <span></span>
-      <span class="value" id="gust-beer">-- km/h</span>
+      <span id="gust-beer">-- km/h</span>
     </div>
 
     <div class="row">
-      <span class="emoji">💧</span>
-      <span class="label" id="label-hum-beer">Humidity</span>
+      <span>💧</span>
+      <span>Humidity</span>
       <span></span>
-      <span class="value" id="hum-beer">-- %</span>
+      <span id="hum-beer">-- %</span>
     </div>
 
     <div class="row">
-      <span class="emoji">🌧️</span>
-      <span class="label" id="label-rain-beer">Rainfall</span>
+      <span>🌧️</span>
+      <span>Rainfall</span>
       <span></span>
-      <span class="value" id="rain-beer">-- mm</span>
+      <span id="rain-beer">-- mm</span>
     </div>
 
     <div class="row">
-      <span class="emoji">❄️</span>
-      <span class="label" id="label-dew-beer">Dew Point</span>
+      <span>❄️</span>
+      <span>Dew Point</span>
       <span></span>
-      <span class="value" id="dew-beer">-- °C</span>
+      <span id="dew-beer">-- °C</span>
     </div>
   </div>
 
@@ -530,47 +515,47 @@
     <div class="station-name">SUNSHINE COAST AIRPORT</div>
 
     <div class="row">
-      <span class="emoji">🌡️</span>
-      <span class="label" id="label-temp-sca">Temperature</span>
+      <span>🌡️</span>
+      <span>Temperature</span>
       <span></span>
-      <span class="value" id="temp-sca">-- °C</span>
+      <span id="temp-sca">-- °C</span>
     </div>
 
     <div class="row">
-      <span class="emoji"></span>
-      <span class="label" id="label-wind-sca">Wind</span>
+      <span></span>
+      <span>Wind</span>
       <svg id="arrow-sca" class="wind-arrow" viewBox="0 0 64 64">
         <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
       </svg>
-      <span class="value" id="wind-sca">-- km/h (--°)</span>
+      <span id="wind-sca">-- km/h (--°)</span>
     </div>
 
     <div class="row">
-      <span class="emoji">💨</span>
-      <span class="label" id="label-gust-sca">Gust</span>
+      <span>💨</span>
+      <span>Gust</span>
       <span></span>
-      <span class="value" id="gust-sca">-- km/h</span>
+      <span id="gust-sca">-- km/h</span>
     </div>
 
     <div class="row">
-      <span class="emoji">💧</span>
-      <span class="label" id="label-hum-sca">Humidity</span>
+      <span>💧</span>
+      <span>Humidity</span>
       <span></span>
-      <span class="value" id="hum-sca">-- %</span>
+      <span id="hum-sca">-- %</span>
     </div>
 
     <div class="row">
-      <span class="emoji">🌧️</span>
-      <span class="label" id="label-rain-sca">Rainfall</span>
+      <span>🌧️</span>
+      <span>Rainfall</span>
       <span></span>
-      <span class="value" id="rain-sca">-- mm</span>
+      <span id="rain-sca">-- mm</span>
     </div>
 
     <div class="row">
-      <span class="emoji">❄️</span>
-      <span class="label" id="label-dew-sca">Dew Point</span>
+      <span>❄️</span>
+      <span>Dew Point</span>
       <span></span>
-      <span class="value" id="dew-sca">-- °C</span>
+      <span id="dew-sca">-- °C</span>
     </div>
   </div>
 
@@ -579,380 +564,374 @@
     <div class="station-name">TEWANTIN</div>
 
     <div class="row">
-      <span class="emoji">🌡️</span>
-      <span class="label" id="label-temp-tew">Temperature</span>
+      <span>🌡️</span>
+      <span>Temperature</span>
       <span></span>
-      <span class="value" id="temp-tew">-- °C</span>
+      <span id="temp-tew">-- °C</span>
     </div>
 
     <div class="row">
-      <span class="emoji"></span>
-      <span class="label" id="label-wind-tew">Wind</span>
+      <span></span>
+      <span>Wind</span>
       <svg id="arrow-tew" class="wind-arrow" viewBox="0 0 64 64">
         <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
       </svg>
-      <span class="value" id="wind-tew">-- km/h (--°)</span>
+      <span id="wind-tew">-- km/h (--°)</span>
     </div>
 
     <div class="row">
-      <span class="emoji">💨</span>
-      <span class="label" id="label-gust-tew">Gust</span>
+      <span>💨</span>
+      <span>Gust</span>
       <span></span>
-      <span class="value" id="gust-tew">-- km/h</span>
+      <span id="gust-tew">-- km/h</span>
     </div>
 
     <div class="row">
-      <span class="emoji">💧</span>
-      <span class="label" id="label-hum-tew">Humidity</span>
+      <span>💧</span>
+      <span>Humidity</span>
       <span></span>
-      <span class="value" id="hum-tew">-- %</span>
+      <span id="hum-tew">-- %</span>
     </div>
 
     <div class="row">
-      <span class="emoji">🌧️</span>
-      <span class="label" id="label-rain-tew">Rainfall</span>
+      <span>🌧️</span>
+      <span>Rainfall</span>
       <span></span>
-      <span class="value" id="rain-tew">-- mm</span>
+      <span id="rain-tew">-- mm</span>
     </div>
 
     <div class="row">
-      <span class="emoji">❄️</span>
-      <span class="label" id="label-dew-tew">Dew Point</span>
+      <span>❄️</span>
+      <span>Dew Point</span>
       <span></span>
-      <span class="value" id="dew-tew">-- °C</span>
+      <span id="dew-tew">-- °C</span>
     </div>
   </div>
 
 </div>
-  <script>
-    /* ===========================================================
-       PAGE SWITCHING
-    =========================================================== */
-    function showPage(name) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+<script>
+/* ===========================================================
+   PAGE SWITCHING
+=========================================================== */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
 
-      document.getElementById('page-' + name).classList.add('active');
-      document.getElementById('btn-' + name).classList.add('active');
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('btn-' + name).classList.add('active');
+}
+
+/* ===========================================================
+   NVG / RED MODES
+=========================================================== */
+function toggleNVG() {
+  document.body.classList.toggle("nvg");
+  document.body.classList.remove("red");
+}
+
+function toggleRED() {
+  document.body.classList.toggle("red");
+  document.body.classList.remove("nvg");
+}
+
+/* ===========================================================
+   WX PAGE — VALUE UPDATER + WIND ARROWS
+=========================================================== */
+function updateValue(id, newValue) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerText = newValue;
+}
+
+function setWindArrow(id, degrees) {
+  const arrow = document.getElementById(id);
+  if (!arrow) return;
+  arrow.style.transform = "rotate(" + degrees + "deg)";
+}
+
+/* ===========================================================
+   WX PAGE — STATION DEFINITIONS
+=========================================================== */
+const stations = [
+  {
+    name: "nambour",
+    lat: -26.63,
+    lon: 152.96,
+    ids: {
+      temp: "temp-nambour",
+      wind: "wind-nambour",
+      gust: "gust-nambour",
+      hum: "hum-nambour",
+      rain: "rain-nambour",
+      dew: "dew-nambour",
+      arrow: "arrow-nambour"
     }
-
-    /* ===========================================================
-       NVG / RED MODES
-    =========================================================== */
-    function toggleNVG() {
-      document.body.classList.toggle("nvg");
-      document.body.classList.remove("red");
+  },
+  {
+    name: "beer",
+    lat: -26.90,
+    lon: 152.95,
+    ids: {
+      temp: "temp-beer",
+      wind: "wind-beer",
+      gust: "gust-beer",
+      hum: "hum-beer",
+      rain: "rain-beer",
+      dew: "dew-beer",
+      arrow: "arrow-beer"
     }
-
-    function toggleRED() {
-      document.body.classList.toggle("red");
-      document.body.classList.remove("nvg");
+  },
+  {
+    name: "sca",
+    lat: -26.60,
+    lon: 153.09,
+    ids: {
+      temp: "temp-sca",
+      wind: "wind-sca",
+      gust: "gust-sca",
+      hum: "hum-sca",
+      rain: "rain-sca",
+      dew: "dew-sca",
+      arrow: "arrow-sca"
     }
-
-    /* ===========================================================
-       WX PAGE — VALUE UPDATER + GHOSTING
-    =========================================================== */
-    function updateValue(id, newValue) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.setAttribute("data-last", el.innerText);
-      el.innerText = newValue;
+  },
+  {
+    name: "tew",
+    lat: -26.39,
+    lon: 153.03,
+    ids: {
+      temp: "temp-tew",
+      wind: "wind-tew",
+      gust: "gust-tew",
+      hum: "hum-tew",
+      rain: "rain-tew",
+      dew: "dew-tew",
+      arrow: "arrow-tew"
     }
+  }
+];
 
-    function setWindArrow(id, degrees) {
-      const arrow = document.getElementById(id);
-      if (!arrow) return;
-      arrow.style.transform = "rotate(" + degrees + "deg)";
+/* ===========================================================
+   WX PAGE — FETCH OPEN-METEO
+=========================================================== */
+async function fetchStation(station) {
+  const url =
+    `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}` +
+    `&longitude=${station.lon}` +
+    `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,dew_point_2m,precipitation` +
+    `&timezone=auto`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const c = data.current;
+
+    updateValue(station.ids.temp, `${Math.round(c.temperature_2m)} °C`);
+    updateValue(station.ids.hum, `${Math.round(c.relative_humidity_2m)} %`);
+    updateValue(station.ids.gust, `${Math.round(c.wind_gusts_10m)} km/h`);
+    updateValue(station.ids.rain, `${(c.precipitation ?? 0).toFixed(1)} mm`);
+    updateValue(station.ids.dew, `${Math.round(c.dew_point_2m)} °C`);
+
+    const windText =
+      `${Math.round(c.wind_speed_10m)} km/h (${Math.round(c.wind_direction_10m)}°)`;
+    updateValue(station.ids.wind, windText);
+
+    setWindArrow(station.ids.arrow, c.wind_direction_10m);
+
+  } catch (e) {
+    console.error("Open-Meteo error for", station.name, e);
+  }
+}
+
+function refreshAll() {
+  stations.forEach(fetchStation);
+}
+
+refreshAll();
+setInterval(refreshAll, 15 * 60 * 1000);
+
+/* ===========================================================
+   MAP ENGINE — PAN + ZOOM CONTROLLERS
+=========================================================== */
+function createMapController(mapElement) {
+  return {
+    x: 0,
+    y: 0,
+    zoom: 1,
+    element: mapElement,
+    apply() {
+      this.element.style.transform =
+        `translate(${this.x}px, ${this.y}px) scale(${this.zoom})`;
     }
+  };
+}
 
-    /* ===========================================================
-       WX PAGE — STATION DEFINITIONS
-    =========================================================== */
-    const stations = [
-      {
-        name: "nambour",
-        lat: -26.63,
-        lon: 152.96,
-        ids: {
-          temp: "temp-nambour",
-          wind: "wind-nambour",
-          gust: "gust-nambour",
-          hum: "hum-nambour",
-          rain: "rain-nambour",
-          dew: "dew-nambour",
-          arrow: "arrow-nambour"
-        }
-      },
-      {
-        name: "beer",
-        lat: -26.90,
-        lon: 152.95,
-        ids: {
-          temp: "temp-beer",
-          wind: "wind-beer",
-          gust: "gust-beer",
-          hum: "hum-beer",
-          rain: "rain-beer",
-          dew: "dew-beer",
-          arrow: "arrow-beer"
-        }
-      },
-      {
-        name: "sca",
-        lat: -26.60,
-        lon: 153.09,
-        ids: {
-          temp: "temp-sca",
-          wind: "wind-sca",
-          gust: "gust-sca",
-          hum: "hum-sca",
-          rain: "rain-sca",
-          dew: "dew-sca",
-          arrow: "arrow-sca"
-        }
-      },
-      {
-        name: "tew",
-        lat: -26.39,
-        lon: 153.03,
-        ids: {
-          temp: "temp-tew",
-          wind: "wind-tew",
-          gust: "gust-tew",
-          hum: "hum-tew",
-          rain: "rain-tew",
-          dew: "dew-tew",
-          arrow: "arrow-tew"
-        }
-      }
-    ];
+const radarMap = createMapController(document.getElementById("map"));
+const satMap = createMapController(document.getElementById("map-sat"));
+const comboSatMap = createMapController(document.getElementById("map-sat-combo"));
+const comboRadarMap = createMapController(document.getElementById("map-radar-combo"));
 
-    /* ===========================================================
-       WX PAGE — FETCH OPEN-METEO
-    =========================================================== */
-    async function fetchStation(station) {
-      const url =
-        `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}` +
-        `&longitude=${station.lon}` +
-        `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,dew_point_2m,precipitation` +
-        `&timezone=auto`;
+/* ===========================================================
+   DRAG TO PAN
+=========================================================== */
+function enableDragging(container, controller) {
+  let dragging = false;
+  let startX = 0;
+  let startY = 0;
 
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const c = data.current;
+  container.addEventListener("pointerdown", e => {
+    dragging = true;
+    startX = e.clientX - controller.x;
+    startY = e.clientY - controller.y;
+  });
 
-        updateValue(station.ids.temp, `${Math.round(c.temperature_2m)} °C`);
-        updateValue(station.ids.hum, `${Math.round(c.relative_humidity_2m)} %`);
-        updateValue(station.ids.gust, `${Math.round(c.wind_gusts_10m)} km/h`);
-        updateValue(station.ids.rain, `${(c.precipitation ?? 0).toFixed(1)} mm`);
-        updateValue(station.ids.dew, `${Math.round(c.dew_point_2m)} °C`);
+  container.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    controller.x = e.clientX - startX;
+    controller.y = e.clientY - startY;
+    controller.apply();
+  });
 
-        const windText =
-          `${Math.round(c.wind_speed_10m)} km/h (${Math.round(c.wind_direction_10m)}°)`;
-        updateValue(station.ids.wind, windText);
+  container.addEventListener("pointerup", () => dragging = false);
+  container.addEventListener("pointerleave", () => dragging = false);
+}
 
-        setWindArrow(station.ids.arrow, c.wind_direction_10m);
+enableDragging(document.getElementById("map-container-radar"), radarMap);
+enableDragging(document.getElementById("map-container-sat"), satMap);
+enableDragging(document.getElementById("map-container-combo"), comboSatMap);
+enableDragging(document.getElementById("map-container-combo"), comboRadarMap);
 
-      } catch (e) {
-        console.error("Open-Meteo error for", station.name, e);
-      }
-    }
+/* ===========================================================
+   ZOOM CONTROLS
+=========================================================== */
+function zoomIn() { radarMap.zoom *= 1.2; radarMap.apply(); }
+function zoomOut() { radarMap.zoom /= 1.2; radarMap.apply(); }
+function resetView() { radarMap.x = radarMap.y = 0; radarMap.zoom = 1; radarMap.apply(); }
 
-    function refreshAll() {
-      stations.forEach(fetchStation);
-    }
+function zoomInSat() { satMap.zoom *= 1.2; satMap.apply(); }
+function zoomOutSat() { satMap.zoom /= 1.2; satMap.apply(); }
+function resetViewSat() { satMap.x = satMap.y = 0; satMap.zoom = 1; satMap.apply(); }
 
-    refreshAll();
-    setInterval(refreshAll, 15 * 60 * 1000);
+function zoomInCombo() {
+  comboSatMap.zoom *= 1.2;
+  comboRadarMap.zoom *= 1.2;
+  comboSatMap.apply();
+  comboRadarMap.apply();
+}
+function zoomOutCombo() {
+  comboSatMap.zoom /= 1.2;
+  comboRadarMap.zoom /= 1.2;
+  comboSatMap.apply();
+  comboRadarMap.apply();
+}
+function resetViewCombo() {
+  comboSatMap.x = comboSatMap.y = 0;
+  comboRadarMap.x = comboRadarMap.y = 0;
+  comboSatMap.zoom = comboRadarMap.zoom = 1;
+  comboSatMap.apply();
+  comboRadarMap.apply();
+}
 
-    /* ===========================================================
-       MAP ENGINE — PAN + ZOOM (GENERIC)
-    =========================================================== */
-    function createMapController(mapElement) {
-      return {
-        x: 0,
-        y: 0,
-        zoom: 1,
-        element: mapElement,
-        apply() {
-          this.element.style.transform =
-            `translate(${this.x}px, ${this.y}px) scale(${this.zoom})`;
-        }
-      };
-    }
+/* ===========================================================
+   RADAR TILES (RAINVIEWER)
+=========================================================== */
+function loadRadarTiles() {
+  const base = "https://tilecache.rainviewer.com/v2/radar/nowcast_0/256/{z}/{x}/{y}/2/1_1.png";
 
-    /* Radar map */
-    const radarMap = createMapController(document.getElementById("map"));
-    /* Satellite map */
-    const satMap = createMapController(document.getElementById("map-sat"));
-    /* Combo maps */
-    const comboSatMap = createMapController(document.getElementById("map-sat-combo"));
-    const comboRadarMap = createMapController(document.getElementById("map-radar-combo"));
+  const map = document.getElementById("map");
+  map.innerHTML = "";
 
-    /* ===========================================================
-       DRAG TO PAN (GENERIC)
-    =========================================================== */
-    function enableDragging(container, controller) {
-      let dragging = false;
-      let startX = 0;
-      let startY = 0;
-
-      container.addEventListener("pointerdown", e => {
-        dragging = true;
-        startX = e.clientX - controller.x;
-        startY = e.clientY - controller.y;
-      });
-
-      container.addEventListener("pointermove", e => {
-        if (!dragging) return;
-        controller.x = e.clientX - startX;
-        controller.y = e.clientY - startY;
-        controller.apply();
-      });
-
-      container.addEventListener("pointerup", () => dragging = false);
-      container.addEventListener("pointerleave", () => dragging = false);
-    }
-
-    enableDragging(document.querySelector("#page-radar #map-container"), radarMap);
-    enableDragging(document.querySelector("#page-sat #map-container"), satMap);
-    enableDragging(document.querySelector("#page-combo #map-container"), comboSatMap);
-    enableDragging(document.querySelector("#page-combo #map-container"), comboRadarMap);
-
-    /* ===========================================================
-       ZOOM CONTROLS
-    =========================================================== */
-    function zoomIn() { radarMap.zoom *= 1.2; radarMap.apply(); }
-    function zoomOut() { radarMap.zoom /= 1.2; radarMap.apply(); }
-    function resetView() { radarMap.x = radarMap.y = 0; radarMap.zoom = 1; radarMap.apply(); }
-
-    function zoomInSat() { satMap.zoom *= 1.2; satMap.apply(); }
-    function zoomOutSat() { satMap.zoom /= 1.2; satMap.apply(); }
-    function resetViewSat() { satMap.x = satMap.y = 0; satMap.zoom = 1; satMap.apply(); }
-
-    function zoomInCombo() {
-      comboSatMap.zoom *= 1.2;
-      comboRadarMap.zoom *= 1.2;
-      comboSatMap.apply();
-      comboRadarMap.apply();
-    }
-    function zoomOutCombo() {
-      comboSatMap.zoom /= 1.2;
-      comboRadarMap.zoom /= 1.2;
-      comboSatMap.apply();
-      comboRadarMap.apply();
-    }
-    function resetViewCombo() {
-      comboSatMap.x = comboSatMap.y = 0;
-      comboRadarMap.x = comboRadarMap.y = 0;
-      comboSatMap.zoom = comboRadarMap.zoom = 1;
-      comboSatMap.apply();
-      comboRadarMap.apply();
-    }
-
-    /* ===========================================================
-       RADAR TILES (RAINVIEWER)
-    =========================================================== */
-    function loadRadarTiles() {
-      const base = "https://tilecache.rainviewer.com/v2/radar/nowcast_0/256/{z}/{x}/{y}/2/1_1.png";
-
-      // We don't need to generate tiles manually — browser loads them as <img> via JS
-      // For simplicity, we load a single large tile grid at zoom 4
-      const map = document.getElementById("map");
-      map.innerHTML = "";
-
-      for (let x = 7; x <= 9; x++) {
-        for (let y = 11; y <= 13; y++) {
-          const img = document.createElement("img");
-          img.src = base
-            .replace("{z}", 4)
-            .replace("{x}", x)
-            .replace("{y}", y);
-          img.style.position = "absolute";
-          img.style.left = (x - 7) * 256 + "px";
-          img.style.top = (y - 11) * 256 + "px";
-          map.appendChild(img);
-        }
-      }
-    }
-
-    loadRadarTiles();
-
-    function updateRadarOpacity(v) {
-      document.getElementById("map").style.opacity = v / 100;
-    }
-
-    /* ===========================================================
-       SATELLITE TILES (HIMAWARI-8)
-    =========================================================== */
-    function himawariURL(channel) {
-      const base = "https://himawari8.nict.go.jp/img/D531106";
-      const file = channel === "vis" ? "0" : channel === "ir" ? "1" : "2";
-      return `${base}/${file}/550/000000_0_0.png`;
-    }
-
-    function loadSatellite(channel) {
-      const map = document.getElementById("map-sat");
-      map.innerHTML = "";
-
+  for (let x = 7; x <= 9; x++) {
+    for (let y = 11; y <= 13; y++) {
       const img = document.createElement("img");
-      img.src = himawariURL(channel);
+      img.src = base
+        .replace("{z}", 4)
+        .replace("{x}", x)
+        .replace("{y}", y);
       img.style.position = "absolute";
-      img.style.left = "0px";
-      img.style.top = "0px";
+      img.style.left = (x - 7) * 256 + "px";
+      img.style.top = (y - 11) * 256 + "px";
       map.appendChild(img);
     }
+  }
+}
 
-    loadSatellite("vis");
+loadRadarTiles();
 
-    function setSatChannel(ch) {
-      document.querySelectorAll(".sat-btn").forEach(b => b.classList.remove("active"));
-      document.getElementById("sat-" + ch).classList.add("active");
-      loadSatellite(ch);
+function updateRadarOpacity(v) {
+  document.getElementById("map").style.opacity = v / 100;
+}
+
+/* ===========================================================
+   SATELLITE TILES (HIMAWARI-8)
+=========================================================== */
+function himawariURL(channel) {
+  const base = "https://himawari8.nict.go.jp/img/D531106";
+  const file = channel === "vis" ? "0" : channel === "ir" ? "1" : "2";
+  return `${base}/${file}/550/000000_0_0.png`;
+}
+
+function loadSatellite(channel) {
+  const map = document.getElementById("map-sat");
+  map.innerHTML = "";
+
+  const img = document.createElement("img");
+  img.src = himawariURL(channel);
+  img.style.position = "absolute";
+  img.style.left = "0px";
+  img.style.top = "0px";
+  map.appendChild(img);
+}
+
+loadSatellite("vis");
+
+function setSatChannel(ch) {
+  document.querySelectorAll(".sat-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("sat-" + ch).classList.add("active");
+  loadSatellite(ch);
+}
+
+/* ===========================================================
+   COMBO PAGE — SAT + RADAR OVERLAY
+=========================================================== */
+function loadCombo() {
+  const sat = document.getElementById("map-sat-combo");
+  const rad = document.getElementById("map-radar-combo");
+
+  sat.innerHTML = "";
+  rad.innerHTML = "";
+
+  // Satellite base
+  const imgSat = document.createElement("img");
+  imgSat.src = himawariURL("ir");
+  imgSat.style.position = "absolute";
+  sat.appendChild(imgSat);
+
+  // Radar overlay
+  const base = "https://tilecache.rainviewer.com/v2/radar/nowcast_0/256/{z}/{x}/{y}/2/1_1.png";
+
+  for (let x = 7; x <= 9; x++) {
+    for (let y = 11; y <= 13; y++) {
+      const img = document.createElement("img");
+      img.src = base
+        .replace("{z}", 4)
+        .replace("{x}", x)
+        .replace("{y}", y);
+      img.style.position = "absolute";
+      img.style.left = (x - 7) * 256 + "px";
+      img.style.top = (y - 11) * 256 + "px";
+      rad.appendChild(img);
     }
+  }
+}
 
-    /* ===========================================================
-       COMBO PAGE — SAT + RADAR OVERLAY
-    =========================================================== */
-    function loadCombo() {
-      const sat = document.getElementById("map-sat-combo");
-      const rad = document.getElementById("map-radar-combo");
+loadCombo();
 
-      sat.innerHTML = "";
-      rad.innerHTML = "";
+function updateComboOpacity(v) {
+  document.getElementById("map-radar-combo").style.opacity = v / 100;
+}
 
-      // Satellite base
-      const imgSat = document.createElement("img");
-      imgSat.src = himawariURL("ir");
-      imgSat.style.position = "absolute";
-      sat.appendChild(imgSat);
-
-      // Radar overlay
-      const base = "https://tilecache.rainviewer.com/v2/radar/nowcast_0/256/{z}/{x}/{y}/2/1_1.png";
-
-      for (let x = 7; x <= 9; x++) {
-        for (let y = 11; y <= 13; y++) {
-          const img = document.createElement("img");
-          img.src = base
-            .replace("{z}", 4)
-            .replace("{x}", x)
-            .replace("{y}", y);
-          img.style.position = "absolute";
-          img.style.left = (x - 7) * 256 + "px";
-          img.style.top = (y - 11) * 256 + "px";
-          rad.appendChild(img);
-        }
-      }
-    }
-
-    loadCombo();
-
-    function updateComboOpacity(v) {
-      document.getElementById("map-radar-combo").style.opacity = v / 100;
-    }
-
-  </script>
+</script>
 
 </body>
 </html>
