@@ -1,8 +1,8 @@
 /* ===========================================================
-   COMBO PAGE — RADAR OVER SATELLITE WITH OPACITY CONTROL
+   COMBO PAGE — RADAR + SATELLITE OVERLAY + GRID/COASTLINES
 =========================================================== */
 
-let comboOpacity = 0.6; // default radar overlay opacity
+let comboOpacity = 0.6;
 
 function initCombo() {
   const container = document.getElementById("combo-map");
@@ -11,6 +11,7 @@ function initCombo() {
   const canvas = createMapCanvas("combo-map");
   const ctx = canvas.getContext("2d");
 
+  drawGridAndCoast(ctx);
   drawComboLayer(ctx);
 }
 
@@ -24,19 +25,11 @@ function drawComboLayer(ctx) {
   const tileSize = 256;
   const zoom = 4;
 
-  /* ------------------------------
-     URL PATTERNS
-  ------------------------------ */
-
   const radarUrl = (x, y, z) =>
     `https://tilecache.rainviewer.com/v2/radar/${z}/${x}/${y}/2/1_1.png`;
 
   const himawariUrl = (x, y, z) =>
     `https://himawari8.nict.go.jp/himawari8/ir/${z}/${x}/${y}.png`;
-
-  /* ------------------------------
-     TILE GRID (AUSTRALIA CENTERED)
-  ------------------------------ */
 
   const tiles = [
     { x: 8, y: 12 }, { x: 9, y: 12 }, { x: 10, y: 12 },
@@ -44,10 +37,7 @@ function drawComboLayer(ctx) {
     { x: 8, y: 14 }, { x: 9, y: 14 }, { x: 10, y: 14 }
   ];
 
-  /* ------------------------------
-     DRAW SATELLITE BASE LAYER
-  ------------------------------ */
-
+  /* Satellite base */
   tiles.forEach(tile => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -60,10 +50,7 @@ function drawComboLayer(ctx) {
     };
   });
 
-  /* ------------------------------
-     DRAW RADAR OVERLAY (WITH OPACITY)
-  ------------------------------ */
-
+  /* Radar overlay */
   tiles.forEach(tile => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -83,7 +70,7 @@ function drawComboLayer(ctx) {
 }
 
 /* ===========================================================
-   OPACITY SLIDER (0.0 – 1.0)
+   OPACITY CONTROL
 =========================================================== */
 
 function setComboOpacity(value) {
@@ -93,5 +80,6 @@ function setComboOpacity(value) {
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
+  drawGridAndCoast(ctx);
   drawComboLayer(ctx);
 }
