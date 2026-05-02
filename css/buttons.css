@@ -1,5 +1,5 @@
 /* ===========================================================
-   RAISED MECHANICAL BUTTONS — CONTAINED GLOW
+   RAISED MECHANICAL BUTTONS
 =========================================================== */
 
 .mfd-button {
@@ -18,10 +18,10 @@
     0 4px 0 #000,
     0 0 6px #000 inset;
 
-  /* Reduced glow intensity */
+  /* Reduced glow — contained inside bezel */
   text-shadow:
-    0 0 1px #ffb000,
-    0 0 2px #ffb000;
+    0 0 2px #ffb000,
+    0 0 4px #ffb000;
 
   transition: transform 0.08s linear, box-shadow 0.08s linear;
 }
