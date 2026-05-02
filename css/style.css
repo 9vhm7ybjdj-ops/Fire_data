@@ -1,84 +1,28 @@
 /* ===========================================================
-   GLOBAL LAYOUT + RESPONSIVE SCALING
+   GLOBAL SCALING SYSTEM
 =========================================================== */
 
-html, body {
-  margin: 0;
-  padding: 0;
-  background: #111;
-  height: 100%;
-  overflow: hidden;
-  font-family: sans-serif;
-}
-
-#mfd-scale-wrapper {
+#scale-wrapper {
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#mfd-frame {
-  width: 90vmin;
-  height: 70vmin;
-  max-width: 1200px;
-  max-height: 900px;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+#mfd-container {
+  width: 1024px;   /* baseline width */
+  height: 768px;   /* baseline height */
+  transform-origin: top left;
 }
 
 /* ===========================================================
-   BEZEL + BUTTONS
+   BUTTON DEPRESS ANIMATION
 =========================================================== */
 
-#bezel {
-  width: 100%;
-  height: 100%;
-  background: #222;
-  border: 12px solid #333;
-  border-radius: 18px;
-  display: flex;
-  flex-direction: row;
-  position: relative;
-  box-shadow:
-    inset 0 0 40px rgba(0,0,0,0.8),
-    0 0 20px rgba(0,0,0,0.6);
-}
-
-.button-column {
-  width: 12%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  padding: 10px 0;
-}
-
-.mfd-button {
-  background: #444;
-  border: 2px solid #666;
-  color: #ddd;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: 0.15s;
-}
-
-.mfd-button:hover {
-  background: #555;
-}
-
-.brightness-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #ccc;
-  font-size: 12px;
-}
-
-#brightness-slider {
-  width: 80%;
+.mfd-button:active {
+  transform: translateY(2px);
+  filter: brightness(0.85);
+  transition: transform 0.05s linear, filter 0.05s linear;
 }
