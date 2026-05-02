@@ -1,107 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fireground WX Data</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fireground WX Data</title>
 
-  <!-- CORE CSS -->
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/crt.css" />
-  <link rel="stylesheet" href="css/modes.css" />
-  <link rel="stylesheet" href="css/lcd.css" />
-  <link rel="stylesheet" href="css/tiles.css" />
-  <link rel="stylesheet" href="css/maps.css" />
-  <link rel="stylesheet" href="css/airfieldwx.css" />
-  <link rel="stylesheet" href="css/buttons.css" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="airfieldwx.css" />
+<link rel="stylesheet" href="bezel.css" />
+<link rel="stylesheet" href="tiles.css" />
+<link rel="stylesheet" href="modes.css" />
+
 </head>
-
 <body>
 
-  <!-- ===========================================================
-       SCALING WRAPPER (centered by scaling.js)
-  ============================================================ -->
-  <div id="scale-wrapper">
+<!-- ==========================================================
+     OUTER BEZEL
+========================================================== -->
+<div id="mfd-bezel">
 
-    <!-- ===========================================================
-         MAIN MFD CONTAINER (1024×768 baseline)
-    ============================================================ -->
-    <div id="mfd-container">
-
-      <!-- TORX SCREWS -->
-      <div id="screw-tl" class="screw"></div>
-      <div id="screw-tr" class="screw"></div>
-      <div id="screw-bl" class="screw"></div>
-      <div id="screw-br" class="screw"></div>
-
-      <!-- LEFT BUTTON STACK -->
-      <div class="button-column left-buttons">
-        <button id="btn-nvg" class="mfd-button mode-btn">NVG</button>
-        <button id="btn-red" class="mfd-button mode-btn">RED</button>
-        <button id="btn-normal" class="mfd-button mode-btn">NORM</button>
-      </div>
-
-      <!-- CRT FRAME -->
-      <div id="crt-frame">
-        <div id="crt">
-
-          <!-- CRT MASK + GLASS -->
-          <div class="crt-mask"></div>
-          <div class="glass"></div>
-
-          <!-- WX PAGE -->
-          <div id="page-wx" class="page active">
-            <div id="wx-grid"></div>
-          </div>
-
-          <!-- RADAR PAGE -->
-          <div id="page-radar" class="page">
-            <div id="radar-map" class="map-container"></div>
-          </div>
-
-          <!-- SATELLITE PAGE -->
-          <div id="page-satellite" class="page">
-            <div id="satellite-map" class="map-container"></div>
-          </div>
-
-          <!-- COMBO PAGE -->
-          <div id="page-combo" class="page">
-            <div id="combo-map" class="map-container"></div>
-          </div>
-
-          <!-- AIRFIELD WX PAGE -->
-          <div id="page-airfieldwx" class="page">
-            <div id="airfieldwx-container"></div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- RIGHT BUTTON STACK -->
-      <div class="button-column right-buttons">
-        <button class="mfd-button page-btn" data-page="wx">WX</button>
-        <button class="mfd-button page-btn" data-page="radar">RADAR</button>
-        <button class="mfd-button page-btn" data-page="satellite">SAT</button>
-        <button class="mfd-button page-btn" data-page="combo">COMBO</button>
-        <button class="mfd-button page-btn" data-page="airfieldwx">AIRFIELD WX</button>
-      </div>
-
-    </div>
+  <!-- ========================================================
+       LEFT VERTICAL MODE BUTTON STACK
+  ========================================================= -->
+  <div id="left-buttons">
+    <button id="btn-normal" class="mode-btn">NORMAL</button>
+    <button id="btn-nvg" class="mode-btn">NVG</button>
+    <button id="btn-red" class="mode-btn">RED</button>
   </div>
 
-  <!-- ===========================================================
-       JAVASCRIPT
-  ============================================================ -->
-  <script src="js/core.js"></script>
-  <script src="js/modes.js"></script>
-  <script src="js/brightness.js"></script>
-  <script src="js/wx.js"></script>
-  <script src="js/maps.js"></script>
-  <script src="js/radar.js"></script>
-  <script src="js/satellite.js"></script>
-  <script src="js/combo.js"></script>
-  <script src="js/airfieldwx.js"></script>
-  <script src="js/scaling.js"></script>
+  <!-- ========================================================
+       MAIN SCREEN AREA
+  ========================================================= -->
+  <div id="mfd-screen">
+
+    <!-- ======================================================
+         TOP PAGE BUTTON BAR
+    ======================================================= -->
+    <div id="page-buttons">
+      <button class="page-btn" data-page="wx">WX</button>
+      <button class="page-btn" data-page="radar">RADAR</button>
+      <button class="page-btn" data-page="satellite">SAT</button>
+      <button class="page-btn" data-page="combo">COMBO</button>
+      <button class="page-btn" data-page="airfield">AIRFIELD WX</button>
+    </div>
+
+    <!-- ======================================================
+         PAGE: WX (2×2 TILE GRID)
+    ======================================================= -->
+    <div id="page-wx" class="page">
+      <div id="wx-grid">
+        <div class="wx-tile" id="wx-tile-1"></div>
+        <div class="wx-tile" id="wx-tile-2"></div>
+        <div class="wx-tile" id="wx-tile-3"></div>
+        <div class="wx-tile" id="wx-tile-4"></div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         PAGE: RADAR
+    ======================================================= -->
+    <div id="page-radar" class="page">
+      <div id="radar-map" class="map-surface"></div>
+    </div>
+
+    <!-- ======================================================
+         PAGE: SATELLITE (VIS/IR/WV SELECTOR INSIDE BEZEL)
+    ======================================================= -->
+    <div id="page-satellite" class="page">
+
+      <div id="sat-channel-bar">
+        <button class="mfd-button sat-channel-btn" data-ch="vis">VIS</button>
+        <button class="mfd-button sat-channel-btn" data-ch="ir">IR</button>
+        <button class="mfd-button sat-channel-btn" data-ch="wv">WV</button>
+      </div>
+
+      <div id="satellite-map" class="map-surface"></div>
+    </div>
+
+    <!-- ======================================================
+         PAGE: COMBO (RADAR + SAT OVERLAY)
+    ======================================================= -->
+    <div id="page-combo" class="page">
+
+      <div id="combo-opacity-bar">
+        <label>Radar Opacity</label>
+        <input id="combo-opacity" type="range" min="0" max="1" step="0.05" value="0.6" />
+      </div>
+
+      <div id="combo-map" class="map-surface"></div>
+    </div>
+
+    <!-- ======================================================
+         PAGE: AIRFIELD WX (DECODED METAR)
+    ======================================================= -->
+    <div id="page-airfield" class="page">
+      <div id="airfieldwx-container"></div>
+    </div>
+
+  </div> <!-- end screen -->
+
+</div> <!-- end bezel -->
+
+<!-- ==========================================================
+     JAVASCRIPT FILES
+========================================================== -->
+<script src="core.js"></script>
+<script src="modes.js"></script>
+<script src="maps.js"></script>
+<script src="radar.js"></script>
+<script src="satellite.js"></script>
+<script src="combo.js"></script>
+<script src="airfieldwx.js"></script>
 
 </body>
 </html>
