@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Fireground WX Panel</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
@@ -13,9 +12,12 @@
   --text: #e6e6e6;
   --amber: #ff9933;
   --yellow: #ffe066;
+  --crt-glow-normal: rgba(255,255,255,0.7);
+  --crt-glow-nvg: rgba(0,255,136,0.9);
+  --crt-glow-red: rgba(255,80,80,0.9);
 }
 
-/* EXACT DARK BRUSHED METAL BACKGROUND */
+/* BODY BACKGROUND — DARK BRUSHED METAL */
 body {
   margin: 0;
   background:
@@ -53,7 +55,7 @@ body {
   letter-spacing: 2px;
 }
 
-/* TOGGLES — FIXED SPACING */
+/* TOGGLES */
 .toggle-wrap {
   display: flex;
   justify-content: center;
@@ -95,23 +97,17 @@ input[type="checkbox"]:checked + .toggle-switch::after {
   background: var(--amber);
 }
 
-/* GRID */
+/* GRID — TRUE 2×2 */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 22px;
   padding: 22px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
-@media (max-width: 1200px) {
-  .grid {
-    transform: scale(calc(100vw / 1600));
-    transform-origin: top center;
-  }
-}
-
-/* TILES — EXACT LIGHTER BRUSHED METAL */
+/* TILES — LIGHTER BRUSHED METAL */
 .tile {
   background:
     linear-gradient(180deg, #1a1a1c 0%, #0f0f11 100%),
@@ -139,7 +135,7 @@ input[type="checkbox"]:checked + .toggle-switch::after {
     0 0 14px rgba(255,255,255,0.05);
 }
 
-/* RIVETS — EXACT MATCH */
+/* RIVETS */
 .tile::before,
 .tile::after,
 .tile .rivet-bl,
@@ -158,9 +154,66 @@ input[type="checkbox"]:checked + .toggle-switch::after {
 .tile .rivet-bl { bottom: 8px; left: 8px; }
 .tile .rivet-br { bottom: 8px; right: 8px; }
 
-/* TEXT */
+/* CRT SCREEN (INNER) */
+.crt-screen {
+  position: relative;
+  margin: 10px 4px 6px 4px;
+  padding: 10px 12px;
+  background: radial-gradient(circle at center, #050608 0%, #000000 80%);
+  border-radius: 12px;
+  border: 2px solid #000; /* thin bezel */
+  overflow: hidden;
+  transform: perspective(900px) translateZ(0) scale(1.01);
+  box-shadow:
+    0 0 10px rgba(0,0,0,0.9),
+    inset 0 0 18px rgba(0,0,0,0.9);
+  animation: crtFlicker 0.12s infinite;
+}
+
+/* CRT SCANLINES + MASK (BASE, COLOUR MODE) */
+.crt-screen::before,
+.crt-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Scanlines */
+.crt-screen::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.25) 0px,
+    rgba(0,0,0,0.25) 1px,
+    transparent 2px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.22;
+}
+
+/* RGB subpixel mask */
+.crt-screen::after {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255,0,0,0.18) 0px,
+    rgba(0,255,0,0.18) 1px,
+    rgba(0,0,255,0.18) 2px,
+    rgba(0,0,0,0) 3px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.25;
+}
+
+/* CRT FLICKER */
+@keyframes crtFlicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.97; }
+}
+
+/* TEXT + ROWS */
 .station-name {
-  font-size: 24px;
+  font-size: 22px;
   color: var(--amber);
   text-transform: uppercase;
   margin-bottom: 4px;
@@ -168,18 +221,19 @@ input[type="checkbox"]:checked + .toggle-switch::after {
 }
 
 .row {
-  font-size: 20px;
-  margin: 6px 0;
+  font-size: 18px;
+  margin: 4px 0;
   display: flex;
   align-items: center;
   gap: 6px;
+  justify-content: flex-start;
 }
 
 .row span {
-  margin-left: auto;
+  margin-left: 0;
 }
 
-/* WIND ARROW — EXACT GEOMETRY + LEFT POSITION */
+/* WIND ARROW — LEFT, NEON BLUE IN NORMAL MODE */
 .wind-arrow {
   width: 22px;
   height: 22px;
@@ -197,18 +251,57 @@ input[type="checkbox"]:checked + .toggle-switch::after {
   display: inline-block;
 }
 
-/* NORMAL MODE — RESET */
-body:not(.nvg):not(.red) .emoji,
-body:not(.nvg):not(.red) .wind-arrow polygon {
+/* NORMAL MODE — NATURAL COLOUR, COLOUR CRT */
+body:not(.nvg):not(.red) .crt-screen {
+  color: var(--text);
+  text-shadow:
+    0 0 4px var(--crt-glow-normal),
+    0 0 8px rgba(255,255,255,0.4);
+}
+
+body:not(.nvg):not(.red) .emoji {
   filter: none !important;
+  color: inherit !important;
   text-shadow: none !important;
 }
 
-/* NVG MODE */
+body:not(.nvg):not(.red) .wind-arrow polygon {
+  fill: #66d9ff;
+  filter: drop-shadow(0 0 6px #66d9ff);
+}
+
+/* NVG MODE — GREEN MONO CRT */
 body.nvg {
   --text: #00ff88;
   --amber: #00ff88;
   --yellow: #00ff88;
+}
+
+body.nvg .crt-screen {
+  color: #00ff88;
+  text-shadow:
+    0 0 4px var(--crt-glow-nvg),
+    0 0 10px var(--crt-glow-nvg);
+}
+
+/* NVG: green-only mask + scanlines tint */
+body.nvg .crt-screen::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.35) 0px,
+    rgba(0,0,0,0.35) 1px,
+    transparent 2px,
+    transparent 3px
+  );
+}
+
+body.nvg .crt-screen::after {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0,255,136,0.25) 0px,
+    rgba(0,255,136,0.25) 2px,
+    rgba(0,0,0,0) 3px
+  );
 }
 
 body.nvg .emoji {
@@ -220,11 +313,38 @@ body.nvg .wind-arrow polygon {
   filter: drop-shadow(0 0 6px #00ff88);
 }
 
-/* RED MODE */
+/* RED MODE — RED MONO CRT */
 body.red {
   --text: #ffb3b3;
   --amber: #ff8080;
   --yellow: #ff9999;
+}
+
+body.red .crt-screen {
+  color: #ff8080;
+  text-shadow:
+    0 0 4px var(--crt-glow-red),
+    0 0 10px var(--crt-glow-red);
+}
+
+/* RED: red-only mask + scanlines tint */
+body.red .crt-screen::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.35) 0px,
+    rgba(0,0,0,0.35) 1px,
+    transparent 2px,
+    transparent 3px
+  );
+}
+
+body.red .crt-screen::after {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255,80,80,0.25) 0px,
+    rgba(255,80,80,0.25) 2px,
+    rgba(0,0,0,0) 3px
+  );
 }
 
 body.red .emoji {
@@ -267,89 +387,93 @@ body.red .wind-arrow polygon {
   <div class="grid">
     <!-- NAMBOUR -->
     <div class="tile">
-      <div class="station-name">NAMBOUR</div>
+      <div class="crt-screen">
+        <div class="station-name">NAMBOUR</div>
 
-      <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-nambour">--.- °C</span></div>
+        <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-nambour">--.- °C</span></div>
 
-      <div class="row">
-        <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-        </svg>
-        Wind
-        <span id="wind-nambour">-- km/h (--°)</span>
+        <div class="row">
+          <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
+            <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+          </svg>
+          Wind
+          <span id="wind-nambour">-- km/h (--°)</span>
+        </div>
+
+        <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-nambour">-- km/h</span></div>
+        <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-nambour">-- %</span></div>
+        <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-nambour">-- mm</span></div>
+        <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-nambour">-- °C</span></div>
       </div>
-
-      <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-nambour">-- km/h</span></div>
-      <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-nambour">-- %</span></div>
-      <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-nambour">-- mm</span></div>
-      <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-nambour">-- °C</span></div>
-
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
     <!-- BEERBURRUM -->
     <div class="tile">
-      <div class="station-name">BEERBURRUM</div>
+      <div class="crt-screen">
+        <div class="station-name">BEERBURRUM</div>
 
-      <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-beerburrum">--.- °C</span></div>
+        <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-beerburrum">--.- °C</span></div>
 
-      <div class="row">
-        <svg id="arrow-beerburrum" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-        </svg>
-        Wind
-        <span id="wind-beerburrum">-- km/h (--°)</span>
+        <div class="row">
+          <svg id="arrow-beerburrum" class="wind-arrow" viewBox="0 0 64 64">
+            <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+          </svg>
+          Wind
+          <span id="wind-beerburrum">-- km/h (--°)</span>
+        </div>
+
+        <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-beerburrum">-- km/h</span></div>
+        <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-beerburrum">-- %</span></div>
+        <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-beerburrum">-- mm</span></div>
+        <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-beerburrum">-- °C</span></div>
       </div>
-
-      <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-beerburrum">-- km/h</span></div>
-      <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-beerburrum">-- %</span></div>
-      <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-beerburrum">-- mm</span></div>
-      <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-beerburrum">-- °C</span></div>
-
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
-    <!-- SUNSHINE COAST -->
+    <!-- SUNSHINE COAST AIRPORT -->
     <div class="tile">
-      <div class="station-name">SUNSHINE COAST AIRPORT</div>
+      <div class="crt-screen">
+        <div class="station-name">SUNSHINE COAST AIRPORT</div>
 
-      <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-sunshine">--.- °C</span></div>
+        <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-sunshine">--.- °C</span></div>
 
-      <div class="row">
-        <svg id="arrow-sunshine" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-        </svg>
-        Wind
-        <span id="wind-sunshine">-- km/h (--°)</span>
+        <div class="row">
+          <svg id="arrow-sunshine" class="wind-arrow" viewBox="0 0 64 64">
+            <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+          </svg>
+          Wind
+          <span id="wind-sunshine">-- km/h (--°)</span>
+        </div>
+
+        <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-sunshine">-- km/h</span></div>
+        <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-sunshine">-- %</span></div>
+        <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-sunshine">-- mm</span></div>
+        <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-sunshine">-- °C</span></div>
       </div>
-
-      <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-sunshine">-- km/h</span></div>
-      <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-sunshine">-- %</span></div>
-      <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-sunshine">-- mm</span></div>
-      <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-sunshine">-- °C</span></div>
-
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
     <!-- TEWANTIN -->
     <div class="tile">
-      <div class="station-name">TEWANTIN</div>
+      <div class="crt-screen">
+        <div class="station-name">TEWANTIN</div>
 
-      <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-tewantin">--.- °C</span></div>
+        <div class="row"><span class="emoji">🌡</span> Temperature <span id="temp-tewantin">--.- °C</span></div>
 
-      <div class="row">
-        <svg id="arrow-tewantin" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
-        </svg>
-        Wind
-        <span id="wind-tewantin">-- km/h (--°)</span>
+        <div class="row">
+          <svg id="arrow-tewantin" class="wind-arrow" viewBox="0 0 64 64">
+            <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
+          </svg>
+          Wind
+          <span id="wind-tewantin">-- km/h (--°)</span>
+        </div>
+
+        <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-tewantin">-- km/h</span></div>
+        <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-tewantin">-- %</span></div>
+        <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-tewantin">-- mm</span></div>
+        <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-tewantin">-- °C</span></div>
       </div>
-
-      <div class="row"><span class="emoji">🌬</span> Gust <span id="gust-tewantin">-- km/h</span></div>
-      <div class="row"><span class="emoji">💧</span> Humidity <span id="hum-tewantin">-- %</span></div>
-      <div class="row"><span class="emoji">🌧</span> Rainfall <span id="rain-tewantin">-- mm</span></div>
-      <div class="row"><span class="emoji">❄</span> Dew Point <span id="dew-tewantin">-- °C</span></div>
-
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
@@ -382,7 +506,7 @@ body.red .wind-arrow polygon {
     document.getElementById(`rain-${id}`).textContent = `${data.rain} mm`;
     document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
 
-    /* WIND ARROW ROTATION */
+    /* WIND ARROW ROTATION (dir + 180 so arrow points FROM direction) */
     const arrow = document.getElementById(`arrow-${id}`);
     arrow.style.transform = `rotate(${data.dir + 180}deg)`;
   }
