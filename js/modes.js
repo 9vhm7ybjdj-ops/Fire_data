@@ -7,6 +7,7 @@ function setMode(mode) {
 
   if (mode === "nvg") document.body.classList.add("nvg");
   if (mode === "red") document.body.classList.add("red");
+  // NORMAL mode = no class
 }
 
 /* ===========================================================
@@ -36,3 +37,18 @@ document.getElementById("btn-normal").addEventListener("click", () => {
   document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active-mode"));
   document.getElementById("btn-normal").classList.add("active-mode");
 });
+
+/* ===========================================================
+   INITIAL MODE SELECTION (NORMAL)
+   Triggered AFTER core.js finishes initialising
+=========================================================== */
+
+document.addEventListener("mfd-ready", () => {
+  // Set NORMAL mode
+  setMode("normal");
+
+  // Highlight NORMAL button
+  const normalBtn = document.getElementById("btn-normal");
+  if (normalBtn) normalBtn.classList.add("active-mode");
+});
+
