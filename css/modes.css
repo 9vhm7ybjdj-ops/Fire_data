@@ -1,39 +1,23 @@
 /* ===========================================================
-   MODE BUTTON ACTIVE STATE
-=========================================================== */
-
-.mode-btn.active-mode {
-  background: #b36b00;
-  color: #fff2cc;
-  border-color: #b36b00;
-  box-shadow:
-    0 0 12px rgba(255,170,0,0.6),
-    inset 0 0 6px rgba(0,0,0,0.8);
-}
-
-/* ===========================================================
-   NORMAL MODE
+   MODE SYSTEM — NORMAL / NVG / RED
 =========================================================== */
 
 body.normal-mode {
-  --lcd-text: #ffffff; /* white */
-  background: #000;
+  color: #fff;
 }
-
-/* ===========================================================
-   NVG MODE
-=========================================================== */
 
 body.nvg-mode {
-  --lcd-text: #00ff66; /* phosphor green */
-  background: #001900;
+  color: #0f0;
+  background: #001100;
 }
 
-/* ===========================================================
-   RED MODE
-=========================================================== */
-
 body.red-mode {
-  --lcd-text: #ff1a1a; /* deep red */
-  background: #190000;
+  color: #f33;
+  background: #220000;
+}
+
+/* Buttons highlight */
+.mode-btn.active-mode {
+  background: #b36b00 !important;
+  color: #fff2cc !important;
 }
