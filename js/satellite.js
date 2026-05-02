@@ -1,19 +1,12 @@
 /* ===========================================================
-   SATELLITE — HIMAWARI
+   SATELLITE PAGE
 =========================================================== */
 
-let satelliteLoaded = false;
-
 function initSatellite() {
-  if (satelliteLoaded) return;
-  satelliteLoaded = true;
+  const canvas = createMapCanvas("satellite-map");
+  const ctx = canvas.getContext("2d");
 
-  const container = document.getElementById("satellite-map");
-
-  const img = document.createElement("img");
-  img.src = "https://rammb-slider.cira.colostate.edu/data/imagery/latest/himawari---full_disk/geocolor/1000.jpg";
-  img.style.opacity = "0.9";
-
-  container.appendChild(img);
-  enableMapControls(container);
+  ctx.fillStyle = "white";
+  ctx.font = "24px monospace";
+  ctx.fillText("SATELLITE DATA", 50, 50);
 }
