@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fireground Tactical v6</title>
+<title>Fireground WX Panel</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 
@@ -12,18 +12,18 @@
 :root {
   --steel-bg: #0d0d0f;
   --steel-grain: rgba(255,255,255,0.04);
-  --tile-bg: #141416;
-  --tile-edge: #1f1f22;
+  --tile-bg: #1a1a1c;
+  --tile-edge: #333;
   --text: #e6e6e6;
-  --muted: #888;
-  --amber: #ffb84d;
+  --amber: #ff9933;
   --yellow: #ffe066;
   --rivet: #3a3a3d;
 }
 
+/* GLOBAL */
 body {
   margin: 0;
-  background: var(--steel-bg);
+  background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0f 100%);
   font-family: 'Rajdhani', sans-serif;
   color: var(--text);
   letter-spacing: 0.5px;
@@ -50,114 +50,30 @@ body::before {
 /* STATUS BAR */
 .status-bar {
   width: 100%;
-  padding: 12px 20px;
-  background: #0f0f11;
-  border-bottom: 2px solid #1c1c1e;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 12px 0;
+  background: #1a1a1c;
+  border-bottom: 2px solid #333;
+  text-align: center;
   font-size: 20px;
   color: var(--amber);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 22px;
-  padding: 22px;
-  transform-origin: top center;
-  margin: 0 auto;
-}
-
-@media (max-width: 1200px) {
-  .grid {
-    transform: scale(calc(100vw / 1400));
-  }
-}
-
-@media (max-width: 600px) {
-  .grid {
-    padding: 10px;
-    gap: 12px;
-  }
-}
-
-/* TILE */
-.tile {
-  background: var(--tile-bg);
-  border: 2px solid var(--tile-edge);
-  padding: 18px 22px;
-  border-radius: 6px;
-  position: relative;
-  box-shadow: inset 0 0 12px #000, 0 0 12px #000;
-  transition: box-shadow 0.2s ease;
-}
-
-.tile::before,
-.tile::after,
-.tile .rivet-bl,
-.tile .rivet-br {
-  content: "";
-  width: 12px;
-  height: 12px;
-  background: var(--rivet);
-  border-radius: 50%;
-  position: absolute;
-  box-shadow: inset 0 0 3px #000;
-}
-
-.tile::before { top: 8px; left: 8px; }
-.tile::after { top: 8px; right: 8px; }
-.tile .rivet-bl { bottom: 8px; left: 8px; }
-.tile .rivet-br { bottom: 8px; right: 8px; }
-
-/* TEXT */
-.station-name {
-  font-size: 26px;
-  color: var(--amber);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-  letter-spacing: 1px;
-}
-
-.row {
-  font-size: 20px;
-  margin: 6px 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.row span {
-  margin-left: auto;
-}
-
-/* INLINE WIND ARROW */
-.wind-arrow {
-  width: 22px;
-  height: 22px;
-  margin: 0 6px;
-  vertical-align: middle;
-  transform-origin: 50% 15%;
-  filter: drop-shadow(0 0 6px var(--amber));
-}
-
-/* TILE-ONLY RED GLOW */
-.gust-pulse {
-  box-shadow: 0 0 18px #ff4d4d !important;
-}
-
-/* MODE TOGGLES */
+/* TOGGLES — FIXED SPACING */
 .toggle-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 14px 0 6px 0;
+  font-size: 18px;
+  color: var(--amber);
+}
+
+.toggle {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 10px 20px;
-  font-size: 18px;
-  color: var(--amber);
 }
 
 .toggle-switch {
@@ -186,6 +102,93 @@ input[type="checkbox"]:checked + .toggle-switch::after {
   background: var(--amber);
 }
 
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+  padding: 22px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    transform: scale(calc(100vw / 1600));
+    transform-origin: top center;
+  }
+}
+
+/* TILE */
+.tile {
+  background: linear-gradient(180deg, #2a2a2d 0%, #1a1a1c 100%);
+  border: 2px solid var(--tile-edge);
+  border-radius: 6px;
+  padding: 16px 20px;
+  position: relative;
+  box-shadow:
+    inset 0 0 8px #000,
+    0 0 12px rgba(255,255,255,0.05);
+}
+
+.tile::before,
+.tile::after,
+.tile .rivet-bl,
+.tile .rivet-br {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: var(--rivet);
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: inset 0 0 3px #000;
+}
+
+.tile::before { top: 8px; left: 8px; }
+.tile::after { top: 8px; right: 8px; }
+.tile .rivet-bl { bottom: 8px; left: 8px; }
+.tile .rivet-br { bottom: 8px; right: 8px; }
+
+/* TEXT */
+.station-name {
+  font-size: 24px;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.row {
+  font-size: 20px;
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.row span {
+  margin-left: auto;
+}
+
+/* WIND ARROW — EXACT MATCH TO YOUR SCREENSHOT */
+.wind-arrow {
+  width: 22px;
+  height: 22px;
+  margin: 0 6px;
+  vertical-align: middle;
+  transform-origin: 50% 15%;
+}
+
+.wind-arrow polygon {
+  fill: #66d9ff;
+  filter: drop-shadow(0 0 6px #66d9ff);
+}
+
+/* GUST ALERT */
+.gust-pulse {
+  color: #ff4d4d;
+  font-weight: 600;
+}
+
 /* NVG MODE */
 body.nvg {
   --text: #00ff88;
@@ -193,6 +196,25 @@ body.nvg {
   --yellow: #00ff88;
   --tile-bg: #001b0f;
   --tile-edge: #00331a;
+}
+
+body.nvg .tile {
+  box-shadow: 0 0 16px #00ff88, inset 0 0 8px #00ff88;
+}
+
+body.nvg .row,
+body.nvg .station-name,
+body.nvg .global-updated {
+  text-shadow: 0 0 6px #00ff88;
+}
+
+body.nvg .wind-arrow polygon {
+  fill: #00ff88;
+  filter: drop-shadow(0 0 6px #00ff88);
+}
+
+body.nvg .gust-pulse {
+  color: #00ff88 !important;
 }
 
 /* RED MODE */
@@ -204,38 +226,43 @@ body.red {
   --tile-edge: #330000;
 }
 
-/* GLOBAL UPDATE TIME */
+body.red .tile {
+  box-shadow: 0 0 16px #ff4d4d, inset 0 0 8px #ff4d4d;
+}
+
+body.red .wind-arrow polygon {
+  fill: #ff8080;
+  filter: drop-shadow(0 0 6px #ff4d4d);
+}
+
 .global-updated {
   text-align: center;
   margin: 20px 0 30px 0;
   font-size: 18px;
   color: var(--yellow);
-  letter-spacing: 1px;
 }
 </style>
 </head>
 <body>
 
-  <!-- STATUS BAR -->
   <div class="status-bar">
     FIREGROUND WX DATA — QLD OPS
   </div>
 
-  <!-- MODE TOGGLES -->
   <div class="toggle-wrap">
-    <label>
+    <label class="toggle">
       NVG
       <input id="nvgToggle" type="checkbox" hidden>
       <span class="toggle-switch"></span>
     </label>
-    <label>
+
+    <label class="toggle">
       RED
       <input id="redToggle" type="checkbox" hidden>
       <span class="toggle-switch"></span>
     </label>
   </div>
 
-  <!-- GRID -->
   <div class="grid">
     <!-- NAMBOUR -->
     <div class="tile">
@@ -246,9 +273,9 @@ body.red {
       <div class="row">
         Wind
         <svg id="arrow-nambour" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+          <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
         </svg>
-        <span id="wind-nambour">-- km/h</span>
+        <span id="wind-nambour">-- km/h (--°)</span>
       </div>
 
       <div class="row">🌬 Gust <span id="gust-nambour">-- km/h</span></div>
@@ -268,9 +295,9 @@ body.red {
       <div class="row">
         Wind
         <svg id="arrow-beerburrum" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+          <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
         </svg>
-        <span id="wind-beerburrum">-- km/h</span>
+        <span id="wind-beerburrum">-- km/h (--°)</span>
       </div>
 
       <div class="row">🌬 Gust <span id="gust-beerburrum">-- km/h</span></div>
@@ -290,9 +317,9 @@ body.red {
       <div class="row">
         Wind
         <svg id="arrow-sunshine" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+          <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
         </svg>
-        <span id="wind-sunshine">-- km/h</span>
+        <span id="wind-sunshine">-- km/h (--°)</span>
       </div>
 
       <div class="row">🌬 Gust <span id="gust-sunshine">-- km/h</span></div>
@@ -312,9 +339,9 @@ body.red {
       <div class="row">
         Wind
         <svg id="arrow-tewantin" class="wind-arrow" viewBox="0 0 64 64">
-          <polygon fill="#66d9ff" points="32 4 40 24 34 24 34 60 30 60 30 24 24 24 32 4"/>
+          <polygon points="32 6 40 24 34 24 34 58 30 58 30 24 24 24 32 6"/>
         </svg>
-        <span id="wind-tewantin">-- km/h</span>
+        <span id="wind-tewantin">-- km/h (--°)</span>
       </div>
 
       <div class="row">🌬 Gust <span id="gust-tewantin">-- km/h</span></div>
@@ -325,7 +352,7 @@ body.red {
       <div class="rivet-bl"></div><div class="rivet-br"></div>
     </div>
 
-  </div> <!-- end grid -->
+  </div>
 
   <div class="global-updated" id="updated-global">Updated: --:--</div>
 <script>
@@ -341,22 +368,26 @@ body.red {
     return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
   }
 
+  function dirToText(deg) {
+    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+    return dirs[Math.round(deg / 45) % 8];
+  }
+
   function applyStation(id, data) {
     document.getElementById(`temp-${id}`).textContent = `${data.temp.toFixed(1)} °C`;
-    document.getElementById(`wind-${id}`).textContent = `${data.wind} km/h`;
+    document.getElementById(`wind-${id}`).textContent = `${data.wind} km/h ${dirToText(data.dir)} (${data.dir}°)`;
     document.getElementById(`gust-${id}`).textContent = `${data.gust.toFixed(1)} km/h`;
     document.getElementById(`hum-${id}`).textContent  = `${data.hum}%`;
     document.getElementById(`rain-${id}`).textContent = `${data.rain} mm`;
     document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
 
-    /* TILE-ONLY GUST GLOW */
+    /* GUST ALERT */
     const tile = document.getElementById(`gust-${id}`).closest('.tile');
     tile.classList.remove('gust-pulse');
-
     if (data.gust > data.wind && data.gust > 40)
       tile.classList.add('gust-pulse');
 
-    /* WIND ARROW — POINTS TO WHERE WIND IS BLOWING */
+    /* WIND ARROW ROTATION */
     const arrow = document.getElementById(`arrow-${id}`);
     arrow.style.transform = `rotate(${data.dir + 180}deg)`;
   }
