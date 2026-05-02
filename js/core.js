@@ -8,7 +8,7 @@ function playClick() {
   const gain = ctx.createGain();
 
   osc.type = "square";
-  osc.frequency.value = 2400; // crisp avionics click
+  osc.frequency.value = 2400;
 
   gain.gain.setValueAtTime(0.15, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
@@ -36,4 +36,13 @@ document.querySelectorAll(".page-btn").forEach(btn => {
     document.querySelectorAll(".page-btn").forEach(b => b.classList.remove("active-page"));
     btn.classList.add("active-page");
   });
+});
+
+/* ===========================================================
+   INITIAL PAGE SELECTION (WX)
+=========================================================== */
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("page-wx").classList.add("active");
+  document.querySelector('.page-btn[data-page="wx"]').classList.add("active-page");
 });
