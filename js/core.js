@@ -30,12 +30,30 @@ document.querySelectorAll(".page-btn").forEach(btn => {
 
     const page = btn.dataset.page;
 
+    // Switch visible page
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(`page-${page}`).classList.add("active");
 
+    // Highlight active button
     document.querySelectorAll(".page-btn").forEach(b => b.classList.remove("active-page"));
     btn.classList.add("active-page");
+
+    // Initialise map pages
+    if (page === "radar") initRadar();
+    if (page === "satellite") initSatellite();
+    if (page === "combo") initCombo();
   });
+});
+
+/* ===========================================================
+   INITIAL PAGE SELECTION (WX)
+=========================================================== */
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("page-wx").classList.add("active");
+  document.querySelector('.page-btn[data-page="wx"]').classList.add("active-page");
+
+  document.dispatchEvent(new Event("mfd-ready"));
 });
 
 /* ===========================================================
