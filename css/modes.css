@@ -3,30 +3,31 @@
 =========================================================== */
 
 .mode-btn.active-mode {
-  background: #111;
+  background: #0a0a0a;          /* darker, more tactical */
   transform: translateY(4px);
+  box-shadow: inset 0 0 6px #000;
 }
 
 /* ===========================================================
-   NORMAL MODE
+   NORMAL MODE (DEFAULT)
 =========================================================== */
 
 body:not(.nvg):not(.red) #crt {
-  background: #000 !important;
+  background: #000000 !important;   /* pure black */
 }
 
 /* ===========================================================
-   NVG MODE
+   NVG MODE — DARKER, LESS INTENSE
 =========================================================== */
 
 body.nvg #crt {
-  background: #001900 !important;
+  background: #000d00 !important;   /* deep green-black */
 }
 
 /* ===========================================================
-   RED MODE
+   RED MODE — DARKER, LESS INTENSE
 =========================================================== */
 
 body.red #crt {
-  background: #190000 !important;
+  background: #0d0000 !important;   /* deep red-black */
 }
