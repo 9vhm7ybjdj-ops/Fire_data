@@ -1,46 +1,49 @@
 /* ===========================================================
-   CORE — PAGE SWITCHING + ACTIVE PAGE HIGHLIGHT + CLICK SOUND
+   RAISED MECHANICAL BUTTONS
 =========================================================== */
 
-/* --- CLICK SOUND --- */
-const clickAudio = new Audio(
-  "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..."
-);
+.mfd-button {
+  width: 120px;
+  height: 48px;
+  background: #1a1a1a;
+  border: 3px solid #444;
+  border-radius: 6px;
+  color: #ffb000 !important;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
 
-function playClick() {
-  clickAudio.currentTime = 0;
-  clickAudio.play();
+  /* Raised mechanical look */
+  box-shadow:
+    0 4px 0 #000,
+    0 0 8px #000 inset;
+
+  text-shadow:
+    0 0 4px #ffb000,
+    0 0 8px #ffb000,
+    0 0 12px #ffb000;
+
+  transition: transform 0.08s linear, box-shadow 0.08s linear;
 }
 
-/* --- PAGE SWITCHING --- */
-document.addEventListener("DOMContentLoaded", () => {
-  const pages = document.querySelectorAll(".page");
-  const pageButtons = document.querySelectorAll(".page-btn");
+/* ===========================================================
+   DEPRESSED STATE (selected)
+=========================================================== */
 
-  function showPage(id, btn) {
-    // Switch page
-    pages.forEach(p => p.classList.remove("active"));
-    document.getElementById(`page-${id}`).classList.add("active");
+.mfd-button.active-page,
+.mfd-button.active-mode {
+  transform: translateY(4px);
+  box-shadow:
+    0 1px 0 #000,
+    0 0 4px #000 inset;
+  background: #111;
+}
 
-    // Highlight active page button
-    pageButtons.forEach(b => b.classList.remove("active-page"));
-    if (btn) btn.classList.add("active-page");
-  }
+/* ===========================================================
+   PHYSICAL PRESS ANIMATION
+=========================================================== */
 
-  // Default page
-  showPage("wx");
-
-  // Button switching
-  pageButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const page = btn.dataset.page;
-      showPage(page, btn);
-      playClick();
-
-      // Map pages need refresh
-      if (page === "radar") initRadar();
-      if (page === "satellite") initSatellite();
-      if (page === "combo") initCombo();
-    });
-  });
-});
+.mfd-button:active {
+  transform: translateY(4px);
+  filter: brightness(0.85);
+}
