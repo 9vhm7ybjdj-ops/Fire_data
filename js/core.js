@@ -1,37 +1,39 @@
 /* ===========================================================
-   CORE — PAGE SWITCHING + DEPRESSED BUTTON STATE
+   SYSTEM-GENERATED MECHANICAL CLICK SOUND
 =========================================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
-  const pages = document.querySelectorAll(".page");
-  const pageButtons = document.querySelectorAll(".page-btn");
+function playClick() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
 
-  function showPage(id, btn) {
-    // Hide all pages
-    pages.forEach(p => p.classList.remove("active"));
+  osc.type = "square";
+  osc.frequency.value = 2400; // crisp avionics click
 
-    // Show selected page
-    document.getElementById(`page-${id}`).classList.add("active");
+  gain.gain.setValueAtTime(0.15, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
 
-    // Depress selected button
-    pageButtons.forEach(b => b.classList.remove("active-page"));
-    if (btn) btn.classList.add("active-page");
-  }
+  osc.connect(gain);
+  gain.connect(ctx.destination);
 
-  // Default page
-  showPage("wx");
+  osc.start();
+  osc.stop(ctx.currentTime + 0.05);
+}
 
-  // Button switching
-  pageButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const page = btn.dataset.page;
-      showPage(page, btn);
+/* ===========================================================
+   PAGE SWITCHING
+=========================================================== */
 
-      // Initialize pages that require JS
-      if (page === "radar") initRadar();
-      if (page === "satellite") initSatellite();
-      if (page === "combo") initCombo();
-      if (page === "airfieldwx") loadAirfieldWX();
-    });
+document.querySelectorAll(".page-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    playClick();
+
+    const page = btn.dataset.page;
+
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(`page-${page}`).classList.add("active");
+
+    document.querySelectorAll(".page-btn").forEach(b => b.classList.remove("active-page"));
+    btn.classList.add("active-page");
   });
 });
