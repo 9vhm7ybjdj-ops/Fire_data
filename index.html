@@ -15,6 +15,7 @@
       --btn-off: #d0d0d0;
       --btn-on: #ffffff;
       --bezel-metal: #1a1a1a;
+      --brightness-level: 1;
     }
 
     * { box-sizing: border-box; }
@@ -38,11 +39,21 @@
       align-items: center;
       min-height: 100vh;
       overflow-x: hidden;
-      transition: filter 0.25s ease;
     }
 
-    body.nvg { filter: brightness(0.85) contrast(0.85) hue-rotate(80deg); }
-    body.red { filter: brightness(0.75) contrast(0.8) sepia(1) hue-rotate(-20deg) saturate(4); }
+    body.nvg {
+      filter: brightness(0.85) contrast(0.85) hue-rotate(80deg);
+    }
+
+    body.red {
+      filter:
+        brightness(0.75)
+        contrast(0.9)
+        saturate(2)
+        grayscale(1)
+        sepia(1)
+        hue-rotate(-50deg);
+    }
 
     #layout {
       display: grid;
@@ -136,12 +147,13 @@
     #crt {
       background: #050505;
       border-radius: 10px;
-      padding: 20px;
+      padding: 20px; /* <-- 20px inset as requested */
       box-shadow:
         inset 0 0 14px rgba(0,0,0,0.9),
         0 0 12px rgba(0,0,0,0.7);
       position: relative;
       overflow: hidden;
+      filter: brightness(var(--brightness-level));
     }
 
     #crt::before {
@@ -161,15 +173,27 @@
     }
 
     /* PAGE SYSTEM */
-    .page { display: none; width: 100%; height: 100%; }
-    .page.active { display: block; }
+    .page {
+      display: none;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transform: translateX(8px);
+      transition: opacity 220ms ease-out, transform 220ms ease-out;
+    }
 
-    /* WX TILE GRID — RESTORED */
+    .page.active {
+      display: block;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* WX TILE GRID — 20px inset, fixed avionics size */
     #tiles-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       grid-template-rows: repeat(2, 1fr);
-      gap: 16px;
+      gap: 14px;
       width: 100%;
       height: 100%;
     }
@@ -177,7 +201,7 @@
     .tile {
       border: 1px solid #444;
       border-radius: 6px;
-      padding: 10px 12px;
+      padding: 8px 10px;
       background: radial-gradient(circle at 20% 0%, #202020 0, #050505 55%);
       box-shadow:
         inset 0 0 10px rgba(0,0,0,0.9),
@@ -186,6 +210,7 @@
       flex-direction: column;
       justify-content: flex-start;
       color: var(--amber);
+      font-size: 13px;
     }
 
     .station-name {
@@ -210,7 +235,7 @@
       transform-origin: 50% 50%;
     }
 
-    /* MAP CONTAINERS — FIXED UNIQUE IDs */
+    /* MAP CONTAINERS */
     #map-container-radar,
     #map-container-sat,
     #map-container-combo {
@@ -225,6 +250,8 @@
     #map-sat,
     #map-sat-combo,
     #map-radar-combo {
+      width: 100%;
+      height: 100%;
       position: absolute;
       top: 0;
       left: 0;
@@ -276,7 +303,53 @@
       font-size: 14px;
     }
 
-    .sat-btn.active { background: #222; color: #fff; }
+    .sat-btn.active {
+      background: #222;
+      color: #fff;
+    }
+
+    /* BRIGHTNESS KNOB — OUTSIDE CRT */
+    #brightness-knob {
+      position: absolute;
+      bottom: 20px;
+      left: -12px;
+      transform: rotate(-90deg);
+      transform-origin: left center;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--amber);
+    }
+
+    #brightness-slider {
+      width: 120px;
+      appearance: none;
+      background: transparent;
+    }
+
+    #brightness-detents {
+      position: relative;
+      width: 130px;
+      height: 18px;
+      margin-top: 2px;
+    }
+
+    .bright-tick {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      height: 8px;
+      background: rgba(255, 210, 122, 0.35);
+      box-shadow: 0 0 4px rgba(255, 210, 122, 0.4);
+      border-radius: 1px;
+    }
+
+    .bright-tick.center {
+      height: 12px;
+      background: rgba(255, 210, 122, 0.8);
+    }
 
   </style>
 </head>
@@ -315,6 +388,7 @@
 
     </div>
 
+
     <!-- RIGHT-SIDE BEZEL -->
     <div id="bezel">
 
@@ -324,10 +398,45 @@
       <div class="screw bl"></div>
       <div class="screw br"></div>
 
-      <!-- CRT interior -->
+
+      <!-- BRIGHTNESS KNOB (outside CRT, correct avionics placement) -->
+      <div id="brightness-knob">
+        <span>BRIGHT</span>
+
+        <div>
+          <input
+            id="brightness-slider"
+            type="range"
+            min="40"
+            max="120"
+            value="100"
+            oninput="setBrightness(this.value)"
+          />
+
+          <!-- Detent ring -->
+          <div id="brightness-detents">
+            <div class="bright-tick" style="left:0%;"></div>
+            <div class="bright-tick" style="left:10%;"></div>
+            <div class="bright-tick" style="left:20%;"></div>
+            <div class="bright-tick" style="left:30%;"></div>
+            <div class="bright-tick" style="left:40%;"></div>
+
+            <div class="bright-tick center" style="left:50%;"></div>
+
+            <div class="bright-tick" style="left:60%;"></div>
+            <div class="bright-tick" style="left:70%;"></div>
+            <div class="bright-tick" style="left:80%;"></div>
+            <div class="bright-tick" style="left:90%;"></div>
+            <div class="bright-tick" style="left:100%;"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- CRT DISPLAY AREA -->
       <div id="crt">
 
-        <!-- PAGE: WX -->
+        <!-- PAGE: WX (default) -->
         <div id="page-wx" class="page active">
           <!-- WX tiles inserted in Part 3 -->
         </div>
@@ -461,6 +570,7 @@
     </div>
   </div>
 
+
   <!-- BEERBURRUM -->
   <div class="tile">
     <div class="station-name">BEERBURRUM</div>
@@ -510,6 +620,7 @@
     </div>
   </div>
 
+
   <!-- SUNSHINE COAST AIRPORT -->
   <div class="tile">
     <div class="station-name">SUNSHINE COAST AIRPORT</div>
@@ -558,6 +669,7 @@
       <span id="dew-sca">-- °C</span>
     </div>
   </div>
+
 
   <!-- TEWANTIN -->
   <div class="tile">
@@ -617,8 +729,14 @@ function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
 
-  document.getElementById('page-' + name).classList.add('active');
-  document.getElementById('btn-' + name).classList.add('active');
+  const target = document.getElementById('page-' + name);
+  const btn = document.getElementById('btn-' + name);
+
+  // force reflow so transitions always play
+  void target.offsetWidth;
+
+  target.classList.add('active');
+  btn.classList.add('active');
 }
 
 /* ===========================================================
@@ -635,18 +753,49 @@ function toggleRED() {
 }
 
 /* ===========================================================
+   BRIGHTNESS CONTROL + DETENT CLICK
+=========================================================== */
+let detentAudioCtx = null;
+
+function playDetentClick() {
+  if (!detentAudioCtx) {
+    detentAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  const osc = detentAudioCtx.createOscillator();
+  const gain = detentAudioCtx.createGain();
+
+  osc.type = "triangle";
+  osc.frequency.value = 900;
+  gain.gain.value = 0.18;
+
+  osc.connect(gain);
+  gain.connect(detentAudioCtx.destination);
+
+  osc.start();
+  osc.stop(detentAudioCtx.currentTime + 0.015);
+}
+
+function setBrightness(value) {
+  const level = value / 100;
+  document.documentElement.style.setProperty('--brightness-level', level);
+
+  if (value % 10 === 0) {
+    playDetentClick();
+  }
+}
+
+/* ===========================================================
    WX PAGE — VALUE UPDATER + WIND ARROWS
 =========================================================== */
 function updateValue(id, newValue) {
   const el = document.getElementById(id);
-  if (!el) return;
-  el.innerText = newValue;
+  if (el) el.innerText = newValue;
 }
 
 function setWindArrow(id, degrees) {
   const arrow = document.getElementById(id);
-  if (!arrow) return;
-  arrow.style.transform = "rotate(" + degrees + "deg)";
+  if (arrow) arrow.style.transform = "rotate(" + degrees + "deg)";
 }
 
 /* ===========================================================
