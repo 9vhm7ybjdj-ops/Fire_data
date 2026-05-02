@@ -1,5 +1,5 @@
 /* ===========================================================
-   RADAR PAGE — REAL RAINVIEWER TILES
+   RADAR PAGE — REAL RAINVIEWER TILES + GRID/COASTLINES
 =========================================================== */
 
 function initRadar() {
@@ -9,14 +9,21 @@ function initRadar() {
   const canvas = createMapCanvas("radar-map");
   const ctx = canvas.getContext("2d");
 
+  drawGridAndCoast(ctx);
+  drawRadarLayer(ctx);
+}
+
+/* ===========================================================
+   DRAW RADAR LAYER
+=========================================================== */
+
+function drawRadarLayer(ctx) {
   const tileSize = 256;
   const zoom = 4;
 
-  // RainViewer tile URL pattern
   const radarUrl = (x, y, z) =>
     `https://tilecache.rainviewer.com/v2/radar/${z}/${x}/${y}/2/1_1.png`;
 
-  // Draw a 3x3 tile grid centered on Australia
   const tiles = [
     { x: 8, y: 12 }, { x: 9, y: 12 }, { x: 10, y: 12 },
     { x: 8, y: 13 }, { x: 9, y: 13 }, { x: 10, y: 13 },
