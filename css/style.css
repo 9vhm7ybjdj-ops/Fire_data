@@ -8,7 +8,6 @@
   box-sizing: border-box;
 }
 
-/* Prevent scrollbars */
 html, body {
   width: 100%;
   height: 100%;
@@ -17,7 +16,7 @@ html, body {
 }
 
 /* ===========================================================
-   SCALING WRAPPER (centered by scaling.js)
+   SCALING WRAPPER
 =========================================================== */
 
 #scale-wrapper {
@@ -36,7 +35,6 @@ html, body {
   height: 768px;
   position: relative;
 
-  /* Brushed metal bezel */
   background: #111;
   border: 14px solid #1a1a1a;
   border-radius: 10px;
@@ -68,19 +66,14 @@ html, body {
 
 .button-column {
   position: absolute;
-  top: 80px; /* ensures buttons never overlap CRT or bezel */
+  top: 80px;
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.left-buttons {
-  left: 20px;
-}
-
-.right-buttons {
-  right: 20px;
-}
+.left-buttons { left: 20px; }
+.right-buttons { right: 20px; }
 
 /* ===========================================================
    CRT FRAME
@@ -88,14 +81,15 @@ html, body {
 
 #crt-frame {
   position: absolute;
-  top: 40px;   /* lowered to avoid top cropping */
+  top: 40px;
   left: 160px;
   width: 704px;
   height: 688px;
 
-  background: #000;
+  background: #000 !important; /* OPAQUE */
   border: 6px solid #222;
   border-radius: 8px;
+
   box-shadow:
     inset 0 0 12px #000,
     0 0 12px #000;
@@ -154,7 +148,6 @@ html, body {
   opacity: 0.8;
 }
 
-/* Screw positions */
 #screw-tl { top: 18px; left: 18px; }
 #screw-tr { top: 18px; right: 18px; }
 #screw-bl { bottom: 18px; left: 18px; }
