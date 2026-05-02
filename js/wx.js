@@ -1,39 +1,72 @@
 /* ===========================================================
-   WX TILE LOADER — 2×2 GRID WITH SUNSHINE COAST STATIONS
+   LIVE WX — OPEN-METEO FOR YOUR 4 SUNSHINE COAST STATIONS
+   Nambour, Beerburrum, Tewantin, Sunshine Coast Airport
 =========================================================== */
 
-function loadWX() {
+const stations = [
+  {
+    name: "Nambour",
+    lat: -26.626,
+    lon: 152.959
+  },
+  {
+    name: "Beerburrum",
+    lat: -26.953,
+    lon: 152.959
+  },
+  {
+    name: "Tewantin",
+    lat: -26.391,
+    lon: 153.037
+  },
+  {
+    name: "Sunshine Coast Airport",
+    lat: -26.603,
+    lon: 153.091
+  }
+];
+
+async function fetchStationWX(station) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    return {
+      name: station.name,
+      temp: data.current.temperature_2m,
+      rh: data.current.relative_humidity_2m,
+      wind: data.current.wind_speed_10m
+    };
+
+  } catch (err) {
+    return {
+      name: station.name,
+      temp: "--",
+      rh: "--",
+      wind: "--"
+    };
+  }
+}
+
+async function loadWX() {
   const grid = document.getElementById("wx-grid");
+  grid.innerHTML = "Loading...";
 
-  grid.innerHTML = `
-    <div class="wx-tile">
-      <strong>YBUD — Buderim</strong><br>
-      Temp: 23°C<br>
-      Wind: 6kt<br>
-      RH: 41%
-    </div>
+  const results = await Promise.all(stations.map(fetchStationWX));
 
+  grid.innerHTML = results.map(s => `
     <div class="wx-tile">
-      <strong>YBSU — Sunshine Coast</strong><br>
-      Temp: 22°C<br>
-      Wind: 8kt<br>
-      RH: 39%
+      <strong>${s.name}</strong><br>
+      Temp: ${s.temp}°C<br>
+      Wind: ${s.wind} kt<br>
+      RH: ${s.rh}%
     </div>
-
-    <div class="wx-tile">
-      <strong>YBBN — Brisbane</strong><br>
-      Temp: 24°C<br>
-      Wind: 10kt<br>
-      RH: 45%
-    </div>
-
-    <div class="wx-tile">
-      <strong>YBMC — Maroochydore</strong><br>
-      Temp: 23°C<br>
-      Wind: 7kt<br>
-      RH: 42%
-    </div>
-  `;
+  `).join("");
 }
 
 document.addEventListener("DOMContentLoaded", loadWX);
+
+// Auto-refresh every 5 minutes
+setInterval(loadWX, 300000);
