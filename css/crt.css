@@ -3,15 +3,13 @@
 =========================================================== */
 
 #crt {
-  background: #000;
+  background: #000 !important; /* FULLY OPAQUE */
   position: relative;
   overflow: hidden;
 
-  /* Slight curvature */
   border-radius: 8px;
   transform: perspective(900px) translateZ(0);
 
-  /* Flicker animation */
   animation: crt-flicker 0.12s infinite;
 }
 
@@ -125,11 +123,11 @@
 }
 
 /* ===========================================================
-   NVG MODE (GREEN PHOSPHOR)
+   NVG MODE
 =========================================================== */
 
 body.nvg #crt {
-  background: #001900;
+  background: #001900 !important; /* OPAQUE */
 }
 
 body.nvg #crt::after {
@@ -138,11 +136,11 @@ body.nvg #crt::after {
 }
 
 /* ===========================================================
-   RED MODE (RED PHOSPHOR)
+   RED MODE
 =========================================================== */
 
 body.red #crt {
-  background: #190000;
+  background: #190000 !important; /* OPAQUE */
 }
 
 body.red #crt::after {
