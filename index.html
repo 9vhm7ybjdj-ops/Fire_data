@@ -179,7 +179,7 @@ input[type="checkbox"]:checked + .toggle-switch::after {
   pointer-events: none;
 }
 
-/* Scanlines */
+/* Scanlines — VERY SUBTLE */
 .crt-screen::before {
   background: repeating-linear-gradient(
     to bottom,
@@ -189,10 +189,10 @@ input[type="checkbox"]:checked + .toggle-switch::after {
     transparent 3px
   );
   mix-blend-mode: multiply;
-  opacity: 0.22;
+  opacity: 0.08;
 }
 
-/* RGB subpixel mask */
+/* RGB subpixel mask — VERY SUBTLE */
 .crt-screen::after {
   background: repeating-linear-gradient(
     90deg,
@@ -202,7 +202,7 @@ input[type="checkbox"]:checked + .toggle-switch::after {
     rgba(0,0,0,0) 3px
   );
   mix-blend-mode: screen;
-  opacity: 0.25;
+  opacity: 0.08;
 }
 
 /* CRT FLICKER */
@@ -246,9 +246,11 @@ input[type="checkbox"]:checked + .toggle-switch::after {
   filter: drop-shadow(0 0 6px #66d9ff);
 }
 
-/* EMOJI WRAPPER */
+/* EMOJI WRAPPER — FORCE FULL COLOUR IN NORMAL MODE */
 .emoji {
   display: inline-block;
+  position: relative;
+  z-index: 3;
 }
 
 /* NORMAL MODE — NATURAL COLOUR, COLOUR CRT */
@@ -261,8 +263,9 @@ body:not(.nvg):not(.red) .crt-screen {
 
 body:not(.nvg):not(.red) .emoji {
   filter: none !important;
-  color: inherit !important;
-  text-shadow: none !important;
+  mix-blend-mode: normal !important;
+  color: inherit;
+  text-shadow: none;
 }
 
 body:not(.nvg):not(.red) .wind-arrow polygon {
@@ -293,6 +296,7 @@ body.nvg .crt-screen::before {
     transparent 2px,
     transparent 3px
   );
+  opacity: 0.10;
 }
 
 body.nvg .crt-screen::after {
@@ -302,6 +306,7 @@ body.nvg .crt-screen::after {
     rgba(0,255,136,0.25) 2px,
     rgba(0,0,0,0) 3px
   );
+  opacity: 0.10;
 }
 
 body.nvg .emoji {
@@ -336,6 +341,7 @@ body.red .crt-screen::before {
     transparent 2px,
     transparent 3px
   );
+  opacity: 0.10;
 }
 
 body.red .crt-screen::after {
@@ -345,6 +351,7 @@ body.red .crt-screen::after {
     rgba(255,80,80,0.25) 2px,
     rgba(0,0,0,0) 3px
   );
+  opacity: 0.10;
 }
 
 body.red .emoji {
@@ -481,12 +488,23 @@ body.red .wind-arrow polygon {
 
   <div class="global-updated" id="updated-global">Updated: --:--</div>
 <script>
-  /* DEMO DATA */
-  const demoData = {
-    nambour:   { temp: 20.4, wind: 36, gust: 54.2, dir: 135, hum: 79, rain: 0.0, dew: 16.5 },
-    beerburrum:{ temp: 19.8, wind: 28, gust: 46.4, dir: 135, hum: 81, rain: 0.0, dew: 16.1 },
-    sunshine:  { temp: 21.5, wind: 42, gust: 57.6, dir: 180, hum: 78, rain: 0.0, dew: 17.5 },
-    tewantin:  { temp: 20.0, wind: 34, gust: 48.3, dir: 140, hum: 76, rain: 0.1, dew: 16.4 }
+  const stations = {
+    nambour: {
+      lat: -26.63,
+      lon: 152.96
+    },
+    beerburrum: {
+      lat: -26.93,
+      lon: 152.95
+    },
+    sunshine: {
+      lat: -26.60,
+      lon: 153.09
+    },
+    tewantin: {
+      lat: -26.39,
+      lon: 153.03
+    }
   };
 
   function formatTime(d) {
@@ -500,25 +518,51 @@ body.red .wind-arrow polygon {
 
   function applyStation(id, data) {
     document.getElementById(`temp-${id}`).textContent = `${data.temp.toFixed(1)} °C`;
-    document.getElementById(`wind-${id}`).textContent = `${data.wind} km/h ${dirToText(data.dir)} (${data.dir}°)`;
+    document.getElementById(`wind-${id}`).textContent =
+      `${data.wind.toFixed(0)} km/h ${dirToText(data.dir)} (${data.dir.toFixed(0)}°)`;
     document.getElementById(`gust-${id}`).textContent = `${data.gust.toFixed(1)} km/h`;
-    document.getElementById(`hum-${id}`).textContent  = `${data.hum}%`;
-    document.getElementById(`rain-${id}`).textContent = `${data.rain} mm`;
+    document.getElementById(`hum-${id}`).textContent  = `${data.hum.toFixed(0)}%`;
+    document.getElementById(`rain-${id}`).textContent = `${data.rain.toFixed(1)} mm`;
     document.getElementById(`dew-${id}`).textContent  = `${data.dew.toFixed(1)} °C`;
 
-    /* WIND ARROW ROTATION (dir + 180 so arrow points FROM direction) */
     const arrow = document.getElementById(`arrow-${id}`);
     arrow.style.transform = `rotate(${data.dir + 180}deg)`;
   }
 
-  function loadDemo() {
-    applyStation('nambour', demoData.nambour);
-    applyStation('beerburrum', demoData.beerburrum);
-    applyStation('sunshine', demoData.sunshine);
-    applyStation('tewantin', demoData.tewantin);
+  async function fetchStation(id, cfg) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${cfg.lat}&longitude=${cfg.lon}` +
+      `&current=temperature_2m,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,rain`;
 
-    document.getElementById("updated-global").textContent =
-      `Updated: ${formatTime(new Date())}`;
+    const res = await fetch(url);
+    const json = await res.json();
+    const c = json.current;
+
+    const mapped = {
+      temp: c.temperature_2m,
+      wind: c.wind_speed_10m,
+      gust: c.wind_gusts_10m ?? c.wind_speed_10m,
+      dir:  c.wind_direction_10m,
+      hum:  c.relative_humidity_2m,
+      rain: c.rain ?? 0,
+      dew:  c.dew_point_2m
+    };
+
+    applyStation(id, mapped);
+  }
+
+  async function refreshAll() {
+    try {
+      await Promise.all([
+        fetchStation('nambour', stations.nambour),
+        fetchStation('beerburrum', stations.beerburrum),
+        fetchStation('sunshine', stations.sunshine),
+        fetchStation('tewantin', stations.tewantin)
+      ]);
+      document.getElementById("updated-global").textContent =
+        `Updated: ${formatTime(new Date())}`;
+    } catch (e) {
+      console.error("WX fetch error", e);
+    }
   }
 
   /* MODE TOGGLES — MUTUALLY EXCLUSIVE */
@@ -545,8 +589,9 @@ body.red .wind-arrow polygon {
     }
   });
 
-  /* INITIAL LOAD */
-  loadDemo();
+  /* INITIAL LOAD + 15-MIN REFRESH */
+  refreshAll();
+  setInterval(refreshAll, 15 * 60 * 1000);
 </script>
 </body>
 </html>
