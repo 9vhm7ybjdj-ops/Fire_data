@@ -1,28 +1,38 @@
 /* ===========================================================
-   MODES — NVG / RED / NORMAL (CRT ONLY)
+   MODE SWITCHING (NVG / RED / NORMAL)
 =========================================================== */
 
-const modeButtons = document.querySelectorAll(".mode-btn");
+function setMode(mode) {
+  document.body.classList.remove("nvg", "red");
 
-function setActiveMode(btn) {
-  modeButtons.forEach(b => b.classList.remove("active-mode"));
-  btn.classList.add("active-mode");
+  if (mode === "nvg") document.body.classList.add("nvg");
+  if (mode === "red") document.body.classList.add("red");
 }
 
-document.getElementById("btn-nvg").addEventListener("click", (e) => {
-  document.body.classList.add("nvg");
-  document.body.classList.remove("red");
-  setActiveMode(e.target);
+/* ===========================================================
+   MODE BUTTON HANDLERS + CLICK SOUND
+=========================================================== */
+
+document.getElementById("btn-nvg").addEventListener("click", () => {
+  playClick();
+  setMode("nvg");
+
+  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active-mode"));
+  document.getElementById("btn-nvg").classList.add("active-mode");
 });
 
-document.getElementById("btn-red").addEventListener("click", (e) => {
-  document.body.classList.add("red");
-  document.body.classList.remove("nvg");
-  setActiveMode(e.target);
+document.getElementById("btn-red").addEventListener("click", () => {
+  playClick();
+  setMode("red");
+
+  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active-mode"));
+  document.getElementById("btn-red").classList.add("active-mode");
 });
 
-document.getElementById("btn-normal").addEventListener("click", (e) => {
-  document.body.classList.remove("nvg");
-  document.body.classList.remove("red");
-  setActiveMode(e.target);
+document.getElementById("btn-normal").addEventListener("click", () => {
+  playClick();
+  setMode("normal");
+
+  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active-mode"));
+  document.getElementById("btn-normal").classList.add("active-mode");
 });
