@@ -1,58 +1,32 @@
 /* ===========================================================
-   MODE SYSTEM — CORRECT CRT BEHAVIOUR
-   Normal mode: white text
-   NVG mode: green phosphor text only
-   RED mode: red phosphor text only
-   CRT background NEVER changes
+   MODE BUTTON ACTIVE STATES
 =========================================================== */
 
-/* NORMAL MODE (default) */
-body #crt,
-body #crt * {
-  color: #ffffff;
-  text-shadow: none;
+.mode-btn.active-mode {
+  background: #111;
+  transform: translateY(4px);
 }
 
 /* ===========================================================
-   NVG MODE — GREEN PHOSPHOR TEXT ONLY
+   NORMAL MODE
 =========================================================== */
 
-body.nvg #crt,
-body.nvg #crt * {
-  color: #00ff66 !important;
-  text-shadow: 0 0 6px #00ff66 !important;
-}
-
-/* ===========================================================
-   RED MODE — RED PHOSPHOR TEXT ONLY
-=========================================================== */
-
-body.red #crt,
-body.red #crt * {
-  color: #ff4444 !important;
-  text-shadow: 0 0 6px #ff4444 !important;
-}
-
-/* ===========================================================
-   DO NOT TOUCH CRT BACKGROUND
-   (Prevents tinting in NVG/RED modes)
-=========================================================== */
-
-body.nvg #crt,
-body.red #crt {
+body:not(.nvg):not(.red) #crt {
   background: #000 !important;
 }
 
 /* ===========================================================
-   BUTTONS SHOULD NEVER CHANGE COLOUR IN MODES
+   NVG MODE
 =========================================================== */
 
-body.nvg .mfd-button,
-body.red .mfd-button {
-  color: #ffb000 !important;
-  background: #1a1a1a !important;
-  border-color: #444 !important;
-  text-shadow:
-    0 0 2px #ffb000,
-    0 0 4px #ffb000 !important;
+body.nvg #crt {
+  background: #001900 !important;
+}
+
+/* ===========================================================
+   RED MODE
+=========================================================== */
+
+body.red #crt {
+  background: #190000 !important;
 }
