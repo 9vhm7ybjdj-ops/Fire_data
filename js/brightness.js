@@ -1,10 +1,7 @@
 /* ===========================================================
-   BRIGHTNESS CONTROL
+   BRIGHTNESS CONTROL (placeholder for future use)
 =========================================================== */
 
-const slider = document.getElementById("brightness-slider");
-
-slider.addEventListener("input", () => {
-  const level = slider.value;
-  document.documentElement.style.setProperty("--brightness-level", level);
-});
+function setBrightness(level) {
+  document.getElementById("crt").style.filter = `brightness(${level}%)`;
+}
