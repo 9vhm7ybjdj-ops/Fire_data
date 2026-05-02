@@ -1,12 +1,37 @@
 /* ===========================================================
-   RADAR PAGE
+   RADAR PAGE — REAL RAINVIEWER TILES
 =========================================================== */
 
 function initRadar() {
+  const container = document.getElementById("radar-map");
+  if (!container) return;
+
   const canvas = createMapCanvas("radar-map");
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "green";
-  ctx.font = "24px monospace";
-  ctx.fillText("RADAR DATA", 50, 50);
+  const tileSize = 256;
+  const zoom = 4;
+
+  // RainViewer tile URL pattern
+  const radarUrl = (x, y, z) =>
+    `https://tilecache.rainviewer.com/v2/radar/${z}/${x}/${y}/2/1_1.png`;
+
+  // Draw a 3x3 tile grid centered on Australia
+  const tiles = [
+    { x: 8, y: 12 }, { x: 9, y: 12 }, { x: 10, y: 12 },
+    { x: 8, y: 13 }, { x: 9, y: 13 }, { x: 10, y: 13 },
+    { x: 8, y: 14 }, { x: 9, y: 14 }, { x: 10, y: 14 }
+  ];
+
+  tiles.forEach(tile => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = radarUrl(tile.x, tile.y, zoom);
+
+    img.onload = () => {
+      const px = (tile.x - 8) * tileSize;
+      const py = (tile.y - 12) * tileSize;
+      ctx.drawImage(img, px, py, tileSize, tileSize);
+    };
+  });
 }
