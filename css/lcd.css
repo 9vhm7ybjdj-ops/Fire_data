@@ -1,9 +1,11 @@
 /* ===========================================================
-   LCD TEXT / SMALL READOUTS
+   LCD FONT + CRT TEXT RENDERING
 =========================================================== */
 
-.lcd {
-  font-family: monospace;
-  color: #0f0;
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+#crt * {
+  font-family: 'Share Tech Mono', monospace;
   font-size: 18px;
+  color: #0f0;
 }
