@@ -1,5 +1,5 @@
 /* ===========================================================
-   MAP ENGINE — CANVAS CREATION + PAN/ZOOM + GRID/COASTLINES
+   MAP ENGINE — CANVAS CREATION + GRID/COASTLINES
 =========================================================== */
 
 function createMapCanvas(containerId) {
@@ -9,7 +9,7 @@ function createMapCanvas(containerId) {
   const canvas = document.createElement("canvas");
   canvas.width = 768;
   canvas.height = 640;
-  canvas.id = `${containerId}-canvas`;
+  canvas.id = `${containerId}-canvas`;   // <— CRITICAL
 
   container.appendChild(canvas);
   return canvas;
@@ -23,9 +23,7 @@ function drawGridAndCoast(ctx) {
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
 
-  /* ------------------------------
-     GRIDLINES
-  ------------------------------ */
+  // GRIDLINES
   ctx.save();
   ctx.strokeStyle = "rgba(0,255,255,0.15)";
   ctx.lineWidth = 1;
@@ -48,10 +46,7 @@ function drawGridAndCoast(ctx) {
 
   ctx.restore();
 
-  /* ------------------------------
-     COASTLINES (low-opacity OSM tiles)
-  ------------------------------ */
-
+  // COASTLINES (low-opacity OSM tiles)
   const tileSize = 256;
   const zoom = 4;
 
