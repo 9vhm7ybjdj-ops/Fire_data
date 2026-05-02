@@ -2,23 +2,30 @@
    LCD TEXT SYSTEM — MODE AWARE
 =========================================================== */
 
-.lcd, 
-#crt, 
+/* Default (NORMAL MODE) — pure white */
+.lcd,
+#crt,
 #crt * {
   font-family: monospace;
-  color: #ffffff; /* NORMAL MODE = PURE WHITE */
+  color: #ffffff; /* NORMAL MODE = WHITE */
 }
 
-/* NVG MODE — GREEN PHOSPHOR */
+/* ===========================================================
+   NVG MODE — GREEN PHOSPHOR
+=========================================================== */
+
 body.nvg #crt,
 body.nvg #crt * {
-  color: #00ff66;
+  color: #00ff66 !important;
   text-shadow: 0 0 6px #00ff66;
 }
 
-/* RED MODE — RED PHOSPHOR */
+/* ===========================================================
+   RED MODE — RED PHOSPHOR
+=========================================================== */
+
 body.red #crt,
 body.red #crt * {
-  color: #ff4444;
+  color: #ff4444 !important;
   text-shadow: 0 0 6px #ff4444;
 }
