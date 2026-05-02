@@ -1,5 +1,5 @@
 /* ===========================================================
-   SCALING ENGINE — FIT 1024×768 INTO ANY SCREEN
+   SCALING ENGINE — CENTERED, NO CROPPING
 =========================================================== */
 
 function scaleMFD() {
@@ -12,7 +12,16 @@ function scaleMFD() {
   const scale = Math.min(scaleX, scaleY);
 
   const wrapper = document.getElementById("scale-wrapper");
+
   wrapper.style.transform = `scale(${scale})`;
+
+  /* Center vertically + horizontally */
+  const offsetX = (window.innerWidth - baseWidth * scale) / 2;
+  const offsetY = (window.innerHeight - baseHeight * scale) / 2;
+
+  wrapper.style.position = "absolute";
+  wrapper.style.left = `${offsetX}px`;
+  wrapper.style.top = `${offsetY}px`;
 }
 
 window.addEventListener("resize", scaleMFD);
