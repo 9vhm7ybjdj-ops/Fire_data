@@ -1,89 +1,120 @@
 /* ===========================================================
    GLOBAL RESET
 =========================================================== */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
+/* Prevent scrollbars */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   background: #000;
-  font-family: monospace;
-  overflow: hidden;
 }
 
 /* ===========================================================
-   SCALING WRAPPER (keeps 1024×768 proportional)
+   SCALING WRAPPER (centered by scaling.js)
 =========================================================== */
+
 #scale-wrapper {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 1024px;
+  height: 768px;
+  transform-origin: top left;
+  position: absolute;
 }
 
 /* ===========================================================
-   MAIN MFD CONTAINER (baseline 1024×768)
+   MAIN MFD CONTAINER
 =========================================================== */
+
 #mfd-container {
   width: 1024px;
   height: 768px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  transform-origin: top left;
-  background: #111;
-  border: 8px solid #222;
-  border-radius: 8px;
   position: relative;
+
+  /* Brushed metal bezel */
+  background: #111;
+  border: 14px solid #1a1a1a;
+  border-radius: 10px;
+
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(255,255,255,0.06) 0%,
+      rgba(255,255,255,0.02) 50%,
+      rgba(255,255,255,0.06) 100%
+    ),
+    repeating-linear-gradient(
+      to right,
+      rgba(255,255,255,0.04) 0px,
+      rgba(255,255,255,0.04) 1px,
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 3px
+    );
+  background-blend-mode: overlay;
+
+  box-shadow:
+    inset 0 0 18px #000,
+    0 0 22px #000;
 }
 
 /* ===========================================================
    BUTTON COLUMNS
 =========================================================== */
+
 .button-column {
+  position: absolute;
+  top: 80px; /* ensures buttons never overlap CRT or bezel */
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: 20px;
 }
 
 .left-buttons {
-  margin-left: 10px;
+  left: 20px;
 }
 
 .right-buttons {
-  margin-right: 10px;
+  right: 20px;
 }
 
 /* ===========================================================
    CRT FRAME
 =========================================================== */
+
 #crt-frame {
-  flex: 1;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: absolute;
+  top: 40px;   /* lowered to avoid top cropping */
+  left: 160px;
+  width: 704px;
+  height: 688px;
+
+  background: #000;
+  border: 6px solid #222;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 12px #000,
+    0 0 12px #000;
 }
 
+/* ===========================================================
+   CRT INNER AREA
+=========================================================== */
+
 #crt {
-  width: 760px;
-  height: 600px;
-  background: #0a0a0a;
-  border: 6px solid #333;
-  border-radius: 6px;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
   position: relative;
 }
 
 /* ===========================================================
-   PAGE VISIBILITY
+   PAGE SYSTEM
 =========================================================== */
+
 .page {
   display: none;
   width: 100%;
@@ -93,3 +124,38 @@ body {
 .page.active {
   display: block;
 }
+
+/* ===========================================================
+   TORX SCREWS
+=========================================================== */
+
+.screw {
+  width: 26px;
+  height: 26px;
+  position: absolute;
+  background: radial-gradient(circle at 30% 30%, #555, #222 70%);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 4px #000,
+    inset 0 0 10px #000,
+    0 0 4px #000;
+}
+
+.screw::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle, transparent 40%, rgba(0,0,0,0.6) 42%),
+    linear-gradient(0deg, transparent 40%, #000 40%, #000 60%, transparent 60%),
+    linear-gradient(60deg, transparent 40%, #000 40%, #000 60%, transparent 60%),
+    linear-gradient(120deg, transparent 40%, #000 40%, #000 60%, transparent 60%);
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+}
+
+/* Screw positions */
+#screw-tl { top: 18px; left: 18px; }
+#screw-tr { top: 18px; right: 18px; }
+#screw-bl { bottom: 18px; left: 18px; }
+#screw-br { bottom: 18px; right: 18px; }
