@@ -1,36 +1,25 @@
 /* ===========================================================
-   CRT BASE
+   CRT DISPLAY CONTAINER
+   - Contains ALL glow, tint, scanlines, curvature
+   - Prevents bleed into bezel or buttons
 =========================================================== */
 
 #crt {
-  background: #000 !important; /* FULLY OPAQUE */
   position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: 8px;
   overflow: hidden;
 
-  border-radius: 8px;
-  transform: perspective(900px) translateZ(0);
-
-  animation: crt-flicker 0.12s infinite;
+  /* Subtle CRT bloom */
+  box-shadow:
+    inset 0 0 25px rgba(0,255,255,0.08),
+    inset 0 0 60px rgba(0,255,255,0.05);
 }
 
 /* ===========================================================
-   PHOSPHOR GLOW (NORMAL MODE)
-=========================================================== */
-
-#crt::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-
-  background:
-    radial-gradient(circle at 50% 50%, rgba(0,255,0,0.08), transparent 70%);
-  mix-blend-mode: screen;
-  z-index: 1;
-}
-
-/* ===========================================================
-   SCANLINES
+   PHOSPHOR GLOW LAYER
 =========================================================== */
 
 #crt::before {
@@ -39,111 +28,44 @@
   inset: 0;
   pointer-events: none;
 
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(0,0,0,0.15) 0px,
-      rgba(0,0,0,0.15) 2px,
-      rgba(0,0,0,0.0) 3px,
-      rgba(0,0,0,0.0) 4px
-    );
-  opacity: 0.35;
-  z-index: 3;
+  background: radial-gradient(
+    circle at center,
+    rgba(0,255,255,0.06),
+    rgba(0,255,255,0.02) 40%,
+    transparent 70%
+  );
 }
 
 /* ===========================================================
-   SUBPIXEL MASK
+   SCANLINES (subtle, authentic)
 =========================================================== */
 
-.crt-mask {
+#crt::after {
+  content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
 
-  background:
-    repeating-linear-gradient(
-      to right,
-      rgba(255,0,0,0.08) 0px,
-      rgba(255,0,0,0.08) 1px,
-      rgba(0,255,0,0.08) 1px,
-      rgba(0,255,0,0.08) 2px,
-      rgba(0,0,255,0.08) 2px,
-      rgba(0,0,255,0.08) 3px
-    );
-  mix-blend-mode: screen;
-  opacity: 0.15;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03) 0px,
+    rgba(255,255,255,0.03) 1px,
+    rgba(0,0,0,0.05) 2px,
+    rgba(0,0,0,0.05) 3px
+  );
+
+  opacity: 0.25;
+  mix-blend-mode: overlay;
 }
 
 /* ===========================================================
-   FLICKER ANIMATION
+   OPTIONAL CURVATURE (subtle barrel distortion)
 =========================================================== */
 
-@keyframes crt-flicker {
-  0%   { opacity: 0.98; }
-  5%   { opacity: 1.00; }
-  10%  { opacity: 0.97; }
-  15%  { opacity: 1.00; }
-  20%  { opacity: 0.96; }
-  25%  { opacity: 1.00; }
-  30%  { opacity: 0.99; }
-  35%  { opacity: 1.00; }
-  40%  { opacity: 0.97; }
-  45%  { opacity: 1.00; }
-  50%  { opacity: 0.98; }
-  55%  { opacity: 1.00; }
-  60%  { opacity: 0.97; }
-  65%  { opacity: 1.00; }
-  70%  { opacity: 0.99; }
-  75%  { opacity: 1.00; }
-  80%  { opacity: 0.96; }
-  85%  { opacity: 1.00; }
-  90%  { opacity: 0.98; }
-  95%  { opacity: 1.00; }
-  100% { opacity: 0.97; }
+#crt {
+  transform: perspective(900px) translateZ(0);
 }
 
-/* ===========================================================
-   GLASS REFLECTION
-=========================================================== */
-
-#crt .glass {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 4;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,0.08) 0%,
-      rgba(255,255,255,0.00) 40%
-    );
-  mix-blend-mode: screen;
-}
-
-/* ===========================================================
-   NVG MODE
-=========================================================== */
-
-body.nvg #crt {
-  background: #001900 !important; /* OPAQUE */
-}
-
-body.nvg #crt::after {
-  background:
-    radial-gradient(circle at 50% 50%, rgba(0,255,0,0.18), transparent 70%);
-}
-
-/* ===========================================================
-   RED MODE
-=========================================================== */
-
-body.red #crt {
-  background: #190000 !important; /* OPAQUE */
-}
-
-body.red #crt::after {
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255,0,0,0.18), transparent 70%);
+#crt > * {
+  transform: translateZ(0);
 }
