@@ -3,22 +3,129 @@
 =========================================================== */
 
 #crt {
-  background: #0a0f08;
+  background: #000;
   position: relative;
   overflow: hidden;
+
+  /* Slight curvature */
+  border-radius: 8px;
+  transform: perspective(900px) translateZ(0);
 }
 
-/* CRT glow */
+/* ===========================================================
+   PHOSPHOR GLOW (NORMAL MODE)
+=========================================================== */
+
 #crt::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(0,255,0,0.08), transparent 70%);
   pointer-events: none;
+
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0,255,0,0.08), transparent 70%);
+  mix-blend-mode: screen;
 }
 
 /* ===========================================================
-   NVG MODE (CRT ONLY)
+   SCANLINES
+=========================================================== */
+
+#crt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.15) 0px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.0) 3px,
+      rgba(0,0,0,0.0) 4px
+    );
+  opacity: 0.35;
+  z-index: 3;
+}
+
+/* ===========================================================
+   SUBPIXEL MASK
+=========================================================== */
+
+.crt-mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(255,0,0,0.08) 0px,
+      rgba(255,0,0,0.08) 1px,
+      rgba(0,255,0,0.08) 1px,
+      rgba(0,255,0,0.08) 2px,
+      rgba(0,0,255,0.08) 2px,
+      rgba(0,0,255,0.08) 3px
+    );
+  mix-blend-mode: screen;
+  opacity: 0.15;
+}
+
+/* ===========================================================
+   FLICKER ANIMATION
+=========================================================== */
+
+@keyframes crt-flicker {
+  0%   { opacity: 0.98; }
+  5%   { opacity: 1.00; }
+  10%  { opacity: 0.97; }
+  15%  { opacity: 1.00; }
+  20%  { opacity: 0.96; }
+  25%  { opacity: 1.00; }
+  30%  { opacity: 0.99; }
+  35%  { opacity: 1.00; }
+  40%  { opacity: 0.97; }
+  45%  { opacity: 1.00; }
+  50%  { opacity: 0.98; }
+  55%  { opacity: 1.00; }
+  60%  { opacity: 0.97; }
+  65%  { opacity: 1.00; }
+  70%  { opacity: 0.99; }
+  75%  { opacity: 1.00; }
+  80%  { opacity: 0.96; }
+  85%  { opacity: 1.00; }
+  90%  { opacity: 0.98; }
+  95%  { opacity: 1.00; }
+  100% { opacity: 0.97; }
+}
+
+#crt {
+  animation: crt-flicker 0.12s infinite;
+}
+
+/* ===========================================================
+   GLASS REFLECTION
+=========================================================== */
+
+#crt .glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,0.08) 0%,
+      rgba(255,255,255,0.00) 40%
+    );
+  mix-blend-mode: screen;
+}
+
+/* ===========================================================
+   NVG MODE (GREEN PHOSPHOR)
 =========================================================== */
 
 body.nvg #crt {
@@ -26,11 +133,12 @@ body.nvg #crt {
 }
 
 body.nvg #crt::after {
-  background: radial-gradient(circle, rgba(0,255,0,0.15), transparent 70%);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0,255,0,0.18), transparent 70%);
 }
 
 /* ===========================================================
-   RED MODE (CRT ONLY)
+   RED MODE (RED PHOSPHOR)
 =========================================================== */
 
 body.red #crt {
@@ -38,5 +146,6 @@ body.red #crt {
 }
 
 body.red #crt::after {
-  background: radial-gradient(circle, rgba(255,0,0,0.15), transparent 70%);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,0,0,0.18), transparent 70%);
 }
