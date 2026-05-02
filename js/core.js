@@ -1,73 +1,65 @@
 /* ===========================================================
-   SYSTEM-GENERATED MECHANICAL CLICK SOUND
+   PAGE SWITCHING — WX / RADAR / SAT / COMBO / AIRFIELD WX
 =========================================================== */
 
-function playClick() {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
+const pages = document.querySelectorAll(".page");
+const pageButtons = document.querySelectorAll(".page-btn");
 
-  osc.type = "square";
-  osc.frequency.value = 2400;
+/* Hide all pages */
+function hideAllPages() {
+  pages.forEach(p => p.classList.remove("active"));
+  pageButtons.forEach(b => b.classList.remove("active-page"));
+}
 
-  gain.gain.setValueAtTime(0.15, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+/* Show selected page */
+function showPage(pageName) {
+  hideAllPages();
 
-  osc.connect(gain);
-  gain.connect(ctx.destination);
+  // Activate the page
+  const page = document.getElementById(`page-${pageName}`);
+  if (page) page.classList.add("active");
 
-  osc.start();
-  osc.stop(ctx.currentTime + 0.05);
+  // Highlight the button
+  pageButtons.forEach(btn => {
+    if (btn.dataset.page === pageName) {
+      btn.classList.add("active-page");
+    }
+  });
+
+  // Fire page-specific events
+  if (pageName === "wx") {
+    document.dispatchEvent(new Event("load-wx"));
+  }
+  if (pageName === "radar") {
+    document.dispatchEvent(new Event("load-radar"));
+  }
+  if (pageName === "satellite") {
+    document.dispatchEvent(new Event("load-satellite"));
+  }
+  if (pageName === "combo") {
+    document.dispatchEvent(new Event("load-combo"));
+  }
+  if (pageName === "airfield") {
+    document.dispatchEvent(new Event("load-airfieldwx"));
+  }
 }
 
 /* ===========================================================
-   PAGE SWITCHING
+   BUTTON CLICK HANDLERS
 =========================================================== */
 
-document.querySelectorAll(".page-btn").forEach(btn => {
+pageButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    playClick();
-
     const page = btn.dataset.page;
-
-    // Switch visible page
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(`page-${page}`).classList.add("active");
-
-    // Highlight active button
-    document.querySelectorAll(".page-btn").forEach(b => b.classList.remove("active-page"));
-    btn.classList.add("active-page");
-
-    // Initialise map pages
-    if (page === "radar") initRadar();
-    if (page === "satellite") initSatellite();
-    if (page === "combo") initCombo();
+    showPage(page);
   });
 });
 
 /* ===========================================================
-   INITIAL PAGE SELECTION (WX)
+   INITIALIZE DEFAULT PAGE
 =========================================================== */
 
-window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("page-wx").classList.add("active");
-  document.querySelector('.page-btn[data-page="wx"]').classList.add("active-page");
-
-  document.dispatchEvent(new Event("mfd-ready"));
-});
-
-/* ===========================================================
-   INITIALISE DEFAULT PAGE (WX) — AFTER DOM IS READY
-=========================================================== */
-
-window.addEventListener("DOMContentLoaded", () => {
-  // Set WX page active
-  const wxPage = document.getElementById("page-wx");
-  if (wxPage) wxPage.classList.add("active");
-
-  const wxBtn = document.querySelector('.page-btn[data-page="wx"]');
-  if (wxBtn) wxBtn.classList.add("active-page");
-
-  // Tell modes.js that the DOM is ready so it can set NORMAL mode
+document.addEventListener("DOMContentLoaded", () => {
+  showPage("wx"); // Default page
   document.dispatchEvent(new Event("mfd-ready"));
 });
