@@ -1,23 +1,24 @@
 /* ===========================================================
-   AIRFIELD WX PAGE — MODE-AWARE, NO FORCED COLOURS
+   AIRFIELD WX PAGE — MODE-AWARE, CLEAN LCD STYLE
 =========================================================== */
 
 #airfieldwx-container {
   padding: 20px;
   font-size: 18px;
   overflow-y: auto;
-
-  /* IMPORTANT: allow mode system to control colour */
   color: inherit !important;
 }
 
-/* Ensure ALL children inherit mode colour */
 #airfieldwx-container * {
   color: inherit !important;
 }
 
-/* Optional: spacing + layout polish */
 .wx-row {
   margin-bottom: 8px;
   letter-spacing: 0.5px;
+}
+
+.wx-label {
+  font-weight: bold;
+  margin-right: 10px;
 }
