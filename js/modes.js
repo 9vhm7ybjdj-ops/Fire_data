@@ -1,54 +1,42 @@
 /* ===========================================================
-   MODE SWITCHING (NVG / RED / NORMAL)
+   MODE SWITCHING — NORMAL / NVG / RED
 =========================================================== */
 
-function setMode(mode) {
-  document.body.classList.remove("nvg", "red");
+const body = document.body;
+const modeButtons = {
+  normal: document.getElementById("btn-normal"),
+  nvg: document.getElementById("btn-nvg"),
+  red: document.getElementById("btn-red")
+};
 
-  if (mode === "nvg") document.body.classList.add("nvg");
-  if (mode === "red") document.body.classList.add("red");
-  // NORMAL mode = no class
+/* ===========================================================
+   CLEAR EXISTING MODE CLASSES
+=========================================================== */
+function clearModes() {
+  body.classList.remove("normal-mode", "nvg-mode", "red-mode");
 }
 
 /* ===========================================================
-   MODE BUTTON HANDLERS + CLICK SOUND
+   APPLY SELECTED MODE
 =========================================================== */
+function setMode(mode) {
+  clearModes();
+  body.classList.add(`${mode}-mode`);
 
-document.getElementById("btn-nvg").addEventListener("click", () => {
-  playClick();
-  setMode("nvg");
-
-  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active-mode"));
-  document.getElementById("btn-nvg").classList.add("active-mode");
-});
-
-document.getElementById("btn-red").addEventListener("click", () => {
-  playClick();
-  setMode("red");
-
-  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active-mode"));
-  document.getElementById("btn-red").classList.add("active-mode");
-});
-
-document.getElementById("btn-normal").addEventListener("click", () => {
-  playClick();
-  setMode("normal");
-
-  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active-mode"));
-  document.getElementById("btn-normal").classList.add("active-mode");
-});
+  // Update active button highlight
+  Object.keys(modeButtons).forEach(key => {
+    modeButtons[key].classList.toggle("active-mode", key === mode);
+  });
+}
 
 /* ===========================================================
-   INITIAL MODE SELECTION (NORMAL)
-   Triggered AFTER core.js finishes initialising
+   EVENT LISTENERS
 =========================================================== */
+modeButtons.normal.addEventListener("click", () => setMode("normal"));
+modeButtons.nvg.addEventListener("click", () => setMode("nvg"));
+modeButtons.red.addEventListener("click", () => setMode("red"));
 
-document.addEventListener("mfd-ready", () => {
-  // Set NORMAL mode
-  setMode("normal");
-
-  // Highlight NORMAL button
-  const normalBtn = document.getElementById("btn-normal");
-  if (normalBtn) normalBtn.classList.add("active-mode");
-});
-
+/* ===========================================================
+   INITIALIZE DEFAULT MODE
+=========================================================== */
+setMode("normal");
