@@ -1,108 +1,98 @@
-/* ============================================================
-   WX.JS — Open‑Meteo Live Weather Tiles
-   4 Stations (Nambour, Beerburrum, Tewantin, Sunshine Coast Apt)
-============================================================ */
+/* ===========================================================
+   WX.JS — 7-field tiles + global OBS TIME (WX page only)
+   Assumes BOM-style observation payload with obs_time_local
+=========================================================== */
 
-/* ------------------------------------------------------------
-   Station Definitions
------------------------------------------------------------- */
-const wxStations = [
-  {
-    id: "nambour",
-    name: "Nambour",
-    lat: -26.626,
-    lon: 152.959
-  },
-  {
-    id: "beerburrum",
-    name: "Beerburrum",
-    lat: -26.953,
-    lon: 152.959
-  },
-  {
-    id: "tewantin",
-    name: "Tewantin",
-    lat: -26.391,
-    lon: 153.037
-  },
-  {
-    id: "apt",
-    name: "Sunshine Coast Apt",
-    lat: -26.603,
-    lon: 153.091
+const WX_STATIONS = {
+  nambour: { id: "IDQ60901/94578" },
+  beerburrum: { id: "IDQ60901/94572" },
+  tewantin: { id: "IDQ60901/94568" },
+  apt: { id: "IDQ60901/95572" }
+};
+
+let wxLatestObsTime = null;
+
+/* -----------------------------------------------------------
+   Entry
+----------------------------------------------------------- */
+function loadWX() {
+  Object.keys(WX_STATIONS).forEach((key) => {
+    fetchStationObs(key, WX_STATIONS[key].id);
+  });
+}
+
+/* -----------------------------------------------------------
+   Fetch one station
+----------------------------------------------------------- */
+function fetchStationObs(key, bomId) {
+  const url =
+    "https://corsproxy.io/?" +
+    encodeURIComponent(`https://api.bom.gov.au/v1/stations/${bomId}/observations`);
+
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data || !data.data || !data.data[0]) return;
+      decodeStationObs(key, data.data[0]);
+    })
+    .catch((err) => console.error("WX fetch error:", err));
+}
+
+/* -----------------------------------------------------------
+   Decode one station
+----------------------------------------------------------- */
+function decodeStationObs(key, d) {
+  const temp = d.air_temp ?? "--";
+  const dew = d.dewpt ?? "--";
+  const wind = d.wind_spd_kmh != null ? `${d.wind_spd_kmh} km/h` : "--";
+  const gust = d.gust_kmh != null ? `${d.gust_kmh} km/h` : "--";
+  const rh = d.rel_hum ?? "--";
+  const rain = d.rain_trace ?? "--";
+
+  const obsTime = d.obs_time_local || d.local_date_time_full || null;
+
+  updateWxTile(key, { temp, dew, wind, gust, rh, rain });
+  updateWxGlobalObsTime(obsTime);
+}
+
+/* -----------------------------------------------------------
+   Update tile DOM
+----------------------------------------------------------- */
+function updateWxTile(key, data) {
+  const fields = ["temp", "dew", "wind", "gust", "rh", "rain"];
+  fields.forEach((f) => {
+    const el = document.getElementById(`${key}-${f}`);
+    if (el) el.textContent = data[f];
+  });
+}
+
+/* -----------------------------------------------------------
+   Global OBS TIME (latest across all stations)
+----------------------------------------------------------- */
+function updateWxGlobalObsTime(t) {
+  if (!t) return;
+
+  const ts = new Date(t);
+  if (!(ts instanceof Date) || isNaN(ts.getTime())) return;
+
+  if (!wxLatestObsTime || ts > wxLatestObsTime) {
+    wxLatestObsTime = ts;
+
+    const formatted = ts.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    const el = document.getElementById("wx-global-obs-time");
+    if (el) el.textContent = `Obs: ${formatted}`;
+
+    const lastUpdate = document.getElementById("wx-last-update");
+    if (lastUpdate) lastUpdate.textContent = `Last update: ${formatted}`;
   }
-];
-
-/* ------------------------------------------------------------
-   Fetch Weather for One Station (CORS‑safe)
------------------------------------------------------------- */
-async function fetchStationWX(station) {
-  const base =
-    `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}` +
-    `&longitude=${station.lon}` +
-    `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m`;
-
-  const url = "https://corsproxy.io/?" + encodeURIComponent(base);
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const c = data.current;
-
-    return {
-      temp: Math.round(c.temperature_2m),
-      rh: Math.round(c.relative_humidity_2m),
-      wind: Math.round(c.wind_speed_10m),
-      gust: Math.round(c.wind_gusts_10m)
-    };
-  } catch (err) {
-    console.error("WX fetch error:", station.name, err);
-    return null;
-  }
 }
 
-/* ------------------------------------------------------------
-   Update Tile DOM
------------------------------------------------------------- */
-function updateTile(stationId, wx) {
-  if (!wx) return;
-
-  document.getElementById(`${stationId}-temp`).textContent = `${wx.temp}°C`;
-  document.getElementById(`${stationId}-wind`).textContent = `${wx.wind} km/h`;
-  document.getElementById(`${stationId}-gust`).textContent = `${wx.gust} km/h`;
-  document.getElementById(`${stationId}-rh`).textContent = `${wx.rh}%`;
-}
-
-/* ------------------------------------------------------------
-   Update Timestamp
------------------------------------------------------------- */
-function updateWXTimestamp() {
-  const now = new Date();
-  const hh = now.getHours().toString().padStart(2, "0");
-  const mm = now.getMinutes().toString().padStart(2, "0");
-  document.getElementById("wx-last-update").textContent = `Last update: ${hh}:${mm}`;
-}
-
-/* ------------------------------------------------------------
-   Fetch All Stations
------------------------------------------------------------- */
-async function refreshWX() {
-  for (const st of wxStations) {
-    const wx = await fetchStationWX(st);
-    updateTile(st.id, wx);
-  }
-  updateWXTimestamp();
-}
-
-/* ------------------------------------------------------------
-   Auto‑Refresh Every 5 Minutes
------------------------------------------------------------- */
-setInterval(refreshWX, 5 * 60 * 1000);
-
-/* ------------------------------------------------------------
-   Initial Load
------------------------------------------------------------- */
-document.addEventListener("mfd-ready", () => {
-  refreshWX();
-});
+/* -----------------------------------------------------------
+   Init + refresh
+----------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", loadWX);
+setInterval(loadWX, 5 * 60 * 1000);
