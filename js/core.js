@@ -6,7 +6,11 @@
 /* ------------------------------------------------------------
    Mechanical Click Sound (Generated Programmatically)
 ------------------------------------------------------------ */
+let suppressClicks = false;
+
 function playClick() {
+  if (suppressClicks) return;
+
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -40,7 +44,6 @@ function showPage(id) {
 
   playClick();
 
-  // Notify map engines
   document.dispatchEvent(new CustomEvent("page-changed", { detail: id }));
 }
 
@@ -100,14 +103,10 @@ modeButtons.forEach(btn => {
 
 /* ------------------------------------------------------------
    OPTION B — DELAYED MFD READY
-   Fires ONLY after CRT + scaling + layout are stable
 ------------------------------------------------------------ */
 function fireMfdReady() {
-  // Wait for DOM
   requestAnimationFrame(() => {
-    // Wait for CRT layout to settle
     requestAnimationFrame(() => {
-      // Wait for scaling.js to apply transforms
       requestAnimationFrame(() => {
         document.dispatchEvent(new Event("mfd-ready"));
         console.log("🔥 MFD READY — CRT + scaling stable");
@@ -117,12 +116,15 @@ function fireMfdReady() {
 }
 
 /* ------------------------------------------------------------
-   INITIAL PAGE LOAD
+   INITIAL PAGE LOAD (NO CLICK SOUNDS)
 ------------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", () => {
+  suppressClicks = true;
+
   setMode("mode-normal");
   showPage("wx-page");
 
-  // Fire Option B timing
+  suppressClicks = false;
+
   fireMfdReady();
 });
