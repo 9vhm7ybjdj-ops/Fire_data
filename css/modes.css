@@ -1,23 +1,63 @@
-/* ===========================================================
-   MODE SYSTEM — NORMAL / NVG / RED
-=========================================================== */
+/* ============================================================
+   MODE BUTTON ACTIVE STATE (Amber highlight)
+============================================================ */
 
-body.normal-mode {
-  color: #fff;
+.mode-btn.active-mode,
+.bezel-btn.active-mode {
+  background: #b36b00;
+  color: #fff2cc;
+  border-color: #b36b00;
+  box-shadow:
+    0 0 12px rgba(255,170,0,0.6),
+    inset 0 0 6px rgba(0,0,0,0.8);
 }
 
-body.nvg-mode {
-  color: #0f0;
-  background: #001100;
+/* ============================================================
+   CRT MODE COLORS
+   These apply ONLY to #crt — never the whole page.
+============================================================ */
+
+/* NORMAL MODE */
+#crt.normal-mode {
+  --crt-text: #ffffff;
+  --crt-glow: rgba(255,255,255,0.12);
+  --crt-scanline-opacity: 0.15;
+  --crt-mask-opacity: 0.10;
+  background: #000;
 }
 
-body.red-mode {
-  color: #f33;
-  background: #220000;
+/* NVG MODE (Green phosphor) */
+#crt.nvg-mode {
+  --crt-text: #00ff66;
+  --crt-glow: rgba(0,255,100,0.25);
+  --crt-scanline-opacity: 0.22;
+  --crt-mask-opacity: 0.14;
+  background: #001900;
 }
 
-/* Buttons highlight */
-.mode-btn.active-mode {
-  background: #b36b00 !important;
-  color: #fff2cc !important;
+/* RED MODE (Deep red phosphor) */
+#crt.red-mode {
+  --crt-text: #ff3333;
+  --crt-glow: rgba(255,50,50,0.25);
+  --crt-scanline-opacity: 0.22;
+  --crt-mask-opacity: 0.14;
+  background: #190000;
+}
+
+/* ============================================================
+   TEXT COLOR INSIDE CRT
+============================================================ */
+
+#crt,
+#crt * {
+  color: var(--crt-text);
+}
+
+/* ============================================================
+   BUTTON PRESS FEEL
+============================================================ */
+
+.bezel-btn:active {
+  transform: translateY(3px);
+  background: #444;
 }
