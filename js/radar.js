@@ -1,44 +1,73 @@
-/* ===========================================================
-   RADAR PAGE — REAL RAINVIEWER TILES + GRID/COASTLINES
-=========================================================== */
+/* ============================================================
+   RADAR.JS — Radar Tile Loader + Canvas Renderer
+   Includes comboUpdateRadar() hook for Combo Page (C2)
+============================================================ */
+
+let radarCanvas, radarCtx;
+let radarImage = new Image();
 
 function initRadar() {
-  const container = document.getElementById("radar-map");
-  if (!container) return;
+  radarCanvas = document.getElementById("radar-canvas");
+  radarCtx = radarCanvas.getContext("2d");
 
-  const canvas = createMapCanvas("radar-map");
-  const ctx = canvas.getContext("2d");
-
-  drawGridAndCoast(ctx);
-  drawRadarLayer(ctx);
+  loadRadarFrame();
 }
 
-/* ===========================================================
-   DRAW RADAR LAYER
-=========================================================== */
+/* ------------------------------------------------------------
+   Load Radar Frame (BOM or Proxy Source)
+------------------------------------------------------------ */
+function loadRadarFrame() {
+  const url = "https://corsproxy.io/?" +
+    encodeURIComponent("https://api.rainviewer.com/public/weather-maps.json");
 
-function drawRadarLayer(ctx) {
-  const tileSize = 256;
-  const zoom = 4;
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const frame = data.radar.past[data.radar.past.length - 1];
+      const imgUrl = "https://corsproxy.io/?" + encodeURIComponent(frame.path);
 
-  const radarUrl = (x, y, z) =>
-    `https://tilecache.rainviewer.com/v2/radar/${z}/${x}/${y}/2/1_1.png`;
+      radarImage = new Image();
+      radarImage.crossOrigin = "anonymous";
+      radarImage.src = imgUrl;
 
-  const tiles = [
-    { x: 8, y: 12 }, { x: 9, y: 12 }, { x: 10, y: 12 },
-    { x: 8, y: 13 }, { x: 9, y: 13 }, { x: 10, y: 13 },
-    { x: 8, y: 14 }, { x: 9, y: 14 }, { x: 10, y: 14 }
-  ];
+      radarImage.onload = () => {
+        window.latestRadarImage = radarImage;
 
-  tiles.forEach(tile => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = radarUrl(tile.x, tile.y, zoom);
+        drawRadar();
 
-    img.onload = () => {
-      const px = (tile.x - 8) * tileSize;
-      const py = (tile.y - 12) * tileSize;
-      ctx.drawImage(img, px, py, tileSize, tileSize);
-    };
-  });
+        // 🔥 Combo page hook
+        if (typeof comboUpdateRadar === "function") {
+          comboUpdateRadar(radarImage);
+        }
+      };
+    })
+    .catch(err => console.error("Radar load error:", err));
 }
+
+/* ------------------------------------------------------------
+   Draw Radar Frame
+------------------------------------------------------------ */
+function drawRadar() {
+  if (!radarCtx) return;
+
+  radarCtx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
+
+  if (radarImage) {
+    radarCtx.drawImage(
+      radarImage,
+      0, 0,
+      radarCanvas.width,
+      radarCanvas.height
+    );
+  }
+}
+
+/* ------------------------------------------------------------
+   Auto-refresh every 5 minutes
+------------------------------------------------------------ */
+setInterval(loadRadarFrame, 5 * 60 * 1000);
+
+/* ------------------------------------------------------------
+   Initial load
+------------------------------------------------------------ */
+document.addEventListener("mfd-ready", initRadar);
