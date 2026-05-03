@@ -1,65 +1,42 @@
 /* ============================================================
-   SCALING.JS — Responsive MFD Scaling (Avionics-Accurate)
+   SCALING ENGINE — Version A
+   Phone‑first, stable, no transform hell
 ============================================================ */
 
-/* ------------------------------------------------------------
-   Target Aspect Ratio (Avionics MFD)
-   4:3 is the correct ratio for your CRT layout
------------------------------------------------------------- */
+/*
+   The bezel is a fixed virtual size:
+   1200 × 900 (defined in bezel.css)
 
-const TARGET_RATIO = 4 / 3;
-
-/* ------------------------------------------------------------
-   Scale the Entire MFD
------------------------------------------------------------- */
+   We scale the ENTIRE bezel uniformly so it fits the screen
+   WITHOUT distorting the CRT or buttons.
+*/
 
 function scaleMFD() {
-  const root = document.getElementById("app-root");
-  if (!root) return;
+  const bezel = document.getElementById("mfd-bezel");
+  if (!bezel) return;
 
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+  const baseWidth = 1200;
+  const baseHeight = 900;
 
-  const currentRatio = w / h;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
 
-  let scale;
+  // Fit-to-screen scaling (uniform)
+  const scale = Math.min(
+    screenWidth / baseWidth,
+    screenHeight / baseHeight
+  );
 
-  if (currentRatio > TARGET_RATIO) {
-    // Screen is too wide → height is limiting factor
-    scale = h / 900; // 900px = your design height
-  } else {
-    // Screen is too tall → width is limiting factor
-    scale = w / 1200; // 1200px = your design width
-  }
-
-  // Apply scaling
-  root.style.transform = `scale(${scale})`;
-  root.style.transformOrigin = "top center";
+  bezel.style.transform = `scale(${scale})`;
+  bezel.style.transformOrigin = "top center";
 
   // Center horizontally
-  const scaledWidth = 1200 * scale;
-  const offsetX = (w - scaledWidth) / 2;
-  root.style.left = `${offsetX}px`;
-
-  // Vertical alignment
-  root.style.top = `20px`;
-
-  console.log(`📐 MFD scaled: ${Math.round(scale * 100)}%`);
+  bezel.style.marginLeft = `${(screenWidth - baseWidth * scale) / 2}px`;
 }
 
-/* ------------------------------------------------------------
-   Recalculate on Resize + Orientation Change
------------------------------------------------------------- */
-
 window.addEventListener("resize", scaleMFD);
-window.addEventListener("orientationchange", () => {
-  setTimeout(scaleMFD, 150);
-});
+window.addEventListener("orientationchange", scaleMFD);
 
-/* ------------------------------------------------------------
-   Initialize on MFD Ready
------------------------------------------------------------- */
-
-document.addEventListener("mfd-ready", () => {
+document.addEventListener("DOMContentLoaded", () => {
   scaleMFD();
 });
