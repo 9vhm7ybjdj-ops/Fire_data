@@ -1,6 +1,6 @@
 /* ============================================================
    WX.JS — LIVE LOCAL WEATHER (Nambour, Beerburrum, Tewantin, Apt)
-   Uses Open-Meteo API
+   Open‑Meteo with nearest-gridpoint model selection
 ============================================================ */
 
 /* ------------------------------------------------------------
@@ -14,10 +14,10 @@ const WX_STATIONS = {
 };
 
 /* ------------------------------------------------------------
-   Fetch Template
+   Build URL — now with models=best_match
 ------------------------------------------------------------ */
 function buildUrl(lat, lon) {
-  return `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_gusts_10m,wind_direction_10m`;
+  return `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_gusts_10m,wind_direction_10m&models=best_match`;
 }
 
 /* ------------------------------------------------------------
