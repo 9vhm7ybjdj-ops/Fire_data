@@ -1,226 +1,125 @@
-/* ============================================================
-   GLOBAL RESET
-============================================================ */
+/* ===========================================================
+   BASE LAYOUT + MAP CONTAINERS
+=========================================================== */
+
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  background: #111; /* stays neutral — modes do NOT affect this */
-  font-family: "LCD", monospace;
-  color: #fff;
+  background: #111;
+  color: #0f0;
+  font-family: "LCD", monospace, system-ui;
 }
 
-/* ============================================================
-   APP ROOT
-============================================================ */
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #app-root {
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  max-width: 1280px;
+  max-height: 720px;
+  padding: 8px;
 }
 
-/* ============================================================
-   MFD BEZEL GRID LAYOUT
-============================================================ */
+/* Bezel + screen framing */
+
 #mfd-bezel {
+  width: 100%;
+  height: 100%;
   display: grid;
-  grid-template-columns: 120px 1280px 120px; /* left buttons | CRT | right buttons */
-  grid-template-rows: 720px;
-  gap: 0;
-  background: #222;
-  padding: 20px;
-  border-radius: 18px;
-  border: 4px solid #000;
-  box-shadow: 0 0 40px #000 inset;
-  transform-origin: center;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 1fr;
+  gap: 8px;
 }
 
-/* ============================================================
-   MOBILE SCALING
-============================================================ */
-@media (max-width: 1600px) {
-  #mfd-bezel {
-    transform: scale(calc(100vw / 1600));
-  }
-}
-
-@media (max-height: 900px) {
-  #mfd-bezel {
-    transform: scale(calc(100vh / 900));
-  }
-}
-
-/* ============================================================
-   LEFT + RIGHT BUTTON STACKS
-============================================================ */
 #left-buttons,
 #right-buttons {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 10px 0;
-}
-
-.bezel-btn {
-  width: 100px;
-  height: 60px;
-  margin: 10px auto;
-  background: #333;
-  border: 3px solid #000;
-  border-radius: 6px;
-  color: #fff;
-  font-size: 22px;
-  font-family: "LCD", monospace;
-  cursor: pointer;
-  box-shadow: 0 0 10px #000 inset;
-  transition: background 0.1s, transform 0.1s;
-}
-
-.bezel-btn:active {
-  background: #555;
-  transform: translateY(2px);
-}
-
-/* ============================================================
-   CENTER SCREEN AREA
-============================================================ */
-#mfd-screen {
-  width: 1280px;
-  height: 720px;
-  position: relative;
-  display: flex;
   justify-content: center;
-  align-items: center;
+  gap: 8px;
 }
 
-/* CRT frame is handled in crt.css */
-#crt-frame {
+#mfd-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* CRT container */
+
+#crt {
   width: 100%;
   height: 100%;
   position: relative;
-}
-
-/* ============================================================
-   PAGE CONTAINER INSIDE CRT
-============================================================ */
-#page-container {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  inset: 0;
   overflow: hidden;
-  padding: 20px;
 }
 
-/* ============================================================
-   PAGE VISIBILITY
-============================================================ */
-.mfd-page {
-  display: none;
+/* Pages */
+
+#mfd-screen .mfd-page {
   width: 100%;
   height: 100%;
+  display: none;
+  padding: 16px 20px;
 }
 
-.active-page {
+#mfd-screen .mfd-page.active-page {
   display: block;
 }
 
-/* ============================================================
-   PAGE HEADERS
-============================================================ */
+/* Page header */
+
 .page-header {
   display: flex;
   justify-content: space-between;
-  font-size: 26px;
-  margin-bottom: 20px;
+  align-items: baseline;
+  margin-bottom: 12px;
 }
 
 .page-title {
-  font-weight: bold;
+  font-size: 24px;
 }
 
 .page-subtitle {
-  opacity: 0.8;
-  font-size: 20px;
+  font-size: 18px;
 }
 
-/* ============================================================
-   WX GRID (4 tiles)
-============================================================ */
-#wx-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 20px;
+/* Map containers (migrated from maps.css) */
+
+.map-container {
   width: 100%;
-  height: calc(100% - 60px);
+  height: calc(100% - 40px);
+  background: #000;
+  position: relative;
+  overflow: hidden;
 }
 
-/* ============================================================
-   TILE BASE STYLE
-============================================================ */
-.wx-tile {
-  background: var(--lcd-bg, #000);
-  border: 3px solid #0f0;
-  border-radius: 8px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  box-shadow: 0 0 12px #000 inset;
-}
-
-.tile-header {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.tile-title {
-  font-weight: bold;
-}
-
-.tile-body {
-  font-size: 22px;
-}
-
-.tile-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-
-.tile-label {
-  opacity: 0.8;
-}
-
-.tile-value {
-  font-weight: bold;
-}
-
-/* ============================================================
-   RADAR + SATELLITE CANVAS CONTAINERS
-============================================================ */
-#radar-container,
-#satellite-container {
-  width: 100%;
-  height: calc(100% - 60px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#radar-canvas,
-#satellite-canvas {
+.map-container canvas {
   width: 100%;
   height: 100%;
-  background: #000;
-  image-rendering: pixelated;
+}
+
+/* Combo slider */
+
+#combo-slider-container {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+#combo-slider-container input[type="range"] {
+  flex: 1;
 }
