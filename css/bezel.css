@@ -1,163 +1,66 @@
 /* ============================================================
-   BEZEL — OUTER METAL HOUSING
-   Wide CRT (1280×720) + Left/Right Button Stacks
+   BEZEL — Dark Matte Metal + Torx T20 Black-Oxide Screws
 ============================================================ */
 
 #mfd-bezel {
-  background: #1a1a1a;
-  border: 6px solid #000;
-  border-radius: 22px;
-  padding: 24px;
-  box-shadow:
-    0 0 40px #000 inset,
-    0 0 20px #000;
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;                 /* deep matte metal */
+  border: 6px solid #0d0d0d;            /* outer frame */
+  border-radius: 8px;
   position: relative;
-
-  /* Brushed metal texture */
-  background-image:
-    linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255,255,255,0.03) 0px,
-      rgba(255,255,255,0.03) 2px,
-      rgba(0,0,0,0.05) 2px,
-      rgba(0,0,0,0.05) 4px
-    );
-}
-
-/* ============================================================
-   BUTTON STACKS — LEFT + RIGHT
-============================================================ */
-
-#left-buttons,
-#right-buttons {
-  background: #111;
-  border: 3px solid #000;
-  border-radius: 12px;
-  padding: 12px 0;
   box-shadow:
-    0 0 20px #000 inset,
-    0 0 10px #000;
+    inset 0 0 12px rgba(0,0,0,0.9),     /* inner depth */
+    0 0 18px rgba(0,0,0,0.8);           /* outer falloff */
 }
 
-/* ============================================================
-   BUTTONS — MECHANICAL, DEEP TRAVEL
-============================================================ */
+/* ------------------------------------------------------------
+   Screw Wells
+------------------------------------------------------------ */
 
-.bezel-btn {
-  width: 100px;
-  height: 60px;
-  margin: 14px auto;
-  background: #2a2a2a;
-  border: 3px solid #000;
-  border-radius: 6px;
-  color: #fff;
-  font-size: 22px;
-  font-family: "LCD", monospace;
-  cursor: pointer;
-
-  box-shadow:
-    0 0 12px #000 inset,
-    0 4px 0 #000,
-    0 0 8px #000;
-
-  transition: background 0.1s, transform 0.1s, box-shadow 0.1s;
-}
-
-.bezel-btn:active {
-  background: #444;
-  transform: translateY(3px);
-  box-shadow:
-    0 0 6px #000 inset,
-    0 1px 0 #000;
-}
-
-/* ============================================================
-   CRT FRAME — INNER BEZEL
-============================================================ */
-
-#crt-frame {
-  background: #0d0d0d;
-  border: 6px solid #000;
-  border-radius: 14px;
-  padding: 12px;
-  box-shadow:
-    0 0 25px #000 inset,
-    0 0 10px #000;
-  position: relative;
-}
-
-/* ============================================================
-   SCREW WELLS — OUTER BEZEL
-============================================================ */
-
-.mfd-screw {
+.bezel-screw {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #555, #222);
-  border: 3px solid #000;
-  box-shadow:
-    0 0 6px #000 inset,
-    0 0 4px #000;
+  background: radial-gradient(
+    circle at 50% 50%,
+    #0f0f0f 0%,
+    #050505 60%,
+    #000 100%
+  );                                     /* recessed well */
   position: absolute;
-}
-
-/* Top-left */
-.mfd-screw.s1 { top: 10px; left: 10px; }
-/* Top-right */
-.mfd-screw.s2 { top: 10px; right: 10px; }
-/* Bottom-left */
-.mfd-screw.s3 { bottom: 10px; left: 10px; }
-/* Bottom-right */
-.mfd-screw.s4 { bottom: 10px; right: 10px; }
-
-/* ============================================================
-   SCREW HEAD — TORX STAR
-============================================================ */
-
-.mfd-screw::after {
-  content: "✶";
-  position: absolute;
-  inset: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
-  color: #111;
-  font-size: 18px;
-  opacity: 0.7;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 6px rgba(0,0,0,0.9),
+    0 0 4px rgba(0,0,0,0.7);
 }
 
-/* ============================================================
-   INNER SCREWS — CRT FRAME
-============================================================ */
+/* ------------------------------------------------------------
+   Torx T20 Black-Oxide Screw Head
+------------------------------------------------------------ */
 
-.crt-screw {
-  width: 20px;
-  height: 20px;
+.bezel-screw::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: #111;                      /* black oxide */
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #666, #222);
-  border: 2px solid #000;
   box-shadow:
-    0 0 4px #000 inset,
-    0 0 3px #000;
-  position: absolute;
+    inset 0 0 4px rgba(255,255,255,0.05),
+    inset 0 0 10px rgba(0,0,0,0.9);
+  mask-image: url("img/torx-t20.svg");   /* your Torx star */
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
 }
 
-/* Positions for 1280×720 CRT */
-.crt-screw.c1 { top: 8px; left: 8px; }
-.crt-screw.c2 { top: 8px; right: 8px; }
-.crt-screw.c3 { bottom: 8px; left: 8px; }
-.crt-screw.c4 { bottom: 8px; right: 8px; }
+/* ------------------------------------------------------------
+   Screw Positions (matches your original layout)
+------------------------------------------------------------ */
 
-.crt-screw::after {
-  content: "✶";
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #111;
-  font-size: 14px;
-  opacity: 0.7;
-}
+#screw-tl { top: 12px; left: 12px; }
+#screw-tr { top: 12px; right: 12px; }
+#screw-bl { bottom: 12px; left: 12px; }
+#screw-br { bottom: 12px; right: 12px; }
