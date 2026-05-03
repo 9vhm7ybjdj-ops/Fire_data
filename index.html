@@ -5,7 +5,7 @@
   <title>Fireground WX Data</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- CSS (logical order) -->
+  <!-- CSS -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/bezel.css" />
   <link rel="stylesheet" href="css/crt.css" />
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/airfieldwx.css" />
   <link rel="stylesheet" href="css/modes.css" />
 
-  <!-- JS (in head, with defer, Option A order) -->
+  <!-- JS -->
   <script src="js/core.js" defer></script>
   <script src="js/modes.js" defer></script>
   <script src="js/brightness.js" defer></script>
@@ -30,6 +30,12 @@
 <body>
   <div id="app-root">
     <div id="mfd-bezel">
+
+      <!-- SCREWS -->
+      <div id="screw-tl" class="bezel-screw"><div class="bezel-screw-mark"></div></div>
+      <div id="screw-tr" class="bezel-screw"><div class="bezel-screw-mark"></div></div>
+      <div id="screw-bl" class="bezel-screw"><div class="bezel-screw-mark"></div></div>
+      <div id="screw-br" class="bezel-screw"><div class="bezel-screw-mark"></div></div>
 
       <!-- LEFT BUTTON STACK -->
       <div id="left-buttons">
@@ -100,88 +106,4 @@
                   <div class="tile-header">Sunshine Coast Apt</div>
                   <div class="tile-body">
                     <div class="tile-row"><span class="tile-label">Temp</span><span id="apt-temp" class="tile-value">--</span></div>
-                    <div class="tile-row"><span class="tile-label">Dew Pt</span><span id="apt-dew" class="tile-value">--</span></div>
-                    <div class="tile-row"><span class="tile-label">Wind</span><span id="apt-wind" class="tile-value">--</span></div>
-                    <div class="tile-row"><span class="tile-label">Gust</span><span id="apt-gust" class="tile-value">--</span></div>
-                    <div class="tile-row"><span class="tile-label">RH</span><span id="apt-rh" class="tile-value">--</span></div>
-                    <div class="tile-row"><span class="tile-label">Rain</span><span id="apt-rain" class="tile-value">--</span></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Global OBS TIME, WX page only -->
-              <div id="wx-global-obs-time">Obs: --:--</div>
-            </div>
-
-            <!-- RADAR PAGE -->
-            <div id="radar-page" class="mfd-page">
-              <div class="page-header">
-                <div class="page-title">Radar</div>
-                <div class="page-subtitle">Pan + Zoom</div>
-              </div>
-              <div class="map-container" id="radar-container">
-                <canvas id="radar-canvas" width="1280" height="720"></canvas>
-              </div>
-            </div>
-
-            <!-- SATELLITE PAGE -->
-            <div id="satellite-page" class="mfd-page">
-              <div class="page-header">
-                <div class="page-title">Satellite</div>
-                <div class="page-subtitle">GeoColor</div>
-              </div>
-              <div class="map-container" id="satellite-container">
-                <canvas id="satellite-canvas" width="1280" height="720"></canvas>
-              </div>
-            </div>
-
-            <!-- COMBO PAGE -->
-            <div id="combo-page" class="mfd-page">
-              <div class="page-header">
-                <div class="page-title">Combo</div>
-                <div class="page-subtitle">Radar + Satellite</div>
-              </div>
-
-              <div class="map-container" id="combo-container">
-                <canvas id="combo-sat" width="1280" height="720"></canvas>
-                <canvas id="combo-radar" width="1280" height="720"></canvas>
-              </div>
-
-              <div id="combo-slider-container">
-                <label for="combo-opacity">Radar Opacity</label>
-                <input type="range" id="combo-opacity" min="0" max="100" value="70" />
-              </div>
-            </div>
-
-            <!-- AIRFIELD WX PAGE -->
-            <div id="airfieldwx-page" class="mfd-page">
-              <div class="page-header">
-                <div class="page-title">YBSU METAR</div>
-                <div id="metar-time" class="page-subtitle">Obs: --:--</div>
-              </div>
-
-              <div id="airfieldwx-content">
-                <div class="metar-row"><span class="metar-label">Wind</span><span id="metar-wind" class="metar-value">--</span></div>
-                <div class="metar-row"><span class="metar-label">Visibility</span><span id="metar-vis" class="metar-value">--</span></div>
-                <div class="metar-row"><span class="metar-label">Cloud</span><span id="metar-cloud" class="metar-value">--</span></div>
-                <div class="metar-row"><span class="metar-label">QNH</span><span id="metar-qnh" class="metar-value">--</span></div>
-                <div class="metar-row"><span class="metar-label">Category</span><span id="metar-cat" class="metar-value">--</span></div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT BUTTON STACK -->
-      <div id="right-buttons">
-        <button class="bezel-btn" data-action="mode-normal">NORM</button>
-        <button class="bezel-btn" data-action="mode-nvg">NVG</button>
-        <button class="bezel-btn" data-action="mode-red">RED</button>
-        <button class="bezel-btn" data-action="brightness-down">DIM</button>
-      </div>
-
-    </div>
-  </div>
-</body>
-</html>
+                    <div class="tile-row"><
