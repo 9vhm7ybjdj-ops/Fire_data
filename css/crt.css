@@ -8,7 +8,186 @@
   position: relative;
   background: #000;
   border-radius: 6px;
+  overflow: /* ============================================================
+   CRT CORE — 1280×720 WIDE DISPLAY
+   All mode tinting is scoped to #crt ONLY.
+============================================================ */
+
+#crt {
+  width: 100%;
+  height: 100%;
+  position: relative;
   overflow: hidden;
+
+  /* Base black CRT glass */
+  background: #000;
+
+  /* Curvature */
+  transform: perspective(900px) translateZ(0) scale(1.01);
+  border-radius: 18px;
+
+  /* Glow + tube depth */
+  box-shadow:
+    0 0 40px rgba(0,255,0,0.15) inset,
+    0 0 60px #000 inset,
+    0 0 40px #000;
+
+  /* Default mode variables */
+  --crt-text: #ffffff;
+  --crt-glow: rgba(0,255,0,0.15);
+  --crt-scanline-opacity: 0.18;
+  --crt-mask-opacity: 0.12;
+}
+
+/* ============================================================
+   MODE: NORMAL (white CRT)
+============================================================ */
+#crt.normal-mode {
+  --crt-text: #ffffff;
+  --crt-glow: rgba(255,255,255,0.12);
+  --crt-scanline-opacity: 0.15;
+  --crt-mask-opacity: 0.10;
+}
+
+/* ============================================================
+   MODE: NVG (green phosphor)
+============================================================ */
+#crt.nvg-mode {
+  --crt-text: #00ff66;
+  --crt-glow: rgba(0,255,100,0.25);
+  --crt-scanline-opacity: 0.22;
+  --crt-mask-opacity: 0.14;
+}
+
+/* ============================================================
+   MODE: RED (red phosphor)
+============================================================ */
+#crt.red-mode {
+  --crt-text: #ff3333;
+  --crt-glow: rgba(255,50,50,0.25);
+  --crt-scanline-opacity: 0.22;
+  --crt-mask-opacity: 0.14;
+}
+
+/* ============================================================
+   CRT TEXT COLOR
+============================================================ */
+#crt,
+#crt * {
+  color: var(--crt-text);
+}
+
+/* ============================================================
+   SCANLINES
+============================================================ */
+#crt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,var(--crt-scanline-opacity)) 2px,
+    rgba(0,0,0,0) 4px
+  );
+
+  mix-blend-mode: multiply;
+  z-index: 5;
+}
+
+/* ============================================================
+   RGB SUBPIXEL MASK
+============================================================ */
+#crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255,0,0,var(--crt-mask-opacity)) 0px,
+    rgba(0,255,0,var(--crt-mask-opacity)) 2px,
+    rgba(0,0,255,var(--crt-mask-opacity)) 4px,
+    rgba(255,0,0,var(--crt-mask-opacity)) 6px
+  );
+
+  mix-blend-mode: screen;
+  z-index: 6;
+}
+
+/* ============================================================
+   GLASS REFLECTION
+============================================================ */
+#crt .crt-glass {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.08) 0%,
+    rgba(255,255,255,0.02) 40%,
+    rgba(0,0,0,0) 70%
+  );
+
+  z-index: 7;
+}
+
+/* ============================================================
+   PHOSPHOR BLOOM (subtle)
+============================================================ */
+#crt .crt-bloom {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  box-shadow:
+    0 0 40px var(--crt-glow) inset,
+    0 0 80px var(--crt-glow) inset;
+
+  z-index: 4;
+}
+
+/* ============================================================
+   PAGE CONTAINER INSIDE CRT
+============================================================ */
+#page-container {
+  position: relative;
+  z-index: 10; /* above scanlines + mask */
+  padding: 20px;
+}
+
+/* ============================================================
+   TEXT RENDERING
+============================================================ */
+#crt,
+#crt * {
+  text-shadow:
+    0 0 4px var(--crt-glow),
+    0 0 8px var(--crt-glow);
+  font-smooth: never;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   OPTIONAL: CRT FLICKER (subtle)
+============================================================ */
+@keyframes crt-flicker {
+  0% { opacity: 1; }
+  50% { opacity: 0.97; }
+  100% { opacity: 1; }
+}
+
+#crt {
+  animation: crt-flicker 0.12s infinite;
+}
+
 
   box-shadow:
     inset 0 0 25px rgba(0,255,255,0.08),
