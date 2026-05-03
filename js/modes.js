@@ -1,85 +1,44 @@
 /* ============================================================
-   MODES.JS — NVG, RED, NORMAL Modes
+   MODES CONTROLLER
+   Normal / NVG / RED
+   Clean, stable, Version A compatible
 ============================================================ */
 
-/* ------------------------------------------------------------
-   Mode State
------------------------------------------------------------- */
-
-let currentMode = "normal";
-
-/* ------------------------------------------------------------
-   Apply Mode to Body
------------------------------------------------------------- */
-
-function applyMode(mode) {
-  const body = document.body;
-
-  body.classList.remove("nvg-mode", "red-mode");
+function setMode(mode) {
+  document.body.classList.remove("nvg-mode", "red-mode");
 
   switch (mode) {
+    case "normal":
+      // Normal mode = no extra class
+      break;
+
     case "nvg":
-      body.classList.add("nvg-mode");
+      document.body.classList.add("nvg-mode");
       break;
 
     case "red":
-      body.classList.add("red-mode");
+      document.body.classList.add("red-mode");
       break;
 
     default:
-      // normal mode = no class
-      break;
+      console.warn("Unknown mode:", mode);
   }
-
-  currentMode = mode;
-  console.log(`🎛 Mode set to: ${mode.toUpperCase()}`);
 }
 
-/* ------------------------------------------------------------
-   Listen for Mode Button Actions
------------------------------------------------------------- */
+/* ============================================================
+   BUTTON EVENT HOOKS
+============================================================ */
 
-document.addEventListener("mfd-action", (e) => {
-  const action = e.detail;
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".bezel-btn").forEach(btn => {
+    const action = btn.dataset.action;
 
-  if (action === "mode-normal") {
-    applyMode("normal");
-  }
+    if (!action) return;
 
-  if (action === "mode-nvg") {
-    applyMode("nvg");
-  }
-
-  if (action === "mode-red") {
-    applyMode("red");
-  }
-
-  if (action === "brightness-down") {
-    adjustBrightness(-0.1);
-  }
-});
-
-/* ------------------------------------------------------------
-   Brightness Control (Shared with brightness.js)
------------------------------------------------------------- */
-
-let brightnessLevel = 1.0;
-
-function adjustBrightness(delta) {
-  brightnessLevel = Math.max(0.2, Math.min(1.0, brightnessLevel + delta));
-
-  const crt = document.getElementById("crt");
-  if (crt) {
-    crt.style.filter = `brightness(${brightnessLevel})`;
-  }
-
-  console.log(`🔆 Brightness: ${Math.round(brightnessLevel * 100)}%`);
-}
-
-/* ------------------------------------------------------------
-   Initialize Mode on MFD Ready
------------------------------------------------------------- */
-
-document.addEventListener("mfd-ready", () => {
-  applyMode(currentMode);
+    btn.addEventListener("click", () => {
+      if (action === "mode-normal") setMode("normal");
+      if (action === "mode-nvg") setMode("nvg");
+      if (action === "mode-red") setMode("red");
+    });
+  });
 });
