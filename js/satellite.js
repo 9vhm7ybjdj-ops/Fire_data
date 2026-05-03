@@ -3,60 +3,61 @@
    Includes comboUpdateSatellite() hook for Combo Page (C2)
 ============================================================ */
 
-let satCanvas, satCtx;
-let satImage = new Image();
+let satelliteCanvas, satelliteCtx;
+let satelliteImage = new Image();
 
 function initSatellite() {
-  satCanvas = document.getElementById("satellite-canvas");
-  satCtx = satCanvas.getContext("2d");
+  satelliteCanvas = document.getElementById("satellite-canvas");
+  if (!satelliteCanvas) return;
+  satelliteCtx = satelliteCanvas.getContext("2d");
 
   loadSatelliteFrame();
 }
 
 /* ------------------------------------------------------------
-   Load Satellite Frame (GOES GeoColor)
+   Load Satellite Frame (example GOES/GeoColor via proxy)
 ------------------------------------------------------------ */
 function loadSatelliteFrame() {
-  const url = "https://corsproxy.io/?" +
-    encodeURIComponent("https://rammb-slider.cira.colostate.edu/data/imagery/latest/goes-16---full_disk/geocolor/1/");
+  const imgUrl =
+    "https://corsproxy.io/?" +
+    encodeURIComponent(
+      "https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/Latest.jpg"
+    );
 
-  // Example static filename — replace with your dynamic logic if needed
-  const imgUrl = url + "latest.jpg";
+  satelliteImage = new Image();
+  satelliteImage.crossOrigin = "anonymous";
+  satelliteImage.src = imgUrl;
 
-  satImage = new Image();
-  satImage.crossOrigin = "anonymous";
-  satImage.src = imgUrl;
-
-  satImage.onload = () => {
-    window.latestSatelliteImage = satImage;
+  satelliteImage.onload = () => {
+    window.latestSatelliteImage = satelliteImage;
 
     drawSatellite();
 
-    // 🔥 Combo page hook
+    // Combo page hook
     if (typeof comboUpdateSatellite === "function") {
-      comboUpdateSatellite(satImage);
+      comboUpdateSatellite(satelliteImage);
     }
   };
 
-  satImage.onerror = () => {
-    console.error("Satellite load error");
-  };
+  satelliteImage.onerror = (err) =>
+    console.error("Satellite load error:", err);
 }
 
 /* ------------------------------------------------------------
    Draw Satellite Frame
 ------------------------------------------------------------ */
 function drawSatellite() {
-  if (!satCtx) return;
+  if (!satelliteCtx || !satelliteCanvas) return;
 
-  satCtx.clearRect(0, 0, satCanvas.width, satCanvas.height);
+  satelliteCtx.clearRect(0, 0, satelliteCanvas.width, satelliteCanvas.height);
 
-  if (satImage) {
-    satCtx.drawImage(
-      satImage,
-      0, 0,
-      satCanvas.width,
-      satCanvas.height
+  if (satelliteImage) {
+    satelliteCtx.drawImage(
+      satelliteImage,
+      0,
+      0,
+      satelliteCanvas.width,
+      satelliteCanvas.height
     );
   }
 }
