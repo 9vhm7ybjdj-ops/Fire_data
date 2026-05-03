@@ -29,6 +29,7 @@
 
 <body>
   <div id="app-root">
+
     <div id="mfd-bezel">
 
       <!-- SCREWS -->
@@ -38,13 +39,124 @@
       <div id="screw-br" class="bezel-screw"><div class="bezel-screw-mark"></div></div>
 
       <!-- LEFT BUTTON STACK -->
-      <div id="left-buttons">
+      <div id="left-buttons" class="bezel-button-column">
         <button class="bezel-btn" data-page="wx-page">WX</button>
         <button class="bezel-btn" data-page="radar-page">RADAR</button>
         <button class="bezel-btn" data-page="satellite-page">SAT</button>
         <button class="bezel-btn" data-page="combo-page">COMBO</button>
         <button class="bezel-btn" data-page="airfieldwx-page">AF WX</button>
       </div>
+
+      <!-- CRT GLASS + CRT DISPLAY -->
+      <div class="crt-glass">
+        <div id="crt">
+
+          <!-- PAGE CONTAINER -->
+          <div id="page-container">
+            <div id="wx-page" class="mfd-page active-page"></div>
+            <div id="radar-page" class="mfd-page"></div>
+            <div id="satellite-page" class="mfd-page"></div>
+            <div id="combo-page" class="mfd-page"></div>
+            <div id="airfieldwx-page" class="mfd-page"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT BUTTON STACK -->
+      <div id="right-buttons" class="bezel-button-column">
+        <button class="bezel-btn" data-action="mode-normal">NORMAL</button>
+        <button class="bezel-btn" data-action="mode-nvg">NVG</button>
+        <button class="bezel-btn" data-action="mode-red">RED</button>
+        <button class="bezel-btn" data-action="brightness-down">DIM</button>
+      </div>
+
+    </div>
+      <!-- END BEZEL -->
+    </div> <!-- #mfd-bezel -->
+
+  </div> <!-- #app-root -->
+
+  <!-- ============================
+       PAGE CONTENT TEMPLATES
+       ============================ -->
+
+  <!-- WX PAGE -->
+  <div id="wx-page-content" style="display:none;">
+    <div id="wx-tiles" class="tile-grid">
+
+      <div class="wx-tile">
+        <h3>Nambour</h3>
+        <div class="wx-row"><span>Temp:</span><span id="nambour-temp">--</span></div>
+        <div class="wx-row"><span>Dew:</span><span id="nambour-dew">--</span></div>
+        <div class="wx-row"><span>Wind:</span><span id="nambour-wind">--</span></div>
+        <div class="wx-row"><span>Gust:</span><span id="nambour-gust">--</span></div>
+        <div class="wx-row"><span>RH:</span><span id="nambour-rh">--</span></div>
+        <div class="wx-row"><span>Rain:</span><span id="nambour-rain">--</span></div>
+      </div>
+
+      <div class="wx-tile">
+        <h3>Beerburrum</h3>
+        <div class="wx-row"><span>Temp:</span><span id="beerburrum-temp">--</span></div>
+        <div class="wx-row"><span>Dew:</span><span id="beerburrum-dew">--</span></div>
+        <div class="wx-row"><span>Wind:</span><span id="beerburrum-wind">--</span></div>
+        <div class="wx-row"><span>Gust:</span><span id="beerburrum-gust">--</span></div>
+        <div class="wx-row"><span>RH:</span><span id="beerburrum-rh">--</span></div>
+        <div class="wx-row"><span>Rain:</span><span id="beerburrum-rain">--</span></div>
+      </div>
+
+      <div class="wx-tile">
+        <h3>Tewantin</h3>
+        <div class="wx-row"><span>Temp:</span><span id="tewantin-temp">--</span></div>
+        <div class="wx-row"><span>Dew:</span><span id="tewantin-dew">--</span></div>
+        <div class="wx-row"><span>Wind:</span><span id="tewantin-wind">--</span></div>
+        <div class="wx-row"><span>Gust:</span><span id="tewantin-gust">--</span></div>
+        <div class="wx-row"><span>RH:</span><span id="tewantin-rh">--</span></div>
+        <div class="wx-row"><span>Rain:</span><span id="tewantin-rain">--</span></div>
+      </div>
+
+      <div class="wx-tile">
+        <h3>Sunshine Coast Apt</h3>
+        <div class="wx-row"><span>Temp:</span><span id="apt-temp">--</span></div>
+        <div class="wx-row"><span>Dew:</span><span id="apt-dew">--</span></div>
+        <div class="wx-row"><span>Wind:</span><span id="apt-wind">--</span></div>
+        <div class="wx-row"><span>Gust:</span><span id="apt-gust">--</span></div>
+        <div class="wx-row"><span>RH:</span><span id="apt-rh">--</span></div>
+        <div class="wx-row"><span>Rain:</span><span id="apt-rain">--</span></div>
+      </div>
+
+    </div>
+
+    <div id="wx-last-update">Last update: --:--</div>
+    <div id="wx-global-obs-time">Obs: --:--</div>
+  </div>
+
+  <!-- RADAR PAGE -->
+  <div id="radar-page-content" style="display:none;">
+    <canvas id="radar-canvas" width="1280" height="720"></canvas>
+  </div>
+
+  <!-- SATELLITE PAGE -->
+  <div id="satellite-page-content" style="display:none;">
+    <canvas id="satellite-canvas" width="1280" height="720"></canvas>
+  </div>
+
+  <!-- COMBO PAGE -->
+  <div id="combo-page-content" style="display:none;">
+    <canvas id="combo-radar" width="1280" height="720"></canvas>
+    <canvas id="combo-sat" width="1280" height="720"></canvas>
+  </div>
+
+  <!-- AIRFIELD WX PAGE -->
+  <div id="airfieldwx-page-content" style="display:none;">
+    <div id="airfieldwx-container">
+      <div id="airfieldwx-output">Loading...</div>
+    </div>
+  </div>
+
+</body>
+</html>
+
 
       <!-- CENTER CRT -->
       <div id="mfd-screen">
