@@ -1,210 +1,145 @@
-/* ===========================================================
-   CRT EFFECT — CONTAINED INSIDE #crt ONLY
-=========================================================== */
-
-#crt {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background: #000;
-  border-radius: 6px;
-  overflow: /* ============================================================
-   CRT CORE — 1280×720 WIDE DISPLAY
-   All mode tinting is scoped to #crt ONLY.
+/* ============================================================
+   CRT — Curved Glass, Glow, Scanlines, Shadow
 ============================================================ */
 
-#crt {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
+.crt-glass {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 78%;
+  height: 78%;
+  transform: translate(-50%, -50%);
+  border-radius: 14px;
 
-  /* Base black CRT glass */
-  background: #000;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.02) 35%,
+    rgba(0,0,0,0.25) 100%
+  );
 
-  /* Curvature */
-  transform: perspective(900px) translateZ(0) scale(1.01);
-  border-radius: 18px;
-
-  /* Glow + tube depth */
   box-shadow:
-    0 0 40px rgba(0,255,0,0.15) inset,
-    0 0 60px #000 inset,
-    0 0 40px #000;
+    inset 0 0 18px rgba(0,0,0,0.9),
+    inset 0 0 32px rgba(0,0,0,0.7),
+    0 0 18px rgba(0,0,0,0.8);
 
-  /* Default mode variables */
-  --crt-text: #ffffff;
-  --crt-glow: rgba(0,255,0,0.15);
-  --crt-scanline-opacity: 0.18;
-  --crt-mask-opacity: 0.12;
+  overflow: hidden;
+  z-index: 10;
 }
 
-/* ============================================================
-   MODE: NORMAL (white CRT)
-============================================================ */
-#crt.normal-mode {
-  --crt-text: #ffffff;
-  --crt-glow: rgba(255,255,255,0.12);
-  --crt-scanline-opacity: 0.15;
-  --crt-mask-opacity: 0.10;
+/* ------------------------------------------------------------
+   CRT Display Surface
+------------------------------------------------------------ */
+
+#crt {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: #000;
+
+  box-shadow:
+    inset 0 0 22px rgba(0,0,0,0.9),
+    inset 0 0 40px rgba(0,0,0,0.7);
+
+  overflow: hidden;
 }
 
-/* ============================================================
-   MODE: NVG (green phosphor)
-============================================================ */
-#crt.nvg-mode {
-  --crt-text: #00ff66;
-  --crt-glow: rgba(0,255,100,0.25);
-  --crt-scanline-opacity: 0.22;
-  --crt-mask-opacity: 0.14;
-}
+/* ------------------------------------------------------------
+   CRT Curvature Shadow (reinforced in bezel.css)
+------------------------------------------------------------ */
 
-/* ============================================================
-   MODE: RED (red phosphor)
-============================================================ */
-#crt.red-mode {
-  --crt-text: #ff3333;
-  --crt-glow: rgba(255,50,50,0.25);
-  --crt-scanline-opacity: 0.22;
-  --crt-mask-opacity: 0.14;
-}
-
-/* ============================================================
-   CRT TEXT COLOR
-============================================================ */
-#crt,
-#crt * {
-  color: var(--crt-text);
-}
-
-/* ============================================================
-   SCANLINES
-============================================================ */
-#crt::before {
+#crt::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
 
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,0,0,0) 0px,
-    rgba(0,0,0,var(--crt-scanline-opacity)) 2px,
-    rgba(0,0,0,0) 4px
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0,0,0,0) 55%,
+    rgba(0,0,0,0.25) 75%,
+    rgba(0,0,0,0.45) 100%
   );
 
   mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+
+/* ------------------------------------------------------------
+   Page Container
+------------------------------------------------------------ */
+
+#page-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
   z-index: 5;
 }
 
-/* ============================================================
-   RGB SUBPIXEL MASK
-============================================================ */
-#crt::after {
+.mfd-page {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.mfd-page.active-page {
+  display: block;
+}
+
+/* ------------------------------------------------------------
+   Scanlines (subtle, avionics-safe)
+------------------------------------------------------------ */
+
+.crt-glass::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
 
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(255,0,0,var(--crt-mask-opacity)) 0px,
-    rgba(0,255,0,var(--crt-mask-opacity)) 2px,
-    rgba(0,0,255,var(--crt-mask-opacity)) 4px,
-    rgba(255,0,0,var(--crt-mask-opacity)) 6px
-  );
-
-  mix-blend-mode: screen;
-  z-index: 6;
-}
-
-/* ============================================================
-   GLASS REFLECTION
-============================================================ */
-#crt .crt-glass {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.08) 0%,
-    rgba(255,255,255,0.02) 40%,
-    rgba(0,0,0,0) 70%
-  );
-
-  z-index: 7;
-}
-
-/* ============================================================
-   PHOSPHOR BLOOM (subtle)
-============================================================ */
-#crt .crt-bloom {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-
-  box-shadow:
-    0 0 40px var(--crt-glow) inset,
-    0 0 80px var(--crt-glow) inset;
-
-  z-index: 4;
-}
-
-/* ============================================================
-   PAGE CONTAINER INSIDE CRT
-============================================================ */
-#page-container {
-  position: relative;
-  z-index: 10; /* above scanlines + mask */
-  padding: 20px;
-}
-
-/* ============================================================
-   TEXT RENDERING
-============================================================ */
-#crt,
-#crt * {
-  text-shadow:
-    0 0 4px var(--crt-glow),
-    0 0 8px var(--crt-glow);
-  font-smooth: never;
-  -webkit-font-smoothing: none;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* ============================================================
-   OPTIONAL: CRT FLICKER (subtle)
-============================================================ */
-@keyframes crt-flicker {
-  0% { opacity: 1; }
-  50% { opacity: 0.97; }
-  100% { opacity: 1; }
-}
-
-#crt {
-  animation: crt-flicker 0.12s infinite;
-}
-
-
-  box-shadow:
-    inset 0 0 25px rgba(0,255,255,0.08),
-    inset 0 0 60px rgba(0,255,255,0.05);
-}
-
-/* Subtle scanlines */
-#crt::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
+  background-image: repeating-linear-gradient(
     to bottom,
-    rgba(0,255,255,0.03) 0px,
-    rgba(0,255,255,0.03) 2px,
-    transparent 2px,
-    transparent 4px
+    rgba(255,255,255,0.015) 0px,
+    rgba(255,255,255,0.015) 1px,
+    rgba(0,0,0,0) 3px
   );
-  pointer-events: none;
+
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+}
+
+/* ------------------------------------------------------------
+   NVG Mode — Dim CRT
+------------------------------------------------------------ */
+
+.nvg-mode #crt {
+  background: #020202;
+}
+
+.nvg-mode #crt::after {
+  opacity: 0.35;
+}
+
+.nvg-mode .crt-glass::before {
+  opacity: 0.08;
+}
+
+/* ------------------------------------------------------------
+   RED Mode — Red CRT Glow
+------------------------------------------------------------ */
+
+.red-mode #crt {
+  background: #1a0000;
+}
+
+.red-mode #crt::after {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0,0,0,0) 55%,
+    rgba(60,0,0,0.35) 75%,
+    rgba(80,0,0,0.55) 100%
+  );
+}
+
+.red-mode .crt-glass::before {
+  opacity: 0.18;
 }
