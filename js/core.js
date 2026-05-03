@@ -40,7 +40,7 @@ function showPage(id) {
 
   playClick();
 
-  // Dispatch event so maps.js knows when to redraw
+  // Notify map engines
   document.dispatchEvent(new CustomEvent("page-changed", { detail: id }));
 }
 
@@ -99,12 +99,30 @@ modeButtons.forEach(btn => {
 });
 
 /* ------------------------------------------------------------
+   OPTION B — DELAYED MFD READY
+   Fires ONLY after CRT + scaling + layout are stable
+------------------------------------------------------------ */
+function fireMfdReady() {
+  // Wait for DOM
+  requestAnimationFrame(() => {
+    // Wait for CRT layout to settle
+    requestAnimationFrame(() => {
+      // Wait for scaling.js to apply transforms
+      requestAnimationFrame(() => {
+        document.dispatchEvent(new Event("mfd-ready"));
+        console.log("🔥 MFD READY — CRT + scaling stable");
+      });
+    });
+  });
+}
+
+/* ------------------------------------------------------------
    INITIAL PAGE LOAD
 ------------------------------------------------------------ */
 document.addEventListener("DOMContentLoaded", () => {
   setMode("mode-normal");
   showPage("wx-page");
 
-  // Notify maps.js that the system is ready
-  document.dispatchEvent(new Event("mfd-ready"));
+  // Fire Option B timing
+  fireMfdReady();
 });
