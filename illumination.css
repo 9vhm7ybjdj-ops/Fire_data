@@ -1,0 +1,91 @@
+/* ============================================================
+   AVIONICS HARD LED ILLUMINATION
+   Sharp amber LED, crisp halo, bezel bleed, CRT reflection
+============================================================ */
+
+/* Base amber color */
+:root {
+  --led-amber: #ffb400;
+  --led-core: #ffcc33;
+}
+
+/* ------------------------------------------------------------
+   BUTTON LED — HARD, SHARP, MIL‑SPEC
+------------------------------------------------------------ */
+
+.bezel-btn {
+  position: relative;
+  transition: box-shadow 0.08s ease, transform 0.05s ease;
+}
+
+/* LED ON (active page button) */
+.bezel-btn.active-btn {
+  color: #fff;
+  text-shadow: 0 0 4px var(--led-core);
+
+  /* Hard LED core + crisp halo */
+  box-shadow:
+    0 0 4px var(--led-core),
+    0 0 12px var(--led-amber),
+    0 0 22px rgba(255,180,0,0.6),
+    inset 0 0 6px rgba(255,200,0,0.4);
+}
+
+/* ------------------------------------------------------------
+   DEPRESSED MECHANICAL TRAVEL
+------------------------------------------------------------ */
+
+.bezel-btn:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 0 8px rgba(0,0,0,0.9),
+    0 1px 2px rgba(0,0,0,0.6);
+}
+
+/* ------------------------------------------------------------
+   BEZEL LIGHT BLEED (subtle reflection)
+------------------------------------------------------------ */
+
+.bezel-btn.active-btn::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 8px;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle,
+    rgba(255,180,0,0.25) 0%,
+    rgba(255,180,0,0.10) 40%,
+    rgba(255,180,0,0) 70%
+  );
+
+  z-index: -1;
+}
+
+/* ------------------------------------------------------------
+   CRT REFLECTION SYNC
+------------------------------------------------------------ */
+
+#crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+
+  background: radial-gradient(
+    circle at 50% 100%,
+    rgba(255,180,0,0.08),
+    rgba(255,180,0,0)
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+body.led-active #crt::after {
+  opacity: 1;
+}
