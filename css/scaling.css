@@ -1,0 +1,38 @@
+/* ============================
+   FIXED SCALING FOR IPHONE 14 PLUS
+   ============================ */
+
+/* Lock the entire UI to 428 × 926 */
+html, body {
+  width: 428px;
+  height: 926px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+  touch-action: none;
+}
+
+/* Prevent Safari zooming */
+body {
+  -webkit-text-size-adjust: none;
+  overscroll-behavior: none;
+}
+
+/* Center on desktop */
+body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Prevent pinch zoom */
+* {
+  touch-action: manipulation;
+}
+
+/* Disable double-tap zoom */
+button, a {
+  touch-action: manipulation;
+}

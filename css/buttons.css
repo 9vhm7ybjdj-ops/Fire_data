@@ -1,0 +1,55 @@
+/* ============================================
+   BASE BEZEL BUTTON STYLE (unchanged)
+   ============================================ */
+
+.bezel-btn {
+  width: 70px;
+  height: 60px;
+  background: #111;
+  border: 2px solid #000;
+  border-radius: 6px;
+  color: #5a4a2a; /* unlit legend colour */
+  font-family: monospace;
+  font-size: 14px;
+  cursor: pointer;
+
+  text-shadow: none; /* unlit = no glow */
+
+  box-shadow:
+    inset 0 0 6px rgba(0,0,0,0.7),
+    0 2px 4px rgba(0,0,0,0.6);
+
+  position: relative;
+  z-index: 31;
+
+  transition: color 0.15s, text-shadow 0.15s, transform 0.1s;
+}
+
+/* Mechanical depress */
+.bezel-btn:active {
+  transform: translateY(1px);
+}
+
+/* ============================================
+   SELECTED BUTTONS (PAGE + MODE)
+   TEXT-ONLY AMBER ILLUMINATION
+   ============================================ */
+
+.page-btn.active-page,
+.mode-btn.active-mode {
+  color: #ffcc66; /* illuminated legend */
+  text-shadow:
+    0 0 4px rgba(255,200,80,0.8),
+    0 0 8px rgba(255,200,80,0.6),
+    0 0 12px rgba(255,200,80,0.4);
+}
+
+/* ============================================
+   SPARE BUTTONS (top row)
+   ============================================ */
+
+.spare-btn {
+  opacity: 1;
+  filter: brightness(1.4);
+  pointer-events: none;
+}

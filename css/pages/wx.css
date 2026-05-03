@@ -1,0 +1,109 @@
+/* ============================================
+   CRT CONTENT CONTAINER
+   ============================================ */
+
+#crt-content {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ============================================
+   WX PAGE ROOT
+   ============================================ */
+
+#page-wx {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  display: block;
+}
+
+/* ============================================
+   2×2 GRID FOR WX TILES
+   ============================================ */
+
+#wx-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================
+   PHOSPHOR COLOUR VARIABLES
+   ============================================ */
+
+:root {
+  --wx-color: #ffffff;
+  --wx-color-nvg: #7CFF8A;
+  --wx-color-red: #FF4A3D;
+}
+
+body.nvg {
+  --wx-color: var(--wx-color-nvg);
+}
+
+body.red {
+  --wx-color: var(--wx-color-red);
+}
+
+/* ============================================
+   WX TILE STYLE
+   ============================================ */
+
+.wx-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  color: var(--wx-color);
+
+  text-shadow:
+    0 0 2px var(--wx-color),
+    0 0 4px var(--wx-color);
+
+  font-family: monospace;
+  font-size: 16px;
+  text-align: center;
+
+  padding: 6px;
+}
+
+/* ============================================
+   TITLE (STATION NAME)
+   ============================================ */
+
+.wx-title {
+  font-size: 18px;
+  margin-bottom: 6px;
+  font-weight: bold;
+  text-shadow:
+    0 0 3px var(--wx-color),
+    0 0 6px var(--wx-color);
+}
+
+/* ============================================
+   VALUE LINES
+   ============================================ */
+
+.wx-temp,
+.wx-wind,
+.wx-gust,
+.wx-dir,
+.wx-hum,
+.wx-rain,
+.wx-time {
+  margin: 2px 0;
+}

@@ -1,0 +1,80 @@
+/* ============================
+   GLOBAL ILLUMINATION SYSTEM
+   ============================ */
+
+/* When illumination is OFF */
+body.illum-off .bezel-btn {
+  filter: brightness(0.55);
+}
+
+/* When illumination is ON */
+body.illum-on .bezel-btn {
+  filter: brightness(1.0);
+  transition: filter 0.15s ease-out;
+}
+
+/* ============================
+   AMBER LED GLOW (Hard Avionics)
+   ============================ */
+
+.bezel-btn.led-on {
+  color: #ffb400;
+  text-shadow:
+    0 0 6px rgba(255,180,0,0.9),
+    0 0 12px rgba(255,180,0,0.6),
+    0 0 18px rgba(255,180,0,0.4);
+}
+
+.bezel-btn.led-off {
+  color: #666;
+  text-shadow: none;
+}
+
+/* ============================
+   BEZEL AMBIENT LIGHT BLEED
+   ============================ */
+
+body.illum-on #mfd-bezel {
+  box-shadow:
+    inset 0 0 12px rgba(255,180,0,0.15),
+    inset 0 0 24px rgba(255,180,0,0.08),
+    0 0 18px rgba(255,180,0,0.25);
+}
+
+body.illum-off #mfd-bezel {
+  box-shadow:
+    inset 0 0 8px rgba(0,0,0,0.8),
+    0 0 12px rgba(0,0,0,0.9);
+}
+
+/* ============================
+   MODE-SAFE ILLUMINATION
+   ============================ */
+
+/* NVG mode — reduce bloom */
+body.mode-nvg .bezel-btn.led-on {
+  color: #d4ffb4;
+  text-shadow:
+    0 0 4px rgba(200,255,150,0.6),
+    0 0 8px rgba(200,255,150,0.4);
+}
+
+body.mode-nvg #mfd-bezel {
+  box-shadow:
+    inset 0 0 10px rgba(150,255,150,0.12),
+    inset 0 0 20px rgba(150,255,150,0.06);
+}
+
+/* RED mode — suppress amber entirely */
+body.mode-red .bezel-btn.led-on {
+  color: #ff6b6b;
+  text-shadow:
+    0 0 4px rgba(255,80,80,0.6),
+    0 0 8px rgba(255,80,80,0.4);
+}
+
+body.mode-red #mfd-bezel {
+  box-shadow:
+    inset 0 0 10px rgba(255,80,80,0.12),
+    inset 0 0 20px rgba(255,80,80,0.06);
+}

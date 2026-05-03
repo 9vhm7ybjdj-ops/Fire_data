@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- FIXED VIEWPORT (prevents scrolling on iPhone) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>MFD</title>
+
+  <!-- Load UI layers first -->
+  <link rel="stylesheet" href="css/buttons.css" />
+  <link rel="stylesheet" href="css/crt.css" />
+  <link rel="stylesheet" href="css/pages/wx.css" />
+
+  <!-- Load bezel last so realism wins -->
+  <link rel="stylesheet" href="css/bezel.css" />
+</head>
+
+<body data-mode="normal">
+  <div id="mfd-root">
+    <div id="mfd-bezel">
+
+      <!-- BEZEL SCREWS -->
+      <div class="bezel-screw tl"></div>
+      <div class="bezel-screw tr"></div>
+      <div class="bezel-screw bl"></div>
+      <div class="bezel-screw br"></div>
+
+      <!-- TOP BUTTON ROW -->
+      <div id="mfd-top-buttons" class="mfd-button-row">
+        <button class="bezel-btn page-btn" data-page="wx">WX</button>
+
+        <!-- SPARE buttons (illuminated, non-selectable) -->
+        <button class="bezel-btn spare-btn" disabled>SPARE</button>
+        <button class="bezel-btn spare-btn" disabled>SPARE</button>
+        <button class="bezel-btn spare-btn" disabled>SPARE</button>
+      </div>
+
+      <!-- CRT WRAPPER -->
+      <div id="mfd-crt-wrapper">
+        <div id="mfd-crt">
+          <div id="crt-content">
+
+            <!-- ⭐ WX PAGE MUST BE INSIDE CRT CONTENT ⭐ -->
+            <div id="page-wx" data-page-id="wx">
+              <div id="wx-grid"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM BUTTON ROW -->
+      <div id="mfd-bottom-buttons" class="mfd-button-row">
+        <button class="bezel-btn mode-btn" data-mode="normal">NORM</button>
+        <button class="bezel-btn mode-btn" data-mode="nvg">NVG</button>
+        <button class="bezel-btn mode-btn" data-mode="red">RED</button>
+
+        <!-- ROTARY KNOB -->
+        <div id="dim-knob">
+          <div class="knob-base"></div>
+
+          <div class="knob-detents">
+            <span class="detent det-1">1</span>
+            <span class="detent det-2">2</span>
+            <span class="detent det-3">3</span>
+            <span class="detent det-4">4</span>
+          </div>
+
+          <div class="knob-rotate">
+            <div class="knob-grip"></div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JS FILES -->
+  <script src="js/core.js"></script>
+  <script src="js/modes.js"></script>
+  <script src="js/wx.js"></script>
+
+</body>
+</html>
+
+
+  <script src="js/scaling.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/modes.js"></script>
+  <script src="js/brightness.js"></script>
+  <script src="js/pages/wx.js"></script>
+</body>
+</html>

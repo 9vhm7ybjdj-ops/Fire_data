@@ -1,0 +1,267 @@
+/* GLOBAL SCROLL LOCK — knob‑safe */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+body {
+  position: relative;
+  background: #000;
+}
+
+/* CRT GLOW VARIABLES */
+:root {
+  --crt-glow: rgba(0,255,0,0.15); /* normal */
+}
+
+body.nvg {
+  --crt-glow: rgba(124,255,138,0.25); /* P43 NVG green */
+}
+
+body.red {
+  --crt-glow: rgba(255,74,61,0.25); /* P22 red */
+}
+
+/* ROOT */
+#mfd-root {
+  width: 428px;
+  height: 926px;
+  margin: 0 auto;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* BEZEL */
+#mfd-bezel {
+  position: relative;
+  width: 428px;
+  height: 926px;
+  background: #1a1a1a;
+  border: 22px solid #111;
+  box-sizing: border-box;
+
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 2px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 3px);
+
+  box-shadow:
+    inset 0 0 6px rgba(255,255,255,0.05),
+    inset 0 0 12px rgba(0,0,0,0.6),
+    0 0 12px rgba(0,0,0,0.9);
+
+  overflow: visible;
+  z-index: 10;
+}
+
+/* ============================
+   BEZEL SCREWS
+   ============================ */
+
+.bezel-screw {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle at 50% 50%, #2a2a2a, #111);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 4px #000,
+    0 0 3px rgba(0,0,0,0.6);
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+}
+
+.bezel-screw.tl { top: 18px; left: 18px;  --torque-angle: -12deg; --wear: 0.04; }
+.bezel-screw.tr { top: 18px; right: 18px; --torque-angle: 5deg;   --wear: 0.02; }
+.bezel-screw.bl { bottom: 18px; left: 18px; --torque-angle: 17deg; --wear: 0.03; }
+.bezel-screw.br { bottom: 18px; right: 18px; --torque-angle: -7deg; --wear: 0.05; }
+
+.bezel-screw::before {
+  content: "✚";
+  position: absolute;
+  color: #555;
+  font-size: 14px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  text-shadow:
+    1px 1px 0 rgba(0,0,0,0.8),
+    0 0 calc(12px * var(--wear)) rgba(255,255,255,0.05);
+}
+
+.bezel-screw::after {
+  content: "";
+  position: absolute;
+  width: 1px;
+  height: 6px;
+  background: #ffe95a;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%) rotate(var(--torque-angle));
+  border-radius: 1px;
+  opacity: 0.35;
+  box-shadow: 0 0 1px rgba(255,233,90,0.25);
+}
+
+/* ============================
+   BUTTON ROWS
+   ============================ */
+
+.mfd-button-row {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 30;
+}
+
+#mfd-top-buttons {
+  top: 40px;
+  justify-content: center;
+}
+
+.spare-btn {
+  opacity: 1;
+  filter: brightness(1.4);
+  pointer-events: none;
+}
+
+/* bottom row moved up 10px */
+#mfd-bottom-buttons {
+  bottom: 50px;
+  justify-content: flex-start;
+}
+
+/* MODE BUTTONS SHOULD NOT DEPRESS */
+.mode-btn:active {
+  transform: none !important;
+  filter: none !important;
+}
+
+/* ============================
+   CRT
+   ============================ */
+
+#mfd-crt-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  height: 480px;
+  top: 110px;
+  z-index: 20;
+}
+
+#mfd-crt {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  border-radius: 4px;
+  position: relative;
+  z-index: 21;
+
+  box-shadow:
+    inset 0 0 40px var(--crt-glow),
+    inset 0 0 80px var(--crt-glow);
+}
+
+/* ============================
+   ROTARY KNOB
+   ============================ */
+
+#dim-knob {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin-left: auto;
+  cursor: pointer;
+  z-index: 50;
+}
+
+#dim-knob .knob-base {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #0d0d0d;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 12px rgba(0,0,0,0.9),
+    0 0 8px rgba(0,0,0,0.6);
+  z-index: 1;
+}
+
+#dim-knob .knob-detents {
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  top: -25%;
+  left: -25%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.detent {
+  position: absolute;
+  font-size: 15px;
+  color: #6b6b6b;
+  font-family: monospace;
+  transform: translate(-50%, -50%);
+  text-shadow:
+    1px 1px 0px #000,
+    -1px -1px 0px #222;
+}
+
+.det-1 { top: 82%; left: 18%; }
+.det-2 { top: 18%; left: 18%; }
+.det-3 { top: 18%; left: 80%; }
+.det-4 { top: 82%; left: 80%; }
+
+#dim-knob .knob-rotate {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  transform-origin: 50% 50% !important;
+}
+
+#dim-knob .knob-grip {
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  top: 15%;
+  left: 15%;
+  background: #222;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 8px rgba(0,0,0,0.8),
+    0 4px 8px rgba(0,0,0,0.5);
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.10) 0px,
+      rgba(255,255,255,0.10) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+}
+
+#dim-knob .knob-indicator {
+  position: absolute;
+  width: 6px;
+  height: 18px;
+  background: #fff;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  box-shadow: 0 0 4px rgba(255,255,255,0.6);
+}
