@@ -1,102 +1,46 @@
-/* ============================================================
-   AIRFIELD WX PAGE — YBSU METAR (Decoded Only)
-============================================================ */
+/* ===========================================================
+   AIRFIELD WX PAGE — YBSU METAR DECODED
+   Clean avionics styling for 1280×720 CRT
+=========================================================== */
 
 #airfieldwx-page {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ============================================================
-   HEADER
-============================================================ */
-
-#airfieldwx-page .page-header {
-  font-size: 28px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-
-#airfieldwx-page .page-title {
-  font-weight: bold;
-}
-
-#airfieldwx-page .page-subtitle {
-  opacity: 0.8;
+  padding: 20px;
+  color: #0f0;
+  font-family: LCD, monospace;
   font-size: 20px;
-}
-
-/* ============================================================
-   CONTENT AREA
-============================================================ */
-
-#airfieldwx-content {
-  width: 100%;
-  height: calc(100% - 60px);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding-right: 6px;
   overflow-y: auto;
 }
 
-/* ============================================================
-   METAR ROWS
-============================================================ */
+#airfieldwx-content {
+  margin-top: 20px;
+}
 
 .metar-row {
   display: flex;
   justify-content: space-between;
-  padding: 12px 14px;
-  border: 2px solid var(--crt-text);
-  border-radius: 8px;
-
-  background: rgba(0, 0, 0, 0.85);
-  box-shadow:
-    0 0 10px rgba(0,0,0,0.9) inset,
-    0 0 6px rgba(0,0,0,0.7);
+  padding: 6px 0;
 }
 
 .metar-label {
-  font-size: 22px;
-  opacity: 0.75;
+  font-size: 20px;
 }
 
 .metar-value {
-  font-size: 22px;
-  font-weight: bold;
-  text-shadow:
-    0 0 4px var(--crt-glow),
-    0 0 8px var(--crt-glow);
+  font-size: 20px;
+  font-family: LCD, monospace;
 }
 
-/* ============================================================
-   RESPONSIVE SCALING
-============================================================ */
+/* -----------------------------------------------------------
+   FIX: Prevent YBSU METAR header from appearing on all pages
+----------------------------------------------------------- */
 
-@media (max-width: 1400px) {
-  .metar-label,
-  .metar-value {
-    font-size: 20px;
-  }
+#airfieldwx-page:not(.active-page) .page-title,
+#airfieldwx-page:not(.active-page) .page-subtitle {
+  display: none;
+  opacity: 0;
 }
 
-@media (max-width: 1100px) {
-  .metar-label,
-  .metar-value {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 900px) {
-  .metar-row {
-    padding: 10px 12px;
-  }
-  .metar-label,
-  .metar-value {
-    font-size: 16px;
-  }
+#airfieldwx-page .page-title,
+#airfieldwx-page .page-subtitle {
+  transition: opacity 0.25s ease;
 }
