@@ -1,33 +1,85 @@
-/* ===========================================================
-   MODE SWITCHING — NORMAL / NVG / RED
-=========================================================== */
+/* ============================================================
+   MODES.JS — NVG, RED, NORMAL Modes
+============================================================ */
 
-const body = document.body;
+/* ------------------------------------------------------------
+   Mode State
+------------------------------------------------------------ */
 
-const btnNormal = document.getElementById("btn-normal");
-const btnNVG = document.getElementById("btn-nvg");
-const btnRed = document.getElementById("btn-red");
+let currentMode = "normal";
 
-/* Remove all mode classes */
-function clearModes() {
-  body.classList.remove("normal-mode", "nvg-mode", "red-mode");
+/* ------------------------------------------------------------
+   Apply Mode to Body
+------------------------------------------------------------ */
+
+function applyMode(mode) {
+  const body = document.body;
+
+  body.classList.remove("nvg-mode", "red-mode");
+
+  switch (mode) {
+    case "nvg":
+      body.classList.add("nvg-mode");
+      break;
+
+    case "red":
+      body.classList.add("red-mode");
+      break;
+
+    default:
+      // normal mode = no class
+      break;
+  }
+
+  currentMode = mode;
+  console.log(`🎛 Mode set to: ${mode.toUpperCase()}`);
 }
 
-/* Apply selected mode */
-function setMode(mode) {
-  clearModes();
-  body.classList.add(`${mode}-mode`);
+/* ------------------------------------------------------------
+   Listen for Mode Button Actions
+------------------------------------------------------------ */
 
-  // Update active button highlight
-  btnNormal.classList.toggle("active-mode", mode === "normal");
-  btnNVG.classList.toggle("active-mode", mode === "nvg");
-  btnRed.classList.toggle("active-mode", mode === "red");
+document.addEventListener("mfd-action", (e) => {
+  const action = e.detail;
+
+  if (action === "mode-normal") {
+    applyMode("normal");
+  }
+
+  if (action === "mode-nvg") {
+    applyMode("nvg");
+  }
+
+  if (action === "mode-red") {
+    applyMode("red");
+  }
+
+  if (action === "brightness-down") {
+    adjustBrightness(-0.1);
+  }
+});
+
+/* ------------------------------------------------------------
+   Brightness Control (Shared with brightness.js)
+------------------------------------------------------------ */
+
+let brightnessLevel = 1.0;
+
+function adjustBrightness(delta) {
+  brightnessLevel = Math.max(0.2, Math.min(1.0, brightnessLevel + delta));
+
+  const crt = document.getElementById("crt");
+  if (crt) {
+    crt.style.filter = `brightness(${brightnessLevel})`;
+  }
+
+  console.log(`🔆 Brightness: ${Math.round(brightnessLevel * 100)}%`);
 }
 
-/* Button listeners */
-btnNormal.addEventListener("click", () => setMode("normal"));
-btnNVG.addEventListener("click", () => setMode("nvg"));
-btnRed.addEventListener("click", () => setMode("red"));
+/* ------------------------------------------------------------
+   Initialize Mode on MFD Ready
+------------------------------------------------------------ */
 
-/* Default mode on load */
-setMode("normal");
+document.addEventListener("mfd-ready", () => {
+  applyMode(currentMode);
+});
