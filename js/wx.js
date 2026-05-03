@@ -43,7 +43,7 @@ function fetchStationObs(key, bomId) {
 ----------------------------------------------------------- */
 function decodeStationObs(key, d) {
   const temp = d.air_temp ?? "--";
-  const dew = d.dewpt ?? "--";
+  const dew = d.dewpt ?? computeDewFromTempRh(d.air_temp, d.rel_hum);
   const wind = d.wind_spd_kmh != null ? `${d.wind_spd_kmh} km/h` : "--";
   const gust = d.gust_kmh != null ? `${d.gust_kmh} km/h` : "--";
   const rh = d.rel_hum ?? "--";
@@ -53,6 +53,21 @@ function decodeStationObs(key, d) {
 
   updateWxTile(key, { temp, dew, wind, gust, rh, rain });
   updateWxGlobalObsTime(obsTime);
+}
+
+/* -----------------------------------------------------------
+   Simple dew point estimate if not provided
+----------------------------------------------------------- */
+function computeDewFromTempRh(temp, rh) {
+  if (temp == null || rh == null) return "--";
+  const t = Number(temp);
+  const h = Number(rh);
+  if (isNaN(t) || isNaN(h) || h <= 0) return "--";
+  const a = 17.27;
+  const b = 237.7;
+  const alpha = ((a * t) / (b + t)) + Math.log(h / 100);
+  const dew = (b * alpha) / (a - alpha);
+  return `${dew.toFixed(1)}°C`;
 }
 
 /* -----------------------------------------------------------
