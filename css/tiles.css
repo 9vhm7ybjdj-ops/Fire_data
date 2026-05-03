@@ -1,10 +1,6 @@
 /* ===========================================================
-   WX TILE GRID
+   WX GRID + TILES + GLOBAL OBS TIME
 =========================================================== */
-
-#wx-grid {
-  display: grid;
-  grid-template-/* WX grid and tiles */
 
 #wx-page {
   position: relative;
@@ -15,7 +11,7 @@
   grid-template-columns: repeat(2, 1fr);
   grid-auto-rows: auto;
   gap: 16px;
-  padding: 16px 20px 60px 20px;
+  padding: 12px 4px 48px 4px;
 }
 
 .wx-tile {
@@ -24,8 +20,8 @@
 }
 
 .tile-header {
-  font-size: 22px;
-  margin-bottom: 6px;
+  font-size: 20px;
+  margin-bottom: 4px;
 }
 
 .tile-body {
@@ -53,115 +49,4 @@
   right: 24px;
   bottom: 18px;
   font-size: 20px;
-}
-: 1fr 1fr;
-  grid-template-/* ============================================================
-   WX TILE GRID — 2×2 inside 1280×720 CRT
-============================================================ */
-
-#wx-grid {
-  width: 100%;
-  height: calc(100% - 60px);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 22px;
-  padding: 0;
-}
-
-/* ============================================================
-   TILE BASE STYLE
-============================================================ */
-
-.wx-tile {
-  background: rgba(0, 0, 0, 0.85);
-  border: 3px solid var(--crt-text);
-  border-radius: 10px;
-  padding: 14px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-
-  box-shadow:
-    0 0 12px rgba(0,0,0,0.8) inset,
-    0 0 6px rgba(0,0,0,0.6);
-
-  overflow: hidden;
-}
-
-/* ============================================================
-   TILE HEADER
-============================================================ */
-
-.tile-header {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  text-shadow:
-    0 0 4px var(--crt-glow),
-    0 0 8px var(--crt-glow);
-}
-
-/* ============================================================
-   TILE BODY
-============================================================ */
-
-.tile-body {
-  font-size: 24px;
-  line-height: 1.25;
-}
-
-.tile-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.tile-label {
-  opacity: 0.75;
-}
-
-.tile-value {
-  font-weight: bold;
-  text-shadow:
-    0 0 4px var(--crt-glow),
-    0 0 8px var(--crt-glow);
-}
-
-/* ============================================================
-   RESPONSIVE SCALING FOR SMALLER DEVICES
-============================================================ */
-
-@media (max-width: 1400px) {
-  .tile-header { font-size: 24px; }
-  .tile-body { font-size: 20px; }
-}
-
-@media (max-width: 1100px) {
-  .tile-header { font-size: 22px; }
-  .tile-body { font-size: 18px; }
-}
-
-@media (max-width: 900px) {
-  #wx-grid {
-    gap: 14px;
-  }
-  .tile-header { font-size: 20px; }
-  .tile-body { font-size: 16px; }
-}
-: 1fr 1fr;
-  gap: 12px;
-  width: 100%;
-  height: 100%;
-}
-
-.wx-tile {
-  border: 2px solid #222;
-  padding: 10px;
-  border-radius: 6px;
-  background: rgba(0,0,0,0.4);
-  color: inherit;
-  font-family: monospace;
-  font-size: 16px;
 }
