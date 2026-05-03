@@ -1,107 +1,129 @@
 /* ============================================================
-   CRT — Version A (Correct Geometry)
-   Centered, full-size, tight inset, subtle curvature
+   CRT DISPLAY — Version A
+   Medium curvature, scanlines, RGB mask, glass reflection
 ============================================================ */
 
-#crt {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
+.crt-glass {
+  position: relative;
+  width: 100%;
+  height: 100%;
   background: #000;
   overflow: hidden;
 
-  /* Subtle curvature */
+  /* Curvature */
   transform: perspective(900px) translateZ(0) scale(1.01);
-  border-radius: 10px;
+  border-radius: 12px;
 
-  /* Ensure CRT sits under bezel buttons */
-  z-index: 5;
+  /* Inner glow */
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,0.9),
+    inset 0 0 80px rgba(0,0,0,0.6);
 }
 
-/* ============================================================
-   CRT TEXT — Normal Mode = WHITE
-============================================================ */
+/* ------------------------------------------------------------
+   SCANLINES
+------------------------------------------------------------ */
 
-#crt,
-#crt * {
-  color: #f5f5f5; /* correct white */
-  font-family: Consolas, monospace;
-  text-shadow: 0 0 2px rgba(255,255,255,0.4);
-}
-
-/* NVG Mode */
-.nvg-mode #crt,
-.nvg-mode #crt * {
-  color: #7f7f7f;
-}
-
-/* RED Mode */
-.red-mode #crt,
-.red-mode #crt * {
-  color: #ffb3b3;
-}
-
-/* ============================================================
-   SCANLINES — subtle, not overpowering
-============================================================ */
-
-#crt::before {
+.crt-glass::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
 
   background: repeating-linear-gradient(
     to bottom,
     rgba(255,255,255,0.03) 0px,
     rgba(255,255,255,0.03) 1px,
-    rgba(0,0,0,0) 2px
+    rgba(0,0,0,0.05) 2px,
+    rgba(0,0,0,0.05) 3px
   );
 
-  pointer-events: none;
-  z-index: 2;
+  mix-blend-mode: overlay;
+  opacity: 0.25;
 }
 
-/* ============================================================
-   GLASS REFLECTION — subtle avionics sheen
-============================================================ */
+/* ------------------------------------------------------------
+   RGB MASK (subtle)
+------------------------------------------------------------ */
 
 .crt-glass::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.06),
-    rgba(255,255,255,0)
-  );
+  inset: 0;
   pointer-events: none;
-  z-index: 3;
+  z-index: 2;
+
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255,0,0,0.04) 0px,
+    rgba(0,255,0,0.04) 1px,
+    rgba(0,0,255,0.04) 2px,
+    rgba(0,0,0,0) 3px
+  );
+
+  opacity: 0.15;
 }
 
-/* ============================================================
-   PAGE CONTAINER
-============================================================ */
+/* ------------------------------------------------------------
+   GLASS REFLECTION
+------------------------------------------------------------ */
 
-#page-container {
+#crt .glass-reflection {
+  content: "";
   position: absolute;
   inset: 0;
-  padding: 20px;
+  pointer-events: none;
   z-index: 4;
+
+  background: linear-gradient(
+    to bottom right,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.02) 40%,
+    rgba(0,0,0,0) 70%
+  );
+
+  mix-blend-mode: screen;
+  opacity: 0.25;
 }
+
+/* ------------------------------------------------------------
+   PAGE CONTENT INSIDE CRT
+------------------------------------------------------------ */
 
 .mfd-page {
   display: none;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  font-family: Consolas, monospace;
+  font-size: 22px;
 }
 
 .mfd-page.active-page {
   display: block;
+}
+
+/* ------------------------------------------------------------
+   NVG MODE (green phosphor)
+------------------------------------------------------------ */
+
+body.nvg-mode #crt {
+  filter: hue-rotate(90deg) brightness(0.6);
+}
+
+body.nvg-mode .mfd-page {
+  color: #9aff9a;
+}
+
+/* ------------------------------------------------------------
+   RED MODE (red phosphor)
+------------------------------------------------------------ */
+
+body.red-mode #crt {
+  filter: hue-rotate(-45deg) brightness(0.75);
+}
+
+body.red-mode .mfd-page {
+  color: #ff6b6b;
 }
