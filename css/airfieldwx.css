@@ -1,24 +1,102 @@
-/* ===========================================================
-   AIRFIELD WX PAGE — MODE-AWARE, CLEAN LCD STYLE
-=========================================================== */
+/* ============================================================
+   AIRFIELD WX PAGE — YBSU METAR (Decoded Only)
+============================================================ */
 
-#airfieldwx-container {
-  padding: 20px;
-  font-size: 18px;
-  overflow-y: auto;
-  color: inherit !important;
+#airfieldwx-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-#airfieldwx-container * {
-  color: inherit !important;
+/* ============================================================
+   HEADER
+============================================================ */
+
+#airfieldwx-page .page-header {
+  font-size: 28px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.wx-row {
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
-}
-
-.wx-label {
+#airfieldwx-page .page-title {
   font-weight: bold;
-  margin-right: 10px;
+}
+
+#airfieldwx-page .page-subtitle {
+  opacity: 0.8;
+  font-size: 20px;
+}
+
+/* ============================================================
+   CONTENT AREA
+============================================================ */
+
+#airfieldwx-content {
+  width: 100%;
+  height: calc(100% - 60px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-right: 6px;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   METAR ROWS
+============================================================ */
+
+.metar-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 2px solid var(--crt-text);
+  border-radius: 8px;
+
+  background: rgba(0, 0, 0, 0.85);
+  box-shadow:
+    0 0 10px rgba(0,0,0,0.9) inset,
+    0 0 6px rgba(0,0,0,0.7);
+}
+
+.metar-label {
+  font-size: 22px;
+  opacity: 0.75;
+}
+
+.metar-value {
+  font-size: 22px;
+  font-weight: bold;
+  text-shadow:
+    0 0 4px var(--crt-glow),
+    0 0 8px var(--crt-glow);
+}
+
+/* ============================================================
+   RESPONSIVE SCALING
+============================================================ */
+
+@media (max-width: 1400px) {
+  .metar-label,
+  .metar-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .metar-label,
+  .metar-value {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 900px) {
+  .metar-row {
+    padding: 10px 12px;
+  }
+  .metar-label,
+  .metar-value {
+    font-size: 16px;
+  }
 }
