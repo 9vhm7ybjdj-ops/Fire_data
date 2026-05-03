@@ -1,130 +1,95 @@
 /* ============================================================
-   CORE.JS — PAGE SWITCHING + MODE SWITCHING + CLICK SOUND
-   Wide CRT (1280×720) — Canvas Radar/Sat
+   CORE.JS — MFD Boot, Page Loader, Event System
 ============================================================ */
 
 /* ------------------------------------------------------------
-   Mechanical Click Sound (Generated Programmatically)
+   1. FIRE MFD-READY ONLY WHEN CRT EXISTS
 ------------------------------------------------------------ */
-let suppressClicks = false;
 
-function playClick() {
-  if (suppressClicks) return;
+window.addEventListener("DOMContentLoaded", () => {
+  const waitForCRT = setInterval(() => {
+    const crt = document.getElementById("crt");
 
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-
-  osc.type = "square";
-  osc.frequency.value = 420;
-
-  gain.gain.setValueAtTime(0.25, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
-
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc.start();
-  osc.stop(ctx.currentTime + 0.08);
-}
-
-/* ------------------------------------------------------------
-   PAGE SWITCHING
------------------------------------------------------------- */
-const pages = document.querySelectorAll(".mfd-page");
-const pageButtons = document.querySelectorAll("[data-page]");
-
-function showPage(id) {
-  pages.forEach(p => p.classList.remove("active-page"));
-  document.getElementById(id).classList.add("active-page");
-
-  pageButtons.forEach(btn => btn.classList.remove("active-mode"));
-  const activeBtn = document.querySelector(`[data-page="${id}"]`);
-  if (activeBtn) activeBtn.classList.add("active-mode");
-
-  playClick();
-
-  document.dispatchEvent(new CustomEvent("page-changed", { detail: id }));
-}
-
-/* ------------------------------------------------------------
-   MODE SWITCHING (NORMAL / NVG / RED)
------------------------------------------------------------- */
-const crt = document.getElementById("crt");
-const modeButtons = document.querySelectorAll("[data-action]");
-
-function setMode(mode) {
-  crt.classList.remove("normal-mode", "nvg-mode", "red-mode");
-
-  if (mode === "mode-normal") crt.classList.add("normal-mode");
-  if (mode === "mode-nvg") crt.classList.add("nvg-mode");
-  if (mode === "mode-red") crt.classList.add("red-mode");
-
-  modeButtons.forEach(btn => btn.classList.remove("active-mode"));
-  const active = document.querySelector(`[data-action="${mode}"]`);
-  if (active) active.classList.add("active-mode");
-
-  playClick();
-}
-
-/* ------------------------------------------------------------
-   BRIGHTNESS CONTROL (DIM ONLY)
------------------------------------------------------------- */
-let brightness = 1.0;
-
-function dimBrightness() {
-  brightness -= 0.1;
-  if (brightness < 0.3) brightness = 1.0;
-
-  crt.style.filter = `brightness(${brightness})`;
-  playClick();
-}
-
-/* ------------------------------------------------------------
-   EVENT LISTENERS
------------------------------------------------------------- */
-pageButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const page = btn.getAttribute("data-page");
-    showPage(page);
-  });
+    if (crt) {
+      clearInterval(waitForCRT);
+      console.log("🔥 MFD READY — CRT + scaling stable");
+      document.dispatchEvent(new Event("mfd-ready"));
+    }
+  }, 50);
 });
 
-modeButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const action = btn.getAttribute("data-action");
-    if (action === "brightness-down") {
-      dimBrightness();
+
+/* ------------------------------------------------------------
+   2. PAGE SWITCHING
+------------------------------------------------------------ */
+
+function showPage(pageId) {
+  const pages = document.querySelectorAll(".mfd-page");
+  pages.forEach(p => p.classList.remove("active-page"));
+
+  const target = document.getElementById(pageId);
+  if (target) {
+    target.classList.add("active-page");
+  }
+
+  // Update button highlight
+  const buttons = document.querySelectorAll(".bezel-btn[data-page]");
+  buttons.forEach(btn => {
+    if (btn.dataset.page === pageId) {
+      btn.classList.add("active-mode");
     } else {
-      setMode(action);
+      btn.classList.remove("active-mode");
     }
   });
-});
-
-/* ------------------------------------------------------------
-   OPTION B — DELAYED MFD READY
------------------------------------------------------------- */
-function fireMfdReady() {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.dispatchEvent(new Event("mfd-ready"));
-        console.log("🔥 MFD READY — CRT + scaling stable");
-      });
-    });
-  });
 }
 
+
 /* ------------------------------------------------------------
-   INITIAL PAGE LOAD (NO CLICK SOUNDS)
+   3. COPY PAGE CONTENT INTO CRT ON FIRST LOAD
 ------------------------------------------------------------ */
-document.addEventListener("DOMContentLoaded", () => {
-  suppressClicks = true;
 
-  setMode("mode-normal");
+document.addEventListener("mfd-ready", () => {
+  console.log("📄 Injecting page templates…");
+
+  const pages = [
+    "wx",
+    "radar",
+    "satellite",
+    "combo",
+    "airfieldwx"
+  ];
+
+  pages.forEach(name => {
+    const src = document.getElementById(`${name}-page-content`);
+    const dst = document.getElementById(`${name}-page`);
+
+    if (src && dst) {
+      dst.innerHTML = src.innerHTML;
+    }
+  });
+
+  // Default page
   showPage("wx-page");
+});
 
-  suppressClicks = false;
 
-  fireMfdReady();
+/* ------------------------------------------------------------
+   4. BUTTON HANDLERS
+------------------------------------------------------------ */
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".bezel-btn");
+  if (!btn) return;
+
+  // Page buttons
+  if (btn.dataset.page) {
+    showPage(btn.dataset.page);
+  }
+
+  // Mode buttons
+  if (btn.dataset.action) {
+    document.dispatchEvent(new CustomEvent("mfd-action", {
+      detail: btn.dataset.action
+    }));
+  }
 });
