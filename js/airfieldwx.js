@@ -34,9 +34,8 @@ function decodeMetar(m) {
       ? `${m.wind_dir_degrees}° / ${m.wind_speed_kt}kt`
       : "--";
 
-  const vis = m.visibility_statute_mi != null
-    ? `${m.visibility_statute_mi}sm`
-    : "--";
+  const vis =
+    m.visibility_statute_mi != null ? `${m.visibility_statute_mi}sm` : "--";
 
   const cloud =
     m.sky_condition && m.sky_condition.length
@@ -46,9 +45,7 @@ function decodeMetar(m) {
       : "--";
 
   const qnh =
-    m.altim_in_hg != null
-      ? (m.altim_in_hg * 33.8639).toFixed(0)
-      : "--";
+    m.altim_in_hg != null ? (m.altim_in_hg * 33.8639).toFixed(0) : "--";
 
   const cat = m.flight_category || "--";
 
