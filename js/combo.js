@@ -1,85 +1,102 @@
 /* ===========================================================
-   COMBO PAGE — RADAR + SATELLITE OVERLAY + GRID/COASTLINES
+   COMBO PAGE — C2 Layout
+   Satellite base + Radar overlay + Opacity slider
+   Uses the same canvas engine as radar.js and satellite.js
 =========================================================== */
 
-let comboOpacity = 0.6;
+let comboSatCanvas, comboSatCtx;
+let comboRadarCanvas, comboRadarCtx;
 
+let comboRadarOpacity = 0.7; // default 70%
+
+/* -----------------------------------------------------------
+   INIT COMBO PAGE
+----------------------------------------------------------- */
 function initCombo() {
-  const container = document.getElementById("combo-map");
-  if (!container) return;
+  comboSatCanvas = document.getElementById("combo-sat");
+  comboRadarCanvas = document.getElementById("combo-radar");
 
-  const canvas = createMapCanvas("combo-map");
-  const ctx = canvas.getContext("2d");
+  comboSatCtx = comboSatCanvas.getContext("2d");
+  comboRadarCtx = comboRadarCanvas.getContext("2d");
 
-  drawGridAndCoast(ctx);
-  drawComboLayer(ctx);
-}
+  // Bind slider
+  const slider = document.getElementById("combo-opacity");
+  slider.value = comboRadarOpacity * 100;
 
-/* ===========================================================
-   DRAW COMBO LAYER
-=========================================================== */
-
-function drawComboLayer(ctx) {
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-  const tileSize = 256;
-  const zoom = 4;
-
-  const radarUrl = (x, y, z) =>
-    `https://tilecache.rainviewer.com/v2/radar/${z}/${x}/${y}/2/1_1.png`;
-
-  const himawariUrl = (x, y, z) =>
-    `https://himawari8.nict.go.jp/himawari8/ir/${z}/${x}/${y}.png`;
-
-  const tiles = [
-    { x: 8, y: 12 }, { x: 9, y: 12 }, { x: 10, y: 12 },
-    { x: 8, y: 13 }, { x: 9, y: 13 }, { x: 10, y: 13 },
-    { x: 8, y: 14 }, { x: 9, y: 14 }, { x: 10, y: 14 }
-  ];
-
-  /* Satellite base */
-  tiles.forEach(tile => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = himawariUrl(tile.x, tile.y, zoom);
-
-    img.onload = () => {
-      const px = (tile.x - 8) * tileSize;
-      const py = (tile.y - 12) * tileSize;
-      ctx.drawImage(img, px, py, tileSize, tileSize);
-    };
+  slider.addEventListener("input", (e) => {
+    comboRadarOpacity = e.target.value / 100;
+    drawCombo(); // redraw with new opacity
   });
 
-  /* Radar overlay */
-  tiles.forEach(tile => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = radarUrl(tile.x, tile.y, zoom);
-
-    img.onload = () => {
-      ctx.save();
-      ctx.globalAlpha = comboOpacity;
-
-      const px = (tile.x - 8) * tileSize;
-      const py = (tile.y - 12) * tileSize;
-      ctx.drawImage(img, px, py, tileSize, tileSize);
-
-      ctx.restore();
-    };
-  });
+  // Initial draw
+  drawCombo();
 }
 
-/* ===========================================================
-   OPACITY CONTROL
-=========================================================== */
+/* -----------------------------------------------------------
+   DRAW SATELLITE + RADAR OVERLAY
+----------------------------------------------------------- */
+function drawCombo() {
+  if (!comboSatCtx || !comboRadarCtx) return;
 
-function setComboOpacity(value) {
-  comboOpacity = parseFloat(value);
+  // Clear both layers
+  comboSatCtx.clearRect(0, 0, comboSatCanvas.width, comboSatCanvas.height);
+  comboRadarCtx.clearRect(0, 0, comboRadarCanvas.width, comboRadarCanvas.height);
 
-  const canvas = document.getElementById("combo-map-canvas");
-  if (!canvas) return;
+  /* ---------------------------------------------------------
+     1. Draw Satellite Base Layer
+     (Uses your existing satellite engine)
+  --------------------------------------------------------- */
+  if (window.latestSatelliteImage) {
+    comboSatCtx.drawImage(
+      window.latestSatelliteImage,
+      0, 0,
+      comboSatCanvas.width,
+      comboSatCanvas.height
+    );
+  } else {
+    comboSatCtx.fillStyle = "black";
+    comboSatCtx.fillText("SATELLITE LOADING…", 40, 40);
+  }
 
-  const ctx = canvas.getContext("2d");
-  drawGridAndCoast(ctx);
-  drawComboLayer(ctx);
+  /* ---------------------------------------------------------
+     2. Draw Radar Overlay Layer
+     (Uses your existing radar engine)
+  --------------------------------------------------------- */
+  comboRadarCtx.globalAlpha = comboRadarOpacity;
+
+  if (window.latestRadarImage) {
+    comboRadarCtx.drawImage(
+      window.latestRadarImage,
+      0, 0,
+      comboRadarCanvas.width,
+      comboRadarCanvas.height
+    );
+  } else {
+    comboRadarCtx.fillStyle = "yellow";
+    comboRadarCtx.fillText("RADAR LOADING…", 40, 40);
+  }
+
+  comboRadarCtx.globalAlpha = 1.0; // reset
 }
+
+/* -----------------------------------------------------------
+   REFRESH HANDLERS
+   Called by your radar/satellite update loops
+----------------------------------------------------------- */
+function comboUpdateSatellite(img) {
+  window.latestSatelliteImage = img;
+  drawCombo();
+}
+
+function comboUpdateRadar(img) {
+  window.latestRadarImage = img;
+  drawCombo();
+}
+
+/* -----------------------------------------------------------
+   PAGE ACTIVATION HOOK
+   Called when switching to COMBO page
+----------------------------------------------------------- */
+document.addEventListener("mfd-ready", () => {
+  initCombo();
+});
