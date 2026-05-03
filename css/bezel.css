@@ -5,13 +5,14 @@
 #mfd-bezel {
   width: 100%;
   height: 100%;
-  background: #1a1a1a;                 /* deep matte metal */
-  border: 6px solid #0d0d0d;            /* outer frame */
-  border-radius: 8px;
+  background: #141414;
+  border: 8px solid #0a0a0a;
+  border-radius: 10px;
   position: relative;
+
   box-shadow:
-    inset 0 0 12px rgba(0,0,0,0.9),     /* inner depth */
-    0 0 18px rgba(0,0,0,0.8);           /* outer falloff */
+    inset 0 0 18px rgba(0,0,0,0.85),
+    0 0 22px rgba(0,0,0,0.9);
 }
 
 /* ------------------------------------------------------------
@@ -19,21 +20,24 @@
 ------------------------------------------------------------ */
 
 .bezel-screw {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
+  position: absolute;
+
   background: radial-gradient(
     circle at 50% 50%,
-    #0f0f0f 0%,
-    #050505 60%,
+    #0d0d0d 0%,
+    #050505 55%,
     #000 100%
-  );                                     /* recessed well */
-  position: absolute;
+  );
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   box-shadow:
-    inset 0 0 6px rgba(0,0,0,0.9),
+    inset 0 0 8px rgba(0,0,0,0.95),
     0 0 4px rgba(0,0,0,0.7);
 }
 
@@ -45,22 +49,160 @@
   content: "";
   width: 18px;
   height: 18px;
-  background: #111;                      /* black oxide */
+
+  background: #111;
   border-radius: 50%;
+
   box-shadow:
-    inset 0 0 4px rgba(255,255,255,0.05),
+    inset 0 0 3px rgba(255,255,255,0.05),
     inset 0 0 10px rgba(0,0,0,0.9);
-  mask-image: url("img/torx-t20.svg");   /* your Torx star */
+
+  mask-image: url("img/torx-t20.svg");
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: center;
 }
 
 /* ------------------------------------------------------------
-   Screw Positions (matches your original layout)
+   Screw Positions — 4 corners
 ------------------------------------------------------------ */
 
-#screw-tl { top: 12px; left: 12px; }
-#screw-tr { top: 12px; right: 12px; }
-#screw-bl { bottom: 12px; left: 12px; }
-#screw-br { bottom: 12px; right: 12px; }
+#screw-tl { top: 14px; left: 14px; }
+#screw-tr { top: 14px; right: 14px; }
+#screw-bl { bottom: 14px; left: 14px; }
+#screw-br { bottom: 14px; right: 14px; }
+
+/* ============================================================
+   WEAR PACK — Micro-scratches, smudges, NVG reflections, torque marks
+============================================================ */
+
+/* Edge wear */
+#mfd-bezel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 12%),
+    linear-gradient(to top, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 18%),
+    linear-gradient(to right, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 20%),
+    linear-gradient(to left, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 20%);
+
+  mix-blend-mode: overlay;
+  opacity: 0.35;
+}
+
+/* Micro-scratches */
+#mfd-bezel::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+
+  background-image:
+    repeating-linear-gradient(
+      115deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 1px,
+      rgba(255,255,255,0) 3px,
+      rgba(255,255,255,0) 7px
+    );
+  opacity: 0.18;
+  mix-blend-mode: screen;
+}
+
+/* Screw scuffing */
+.bezel-screw::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255,255,255,0.10) 0%,
+    rgba(255,255,255,0) 60%
+  );
+
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* Random screw rotation */
+#screw-tl::before { transform: rotate(12deg); }
+#screw-tr::before { transform: rotate(-7deg); }
+#screw-bl::before { transform: rotate(19deg); }
+#screw-br::before { transform: rotate(-14deg); }
+
+/* Button grime */
+.bezel-btn::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 6px;
+
+  background: radial-gradient(
+    circle at 50% 60%,
+    rgba(0,0,0,0.35) 0%,
+    rgba(0,0,0,0) 70%
+  );
+
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* CRT curvature shadow */
+#crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0,0,0,0) 55%,
+    rgba(0,0,0,0.25) 75%,
+    rgba(0,0,0,0.45) 100%
+  );
+
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+
+/* NVG-safe reflections */
+.nvg-mode #mfd-bezel::after,
+.nvg-mode #mfd-bezel::before,
+.nvg-mode .crt-glass::after {
+  opacity: 0.18;
+}
+
+.nvg-mode #crt::after {
+  opacity: 0.35;
+}
+
+/* Torque paint marks */
+.bezel-screw-mark {
+  position: absolute;
+  width: 3px;
+  height: 16px;
+  background: #f4d34a;
+  border-radius: 999px;
+  box-shadow: 0 0 4px rgba(244,211,74,0.7);
+  pointer-events: none;
+}
+
+#screw-tl .bezel-screw-mark,
+#screw-tr .bezel-screw-mark {
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#screw-bl .bezel-screw-mark,
+#screw-br .bezel-screw-mark {
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
