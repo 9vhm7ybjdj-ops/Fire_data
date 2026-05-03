@@ -1,47 +1,51 @@
 /* ============================================================
-   BRIGHTNESS.JS — CRT Brightness Control
+   BRIGHTNESS ENGINE — Version A
+   Subtle dimming for NVG/RED modes
+   No bleed, no conflicts, no layout impact
 ============================================================ */
 
-/* ------------------------------------------------------------
-   Brightness State
------------------------------------------------------------- */
-
-let brightnessLevel = 1.0; // 100% default
-
-
-/* ------------------------------------------------------------
-   Apply Brightness to CRT Only
------------------------------------------------------------- */
-
 function applyBrightness() {
+  const body = document.body;
+
+  // Default brightness (Normal mode)
+  let brightness = 1;
+
+  if (body.classList.contains("nvg-mode")) {
+    brightness = 0.55; // NVG-safe dim
+  }
+
+  if (body.classList.contains("red-mode")) {
+    brightness = 0.75; // Red mode slightly dimmer
+  }
+
+  // Apply brightness to CRT only
   const crt = document.getElementById("crt");
-  if (!crt) return;
-
-  // Clamp between 20% and 100%
-  const clamped = Math.max(0.2, Math.min(1.0, brightnessLevel));
-
-  crt.style.filter = `brightness(${clamped})`;
-
-  console.log(`🔆 Brightness applied: ${Math.round(clamped * 100)}%`);
+  if (crt) {
+    crt.style.filter = `brightness(${brightness})`;
+  }
 }
 
+/* ============================================================
+   HOOK INTO MODE CHANGES
+============================================================ */
 
-/* ------------------------------------------------------------
-   Adjust Brightness (Called by modes.js)
------------------------------------------------------------- */
-
-function adjustBrightness(delta) {
-  brightnessLevel += delta;
-  brightnessLevel = Math.max(0.2, Math.min(1.0, brightnessLevel));
-
+document.addEventListener("DOMContentLoaded", () => {
   applyBrightness();
-}
 
+  // Reapply brightness whenever a mode button is pressed
+  document.querySelectorAll(".bezel-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const action = btn.dataset.action;
+      if (!action) return;
 
-/* ------------------------------------------------------------
-   Initialize on MFD Ready
------------------------------------------------------------- */
-
-document.addEventListener("mfd-ready", () => {
-  applyBrightness();
+      if (
+        action === "mode-normal" ||
+        action === "mode-nvg" ||
+        action === "mode-red"
+      ) {
+        // Delay ensures body class is updated first
+        setTimeout(applyBrightness, 10);
+      }
+    });
+  });
 });
