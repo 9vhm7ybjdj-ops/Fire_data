@@ -1,89 +1,140 @@
 /* ============================================================
-   WX.JS — LIVE LOCAL WEATHER (Nambour, Beerburrum, Tewantin, Apt)
-   Open‑Meteo with nearest-gridpoint model selection
+   WX ENGINE — Clean, stable, Version A compatible
+   Fetches nearest gridpoint, pulls forecast, renders tiles
 ============================================================ */
 
-/* ------------------------------------------------------------
-   Station Coordinates
------------------------------------------------------------- */
-const WX_STATIONS = {
-  nambour:      { lat: -26.626, lon: 152.959 },
-  beerburrum:   { lat: -26.953, lon: 152.959 },
-  tewantin:     { lat: -26.391, lon: 153.037 },
-  apt:          { lat: -26.603, lon: 153.091 } // Sunshine Coast Airport
-};
+/* -------------------------------
+   CONFIG
+-------------------------------- */
 
-/* ------------------------------------------------------------
-   Build URL — now with models=best_match
------------------------------------------------------------- */
-function buildUrl(lat, lon) {
-  return `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_gusts_10m,wind_direction_10m&models=best_match`;
-}
+const WX_API = "https://api.weather.gov";
 
-/* ------------------------------------------------------------
-   Update Tile Helper
------------------------------------------------------------- */
-function updateTile(prefix, data) {
-  document.getElementById(`${prefix}-temp`).textContent = `${data.temp}°C`;
-  document.getElementById(`${prefix}-dew`).textContent  = `${data.dew}°C`;
-  document.getElementById(`${prefix}-wind`).textContent = `${data.windDir}° @ ${data.wind} km/h`;
-  document.getElementById(`${prefix}-gust`).textContent = `${data.gust} km/h`;
-  document.getElementById(`${prefix}-rh`).textContent   = `${data.rh}%`;
-  document.getElementById(`${prefix}-rain`).textContent = `${data.rain} mm`;
-}
+/* -------------------------------
+   MAIN ENTRY
+-------------------------------- */
 
-/* ------------------------------------------------------------
-   Parse API Response
------------------------------------------------------------- */
-function parseWx(json) {
-  const c = json.current;
-
-  return {
-    temp:     Math.round(c.temperature_2m),
-    dew:      Math.round(c.dew_point_2m),
-    rh:       Math.round(c.relative_humidity_2m),
-    rain:     c.precipitation ?? 0,
-    wind:     Math.round(c.wind_speed_10m),
-    gust:     Math.round(c.wind_gusts_10m),
-    windDir:  Math.round(c.wind_direction_10m)
-  };
-}
-
-/* ------------------------------------------------------------
-   Fetch All Stations
------------------------------------------------------------- */
-async function fetchWx() {
+async function loadWX() {
   try {
-    const results = await Promise.all([
-      fetch(buildUrl(WX_STATIONS.nambour.lat, WX_STATIONS.nambour.lon)).then(r => r.json()),
-      fetch(buildUrl(WX_STATIONS.beerburrum.lat, WX_STATIONS.beerburrum.lon)).then(r => r.json()),
-      fetch(buildUrl(WX_STATIONS.tewantin.lat, WX_STATIONS.tewantin.lon)).then(r => r.json()),
-      fetch(buildUrl(WX_STATIONS.apt.lat, WX_STATIONS.apt.lon)).then(r => r.json())
-    ]);
+    const coords = await getUserLocation();
+    const grid = await getGridpoint(coords.lat, coords.lon);
+    const forecast = await getForecast(grid.gridId, grid.gridX, grid.gridY);
 
-    const [nambour, beerburrum, tewantin, apt] = results.map(parseWx);
-
-    updateTile("nambour", nambour);
-    updateTile("beerburrum", beerburrum);
-    updateTile("tewantin", tewantin);
-    updateTile("apt", apt);
-
-    const now = new Date();
-    const hh = now.getHours().toString().padStart(2, "0");
-    const mm = now.getMinutes().toString().padStart(2, "0");
-
-    document.getElementById("wx-last-update").textContent = `Last update: ${hh}:${mm}`;
-    document.getElementById("wx-global-obs-time").textContent = `Obs: ${hh}:${mm}`;
-
+    renderWX(forecast);
   } catch (err) {
-    console.error("WX fetch failed:", err);
+    console.error("WX ERROR:", err);
+    document.getElementById("wx-page-content").innerHTML =
+      `<div class="wx-tile"><h3>WX ERROR</h3><p>${err}</p></div>`;
   }
 }
 
-/* ------------------------------------------------------------
-   Trigger Fetch After MFD Ready
------------------------------------------------------------- */
-document.addEventListener("mfd-ready", () => {
-  fetchWx();
-  setInterval(fetchWx, 60_000); // refresh every minute
+/* -------------------------------
+   GET USER LOCATION
+-------------------------------- */
+
+function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject("Geolocation not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        resolve({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude
+        });
+      },
+      err => reject("Location denied")
+    );
+  });
+}
+
+/* -------------------------------
+   GET GRIDPOINT FROM LAT/LON
+-------------------------------- */
+
+async function getGridpoint(lat, lon) {
+  const url = `${WX_API}/points/${lat},${lon}`;
+  const res = await fetch(url);
+
+  if (!res.ok) throw "Failed to get gridpoint";
+
+  const data = await res.json();
+
+  return {
+    gridId: data.properties.gridId,
+    gridX: data.properties.gridX,
+    gridY: data.properties.gridY
+  };
+}
+
+/* -------------------------------
+   GET FORECAST
+-------------------------------- */
+
+async function getForecast(gridId, gridX, gridY) {
+  const url = `${WX_API}/gridpoints/${gridId}/${gridX},${gridY}/forecast`;
+  const res = await fetch(url);
+
+  if (!res.ok) throw "Failed to get forecast";
+
+  const data = await res.json();
+  return data.properties.periods;
+}
+
+/* -------------------------------
+   RENDER WX TILES
+-------------------------------- */
+
+function renderWX(periods) {
+  const container = document.getElementById("wx-page-content");
+  container.innerHTML = "";
+
+  // Use first 3 periods (Today, Tonight, Tomorrow)
+  const slice = periods.slice(0, 3);
+
+  slice.forEach(period => {
+    const tile = document.createElement("div");
+    tile.className = "wx-tile";
+
+    tile.innerHTML = `
+      <h3>${period.name}</h3>
+
+      <div class="wx-row">
+        <span>Temp</span>
+        <span>${period.temperature}°${period.temperatureUnit}</span>
+      </div>
+
+      <div class="wx-row">
+        <span>Wind</span>
+        <span>${period.windSpeed} ${period.windDirection}</span>
+      </div>
+
+      <div class="wx-row">
+        <span>Forecast</span>
+        <span>${period.shortForecast}</span>
+      </div>
+    `;
+
+    container.appendChild(tile);
+  });
+}
+
+/* -------------------------------
+   AUTO-LOAD WX ON PAGE SHOW
+-------------------------------- */
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Load WX once at startup
+  loadWX();
+
+  // Reload WX when returning to WX page
+  document.querySelectorAll(".bezel-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.page === "wx-page") {
+        loadWX();
+      }
+    });
+  });
 });
