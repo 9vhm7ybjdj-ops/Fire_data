@@ -8,23 +8,29 @@ let radarImage = new Image();
 
 function initRadar() {
   radarCanvas = document.getElementById("radar-canvas");
+  if (!radarCanvas) return;
   radarCtx = radarCanvas.getContext("2d");
 
   loadRadarFrame();
 }
 
 /* ------------------------------------------------------------
-   Load Radar Frame (BOM or Proxy Source)
+   Load Radar Frame (Rainviewer or proxy source)
 ------------------------------------------------------------ */
 function loadRadarFrame() {
-  const url = "https://corsproxy.io/?" +
+  const url =
+    "https://corsproxy.io/?" +
     encodeURIComponent("https://api.rainviewer.com/public/weather-maps.json");
 
   fetch(url)
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data || !data.radar || !data.radar.past || !data.radar.past.length)
+        return;
+
       const frame = data.radar.past[data.radar.past.length - 1];
-      const imgUrl = "https://corsproxy.io/?" + encodeURIComponent(frame.path);
+      const imgUrl =
+        "https://corsproxy.io/?" + encodeURIComponent(frame.path);
 
       radarImage = new Image();
       radarImage.crossOrigin = "anonymous";
@@ -35,27 +41,28 @@ function loadRadarFrame() {
 
         drawRadar();
 
-        // 🔥 Combo page hook
+        // Combo page hook
         if (typeof comboUpdateRadar === "function") {
           comboUpdateRadar(radarImage);
         }
       };
     })
-    .catch(err => console.error("Radar load error:", err));
+    .catch((err) => console.error("Radar load error:", err));
 }
 
 /* ------------------------------------------------------------
    Draw Radar Frame
 ------------------------------------------------------------ */
 function drawRadar() {
-  if (!radarCtx) return;
+  if (!radarCtx || !radarCanvas) return;
 
   radarCtx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
 
   if (radarImage) {
     radarCtx.drawImage(
       radarImage,
-      0, 0,
+      0,
+      0,
       radarCanvas.width,
       radarCanvas.height
     );
@@ -68,6 +75,6 @@ function drawRadar() {
 setInterval(loadRadarFrame, 5 * 60 * 1000);
 
 /* ------------------------------------------------------------
-   Initial load
+   Initial load (hooked to core once MFD is ready)
 ------------------------------------------------------------ */
 document.addEventListener("mfd-ready", initRadar);
