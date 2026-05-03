@@ -1,7 +1,6 @@
-/* ===========================================================
+/* ============================================================
    GLOBAL RESET
-=========================================================== */
-
+============================================================ */
 * {
   margin: 0;
   padding: 0;
@@ -12,92 +11,216 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #000;
+  background: #111; /* stays neutral — modes do NOT affect this */
+  font-family: "LCD", monospace;
+  color: #fff;
 }
 
-/* ===========================================================
-   SCALING WRAPPER
-=========================================================== */
-
-#scale-wrapper {
-  width: 1024px;
-  height: 768px;
-  transform-origin: top left;
-  position: absolute;
+/* ============================================================
+   APP ROOT
+============================================================ */
+#app-root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* ===========================================================
-   MAIN MFD CONTAINER — DARK ANODIZED ALUMINUM
-=========================================================== */
+/* ============================================================
+   MFD BEZEL GRID LAYOUT
+============================================================ */
+#mfd-bezel {
+  display: grid;
+  grid-template-columns: 120px 1280px 120px; /* left buttons | CRT | right buttons */
+  grid-template-rows: 720px;
+  gap: 0;
+  background: #222;
+  padding: 20px;
+  border-radius: 18px;
+  border: 4px solid #000;
+  box-shadow: 0 0 40px #000 inset;
+  transform-origin: center;
+}
 
-#mfd-container {
-  width: 1024px;
-  height: 768px;
+/* ============================================================
+   MOBILE SCALING
+============================================================ */
+@media (max-width: 1600px) {
+  #mfd-bezel {
+    transform: scale(calc(100vw / 1600));
+  }
+}
+
+@media (max-height: 900px) {
+  #mfd-bezel {
+    transform: scale(calc(100vh / 900));
+  }
+}
+
+/* ============================================================
+   LEFT + RIGHT BUTTON STACKS
+============================================================ */
+#left-buttons,
+#right-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.bezel-btn {
+  width: 100px;
+  height: 60px;
+  margin: 10px auto;
+  background: #333;
+  border: 3px solid #000;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 22px;
+  font-family: "LCD", monospace;
+  cursor: pointer;
+  box-shadow: 0 0 10px #000 inset;
+  transition: background 0.1s, transform 0.1s;
+}
+
+.bezel-btn:active {
+  background: #555;
+  transform: translateY(2px);
+}
+
+/* ============================================================
+   CENTER SCREEN AREA
+============================================================ */
+#mfd-screen {
+  width: 1280px;
+  height: 720px;
   position: relative;
-
-  background: #141414;
-  border: 14px solid #0d0d0d;
-  border-radius: 10px;
-
-  background-image:
-    linear-gradient(
-      to bottom,
-      rgba(255,255,255,0.03) 0%,
-      rgba(255,255,255,0.00) 35%,
-      rgba(255,255,255,0.04) 100%
-    );
-
-  background-blend-mode: overlay;
-
-  box-shadow:
-    inset 0 0 18px #000,
-    0 0 22px #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* ===========================================================
-   PAGE SYSTEM (GLOBAL)
-=========================================================== */
+/* CRT frame is handled in crt.css */
+#crt-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
 
-.page {
+/* ============================================================
+   PAGE CONTAINER INSIDE CRT
+============================================================ */
+#page-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: 20px;
+}
+
+/* ============================================================
+   PAGE VISIBILITY
+============================================================ */
+.mfd-page {
   display: none;
   width: 100%;
   height: 100%;
 }
 
-.page.active {
+.active-page {
   display: block;
 }
 
-/* ===========================================================
-   TORX SCREWS
-=========================================================== */
-
-.screw {
-  width: 26px;
-  height: 26px;
-  position: absolute;
-  background: radial-gradient(circle at 30% 30%, #555, #222 70%);
-  border-radius: 50%;
-  box-shadow:
-    inset 0 0 4px #000,
-    inset 0 0 10px #000,
-    0 0 4px #000;
+/* ============================================================
+   PAGE HEADERS
+============================================================ */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 26px;
+  margin-bottom: 20px;
 }
 
-.screw::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle, transparent 40%, rgba(0,0,0,0.6) 42%),
-    linear-gradient(0deg, transparent 40%, #000 40%, #000 60%, transparent 60%),
-    linear-gradient(60deg, transparent 40%, #000 40%, #000 60%, transparent 60%),
-    linear-gradient(120deg, transparent 40%, #000 40%, #000 60%, transparent 60%);
-  mix-blend-mode: multiply;
+.page-title {
+  font-weight: bold;
+}
+
+.page-subtitle {
+  opacity: 0.8;
+  font-size: 20px;
+}
+
+/* ============================================================
+   WX GRID (4 tiles)
+============================================================ */
+#wx-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+  height: calc(100% - 60px);
+}
+
+/* ============================================================
+   TILE BASE STYLE
+============================================================ */
+.wx-tile {
+  background: var(--lcd-bg, #000);
+  border: 3px solid #0f0;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-shadow: 0 0 12px #000 inset;
+}
+
+.tile-header {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.tile-title {
+  font-weight: bold;
+}
+
+.tile-body {
+  font-size: 22px;
+}
+
+.tile-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.tile-label {
   opacity: 0.8;
 }
 
-#screw-tl { top: 18px; left: 18px; }
-#screw-tr { top: 18px; right: 18px; }
-#screw-bl { bottom: 18px; left: 18px; }
-#screw-br { bottom: 18px; right: 18px; }
+.tile-value {
+  font-weight: bold;
+}
+
+/* ============================================================
+   RADAR + SATELLITE CANVAS CONTAINERS
+============================================================ */
+#radar-container,
+#satellite-container {
+  width: 100%;
+  height: calc(100% - 60px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#radar-canvas,
+#satellite-canvas {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  image-rendering: pixelated;
+}
