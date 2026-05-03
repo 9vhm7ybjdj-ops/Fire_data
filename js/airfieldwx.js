@@ -1,106 +1,98 @@
-/* ============================================================
+/* ===========================================================
    AIRFIELDWX.JS — YBSU METAR (Decoded Only)
-   Sunshine Coast Airport (YBSU)
-============================================================ */
+   Clean, stable, no bleed-through, no mode interference
+=========================================================== */
 
-/* ------------------------------------------------------------
-   METAR SOURCE (CORS‑safe)
------------------------------------------------------------- */
-const METAR_URL = "https://corsproxy.io/?" +
-  encodeURIComponent("https://aviationweather.gov/api/data/metar?ids=YBSU&format=json");
-
-/* ------------------------------------------------------------
-   Decode METAR into clean fields
------------------------------------------------------------- */
-function decodeMetar(metar) {
-  if (!metar) return null;
-
-  const out = {
-    time: "--:--",
-    wind: "---",
-    vis: "---",
-    cloud: "---",
-    qnh: "---",
-    cat: "---"
-  };
-
-  /* Timestamp */
-  if (metar.obsTime) {
-    const t = new Date(metar.obsTime);
-    const hh = t.getHours().toString().padStart(2, "0");
-    const mm = t.getMinutes().toString().padStart(2, "0");
-    out.time = `${hh}:${mm}`;
-  }
-
-  /* Wind */
-  if (metar.windDir && metar.windSpeed) {
-    out.wind = `${metar.windDir}° / ${metar.windSpeed}kt`;
-  }
-
-  /* Visibility */
-  if (metar.visibility) {
-    out.vis = `${metar.visibility}m`;
-  }
-
-  /* Cloud */
-  if (metar.cloudLayers && metar.cloudLayers.length > 0) {
-    const c = metar.cloudLayers[0];
-    out.cloud = `${c.cover} ${c.baseFt}ft`;
-  }
-
-  /* QNH */
-  if (metar.altimeter && metar.altimeter.value) {
-    out.qnh = `${metar.altimeter.value} hPa`;
-  }
-
-  /* Flight Category */
-  if (metar.flightCategory) {
-    out.cat = metar.flightCategory;
-  }
-
-  return out;
+function loadAirfieldWX() {
+  fetchYBSUMetar();
 }
 
-/* ------------------------------------------------------------
-   Update DOM
------------------------------------------------------------- */
-function updateAirfieldWX(decoded) {
-  if (!decoded) return;
+/* -----------------------------------------------------------
+   Fetch METAR (via CORS proxy)
+----------------------------------------------------------- */
+function fetchYBSUMetar() {
+  const url =
+    "https://corsproxy.io/?" +
+    encodeURIComponent(
+      "https://aviationweather.gov/api/data/metar?ids=YBSU&format=json"
+    );
 
-  document.getElementById("metar-time").textContent = `Obs: ${decoded.time}`;
-  document.getElementById("metar-wind").textContent = decoded.wind;
-  document.getElementById("metar-vis").textContent = decoded.vis;
-  document.getElementById("metar-cloud").textContent = decoded.cloud;
-  document.getElementById("metar-qnh").textContent = decoded.qnh;
-  document.getElementById("metar-cat").textContent = decoded.cat;
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data || !data[0]) return;
+
+      const metar = data[0];
+      decodeMetar(metar);
+    })
+    .catch((err) => console.error("METAR fetch error:", err));
 }
 
-/* ------------------------------------------------------------
-   Fetch METAR
------------------------------------------------------------- */
-async function fetchAirfieldWX() {
-  try {
-    const res = await fetch(METAR_URL);
-    const data = await res.json();
+/* -----------------------------------------------------------
+   Decode METAR into avionics-friendly fields
+----------------------------------------------------------- */
+function decodeMetar(m) {
+  const wind = m.wind_dir_degrees && m.wind_speed_kt
+    ? `${m.wind_dir_degrees}° / ${m.wind_speed_kt}kt`
+    : "--";
 
-    if (!data || !data[0]) return;
+  const vis = m.visibility_statute_mi
+    ? `${m.visibility_statute_mi}sm`
+    : "--";
 
-    const decoded = decodeMetar(data[0]);
-    updateAirfieldWX(decoded);
+  const cloud = m.sky_condition && m.sky_condition.length
+    ? m.sky_condition.map((c) => `${c.sky_cover}${c.cloud_base_ft_agl || ""}`).join(" ")
+    : "--";
 
-  } catch (err) {
-    console.error("METAR fetch error:", err);
-  }
+  const qnh = m.altim_in_hg
+    ? (m.altim_in_hg * 33.8639).toFixed(0)
+    : "--";
+
+  const cat = determineCategory(m);
+
+  updateAirfieldWX({
+    wind,
+    vis,
+    cloud,
+    qnh,
+    cat,
+    obsTime: formatObsTime(m.observation_time),
+  });
 }
 
-/* ------------------------------------------------------------
-   Auto‑refresh every 5 minutes
------------------------------------------------------------- */
-setInterval(fetchAirfieldWX, 5 * 60 * 1000);
+/* -----------------------------------------------------------
+   Determine flight category (simple logic)
+----------------------------------------------------------- */
+function determineCategory(m) {
+  if (!m.flight_category) return "--";
+  return m.flight_category;
+}
 
-/* ------------------------------------------------------------
+/* -----------------------------------------------------------
+   Format observation time
+----------------------------------------------------------- */
+function formatObsTime(t) {
+  if (!t) return "--:--";
+  const d = new Date(t);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+/* -----------------------------------------------------------
+   Update UI
+----------------------------------------------------------- */
+function updateAirfieldWX(data) {
+  document.getElementById("metar-wind").textContent = data.wind;
+  document.getElementById("metar-vis").textContent = data.vis;
+  document.getElementById("metar-cloud").textContent = data.cloud;
+  document.getElementById("metar-qnh").textContent = data.qnh;
+  document.getElementById("metar-cat").textContent = data.cat;
+  document.getElementById("metar-time").textContent = `Obs: ${data.obsTime}`;
+}
+
+/* -----------------------------------------------------------
    Initial load
------------------------------------------------------------- */
-document.addEventListener("mfd-ready", () => {
-  fetchAirfieldWX();
-});
+----------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", loadAirfieldWX);
+
+/* Refresh every 10 minutes */
+setInterval(fetchYBSUMetar, 10 * 60 * 1000);
