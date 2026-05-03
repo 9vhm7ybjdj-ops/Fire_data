@@ -2,208 +2,151 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fireground WX Data</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <!-- Core styles -->
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="bezel.css" />
-  <link rel="stylesheet" href="crt.css" />
-  <link rel="stylesheet" href="tiles.css" />
-  <link rel="stylesheet" href="modes.css" />
-  <link rel="stylesheet" href="airfieldwx.css" />
+  <!-- Correct CSS paths -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/bezel.css" />
+  <link rel="stylesheet" href="css/crt.css" />
+  <link rel="stylesheet" href="css/tiles.css" />
+  <link rel="stylesheet" href="css/modes.css" />
+  <link rel="stylesheet" href="css/airfieldwx.css" />
 </head>
+
 <body>
   <div id="app-root">
     <div id="mfd-bezel">
+
       <!-- LEFT BUTTON STACK -->
       <div id="left-buttons">
-        <button class="bezel-btn left-btn" data-action="mode-normal">NORM</button>
-        <button class="bezel-btn left-btn" data-action="mode-nvg">NVG</button>
-        <button class="bezel-btn left-btn" data-action="mode-red">RED</button>
-        <button class="bezel-btn left-btn" data-action="brightness-down">DIM</button>
+        <button class="bezel-btn" data-page="wx-page">WX</button>
+        <button class="bezel-btn" data-page="radar-page">RADAR</button>
+        <button class="bezel-btn" data-page="satellite-page">SAT</button>
+        <button class="bezel-btn" data-page="airfieldwx-page">AF WX</button>
       </div>
 
-      <!-- CENTER SCREEN AREA -->
+      <!-- CENTER CRT -->
       <div id="mfd-screen">
-        <div id="crt-frame">
-          <div id="crt" class="normal-mode">
-            <!-- PAGE CONTAINER INSIDE CRT -->
-            <div id="page-container">
-              <!-- WX TILES PAGE -->
-              <section id="wx-page" class="mfd-page active-page">
-                <header class="page-header">
-                  <span class="page-title">WX TILES</span>
-                  <span class="page-subtitle" id="wx-last-update">Last update: --:--</span>
-                </header>
-                <div id="wx-grid">
-                  <div class="wx-tile" id="tile-1">
-                    <div class="tile-header">
-                      <span class="tile-title">Nambour</span>
-                    </div>
-                    <div class="tile-body">
-                      <div class="tile-row">
-                        <span class="tile-label">Temp</span>
-                        <span class="tile-value" id="nambour-temp">--°C</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">Wind</span>
-                        <span class="tile-value" id="nambour-wind">-- km/h</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">Gust</span>
-                        <span class="tile-value" id="nambour-gust">-- km/h</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">RH</span>
-                        <span class="tile-value" id="nambour-rh">--%</span>
-                      </div>
-                    </div>
-                  </div>
+        <div id="crt" class="normal-mode">
+          <div class="crt-glass"></div>
+          <div class="crt-bloom"></div>
 
-                  <div class="wx-tile" id="tile-2">
-                    <div class="tile-header">
-                      <span class="tile-title">Beerburrum</span>
-                    </div>
-                    <div class="tile-body">
-                      <div class="tile-row">
-                        <span class="tile-label">Temp</span>
-                        <span class="tile-value" id="beerburrum-temp">--°C</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">Wind</span>
-                        <span class="tile-value" id="beerburrum-wind">-- km/h</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">Gust</span>
-                        <span class="tile-value" id="beerburrum-gust">-- km/h</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">RH</span>
-                        <span class="tile-value" id="beerburrum-rh">--%</span>
-                      </div>
-                    </div>
-                  </div>
+          <div id="page-container">
 
-                  <div class="wx-tile" id="tile-3">
-                    <div class="tile-header">
-                      <span class="tile-title">Tewantin</span>
-                    </div>
-                    <div class="tile-body">
-                      <div class="tile-row">
-                        <span class="tile-label">Temp</span>
-                        <span class="tile-value" id="tewantin-temp">--°C</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">Wind</span>
-                        <span class="tile-value" id="tewantin-wind">-- km/h</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">Gust</span>
-                        <span class="tile-value" id="tewantin-gust">-- km/h</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">RH</span>
-                        <span class="tile-value" id="tewantin-rh">--%</span>
-                      </div>
-                    </div>
-                  </div>
+            <!-- WX PAGE -->
+            <div id="wx-page" class="mfd-page active-page">
+              <div class="page-header">
+                <div class="page-title">Local WX</div>
+                <div id="wx-last-update" class="page-subtitle">Last update: --:--</div>
+              </div>
 
-                  <div class="wx-tile" id="tile-4">
-                    <div class="tile-header">
-                      <span class="tile-title">Sunshine Coast Apt</span>
-                    </div>
-                    <div class="tile-body">
-                      <div class="tile-row">
-                        <span class="tile-label">Temp</span>
-                        <span class="tile-value" id="apt-temp">--°C</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">Wind</span>
-                        <span class="tile-value" id="apt-wind">-- km/h</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">Gust</span>
-                        <span class="tile-value" id="apt-gust">-- km/h</span>
-                      </div>
-                      <div class="tile-row">
-                        <span class="tile-label">RH</span>
-                        <span class="tile-value" id="apt-rh">--%</span>
-                      </div>
-                    </div>
+              <div id="wx-grid">
+
+                <!-- Nambour -->
+                <div class="wx-tile">
+                  <div class="tile-header">Nambour</div>
+                  <div class="tile-body">
+                    <div class="tile-row"><span class="tile-label">Temp</span><span id="nambour-temp" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="nambour-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Gust</span><span id="nambour-gust" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">RH</span><span id="nambour-rh" class="tile-value">--</span></div>
                   </div>
                 </div>
-              </section>
 
-              <!-- AIRFIELD WX PAGE -->
-              <section id="airfieldwx-page" class="mfd-page">
-                <header class="page-header">
-                  <span class="page-title">AIRFIELD WX (YBSU)</span>
-                  <span class="page-subtitle" id="metar-time">Obs: --:--</span>
-                </header>
-                <div id="airfieldwx-content">
-                  <div class="metar-row">
-                    <span class="metar-label">Wind</span>
-                    <span class="metar-value" id="metar-wind">---</span>
-                  </div>
-                  <div class="metar-row">
-                    <span class="metar-label">Visibility</span>
-                    <span class="metar-value" id="metar-vis">---</span>
-                  </div>
-                  <div class="metar-row">
-                    <span class="metar-label">Cloud</span>
-                    <span class="metar-value" id="metar-cloud">---</span>
-                  </div>
-                  <div class="metar-row">
-                    <span class="metar-label">QNH</span>
-                    <span class="metar-value" id="metar-qnh">---</span>
-                  </div>
-                  <div class="metar-row">
-                    <span class="metar-label">Flight Cat</span>
-                    <span class="metar-value" id="metar-cat">---</span>
+                <!-- Beerburrum -->
+                <div class="wx-tile">
+                  <div class="tile-header">Beerburrum</div>
+                  <div class="tile-body">
+                    <div class="tile-row"><span class="tile-label">Temp</span><span id="beerburrum-temp" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="beerburrum-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Gust</span><span id="beerburrum-gust" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">RH</span><span id="beerburrum-rh" class="tile-value">--</span></div>
                   </div>
                 </div>
-              </section>
 
-              <!-- RADAR PAGE -->
-              <section id="radar-page" class="mfd-page">
-                <header class="page-header">
-                  <span class="page-title">RADAR</span>
-                  <span class="page-subtitle" id="radar-status">Loading…</span>
-                </header>
-                <div id="radar-container">
-                  <canvas id="radar-canvas" width="1280" height="720"></canvas>
+                <!-- Tewantin -->
+                <div class="wx-tile">
+                  <div class="tile-header">Tewantin</div>
+                  <div class="tile-body">
+                    <div class="tile-row"><span class="tile-label">Temp</span><span id="tewantin-temp" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="tewantin-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Gust</span><span id="tewantin-gust" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">RH</span><span id="tewantin-rh" class="tile-value">--</span></div>
+                  </div>
                 </div>
-              </section>
 
-              <!-- SATELLITE PAGE -->
-              <section id="satellite-page" class="mfd-page">
-                <header class="page-header">
-                  <span class="page-title">SATELLITE</span>
-                  <span class="page-subtitle" id="sat-status">Loading…</span>
-                </header>
-                <div id="satellite-container">
-                  <canvas id="satellite-canvas" width="1280" height="720"></canvas>
+                <!-- Sunshine Coast Airport -->
+                <div class="wx-tile">
+                  <div class="tile-header">Sunshine Coast Apt</div>
+                  <div class="tile-body">
+                    <div class="tile-row"><span class="tile-label">Temp</span><span id="apt-temp" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="apt-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Gust</span><span id="apt-gust" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">RH</span><span id="apt-rh" class="tile-value">--</span></div>
+                  </div>
                 </div>
-              </section>
+
+              </div>
             </div>
+
+            <!-- RADAR PAGE -->
+            <div id="radar-page" class="mfd-page">
+              <div class="page-header">
+                <div class="page-title">Radar</div>
+                <div class="page-subtitle">Pan + Zoom</div>
+              </div>
+              <div id="radar-container">
+                <canvas id="radar-canvas" width="1280" height="720"></canvas>
+              </div>
+            </div>
+
+            <!-- SATELLITE PAGE -->
+            <div id="satellite-page" class="mfd-page">
+              <div class="page-header">
+                <div class="page-title">Satellite</div>
+                <div class="page-subtitle">GeoColor</div>
+              </div>
+              <div id="satellite-container">
+                <canvas id="satellite-canvas" width="1280" height="720"></canvas>
+              </div>
+            </div>
+
+            <!-- AIRFIELD WX PAGE -->
+            <div id="airfieldwx-page" class="mfd-page">
+              <div class="page-header">
+                <div class="page-title">YBSU METAR</div>
+                <div id="metar-time" class="page-subtitle">Obs: --:--</div>
+              </div>
+
+              <div id="airfieldwx-content">
+                <div class="metar-row"><span class="metar-label">Wind</span><span id="metar-wind" class="metar-value">--</span></div>
+                <div class="metar-row"><span class="metar-label">Visibility</span><span id="metar-vis" class="metar-value">--</span></div>
+                <div class="metar-row"><span class="metar-label">Cloud</span><span id="metar-cloud" class="metar-value">--</span></div>
+                <div class="metar-row"><span class="metar-label">QNH</span><span id="metar-qnh" class="metar-value">--</span></div>
+                <div class="metar-row"><span class="metar-label">Category</span><span id="metar-cat" class="metar-value">--</span></div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
 
       <!-- RIGHT BUTTON STACK -->
       <div id="right-buttons">
-        <button class="bezel-btn right-btn" data-page="wx-page">WX</button>
-        <button class="bezel-btn right-btn" data-page="airfieldwx-page">AF WX</button>
-        <button class="bezel-btn right-btn" data-page="radar-page">RADAR</button>
-        <button class="bezel-btn right-btn" data-page="satellite-page">SAT</button>
+        <button class="bezel-btn" data-action="mode-normal">NORM</button>
+        <button class="bezel-btn" data-action="mode-nvg">NVG</button>
+        <button class="bezel-btn" data-action="mode-red">RED</button>
+        <button class="bezel-btn" data-action="brightness-down">DIM</button>
       </div>
+
     </div>
   </div>
 
-  <script src="core.js"></script>
-  <script src="wx.js"></script>
-  <script src="airfieldwx.js"></script>
-  <script src="maps.js"></script>
+  <!-- Correct JS paths -->
+  <script src="js/core.js"></script>
+  <script src="js/wx.js"></script>
+  <script src="js/airfieldwx.js"></script>
+  <script src="js/maps.js"></script>
 </body>
 </html>
