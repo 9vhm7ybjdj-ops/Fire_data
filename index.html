@@ -62,6 +62,7 @@
               </div>
 
               <div id="wx-grid">
+
                 <!-- Nambour -->
                 <div class="wx-tile">
                   <div class="tile-header">Nambour</div>
@@ -106,4 +107,139 @@
                   <div class="tile-header">Sunshine Coast Apt</div>
                   <div class="tile-body">
                     <div class="tile-row"><span class="tile-label">Temp</span><span id="apt-temp" class="tile-value">--</span></div>
-                    <div class="tile-row"><
+                    <div class="tile-row"><span class="tile-label">Dew Pt</span><span id="apt-dew" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="apt-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Gust</span><span id="apt-gust" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">RH</span><span id="apt-rh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Rain</span><span id="apt-rain" class="tile-value">--</span></div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div id="wx-global-obs-time">Obs: --:--</div>
+            </div>
+            <!-- RADAR PAGE -->
+            <div id="radar-page" class="mfd-page">
+              <div class="page-header">
+                <div class="page-title">Radar</div>
+                <div class="page-subtitle">BOM Weather Radar</div>
+              </div>
+
+              <div id="radar-container">
+                <canvas id="radar-canvas"></canvas>
+              </div>
+
+              <div id="radar-controls">
+                <button class="radar-btn" data-radar-action="zoom-in">+</button>
+                <button class="radar-btn" data-radar-action="zoom-out">−</button>
+                <button class="radar-btn" data-radar-action="pan-up">↑</button>
+                <button class="radar-btn" data-radar-action="pan-down">↓</button>
+                <button class="radar-btn" data-radar-action="pan-left">←</button>
+                <button class="radar-btn" data-radar-action="pan-right">→</button>
+              </div>
+            </div>
+
+            <!-- SATELLITE PAGE -->
+            <div id="satellite-page" class="mfd-page">
+              <div class="page-header">
+                <div class="page-title">Satellite</div>
+                <div class="page-subtitle">Himawari-9</div>
+              </div>
+
+              <div id="sat-container">
+                <canvas id="sat-canvas"></canvas>
+              </div>
+
+              <div id="sat-controls">
+                <button class="sat-btn" data-sat-channel="vis">VIS</button>
+                <button class="sat-btn" data-sat-channel="ir">IR</button>
+                <button class="sat-btn" data-sat-channel="wv">WV</button>
+              </div>
+            </div>
+
+            <!-- COMBO PAGE -->
+            <div id="combo-page" class="mfd-page">
+              <div class="page-header">
+                <div class="page-title">Combo</div>
+                <div class="page-subtitle">Radar + Satellite</div>
+              </div>
+
+              <div id="combo-container">
+                <canvas id="combo-sat-canvas"></canvas>
+                <canvas id="combo-radar-canvas"></canvas>
+              </div>
+
+              <div id="combo-controls">
+                <label class="opacity-label">Radar Opacity</label>
+                <input id="combo-opacity" type="range" min="0" max="1" step="0.01" value="0.7" />
+              </div>
+            </div>
+
+            <!-- AIRFIELD WX PAGE -->
+            <div id="airfieldwx-page" class="mfd-page">
+              <div class="page-header">
+                <div class="page-title">Airfield WX</div>
+                <div id="afwx-last-update" class="page-subtitle">Last update: --:--</div>
+              </div>
+
+              <div id="afwx-grid">
+
+                <!-- YBSU -->
+                <div class="afwx-tile">
+                  <div class="tile-header">YBSU</div>
+                  <div class="tile-body">
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="ybsu-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Vis</span><span id="ybsu-vis" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Cloud</span><span id="ybsu-cloud" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">QNH</span><span id="ybsu-qnh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Temp</span><span id="ybsu-temp" class="tile-value">--</span></div>
+                  </div>
+                </div>
+
+                <!-- YBMC -->
+                <div class="afwx-tile">
+                  <div class="tile-header">YBMC</div>
+                  <div class="tile-body">
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="ybmc-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Vis</span><span id="ybmc-vis" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Cloud</span><span id="ybmc-cloud" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">QNH</span><span id="ybmc-qnh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Temp</span><span id="ybmc-temp" class="tile-value">--</span></div>
+                  </div>
+                </div>
+
+                <!-- YCDR -->
+                <div class="afwx-tile">
+                  <div class="tile-header">YCDR</div>
+                  <div class="tile-body">
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="ycdr-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Vis</span><span id="ycdr-vis" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Cloud</span><span id="ycdr-cloud" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">QNH</span><span id="ycdr-qnh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Temp</span><span id="ycdr-temp" class="tile-value">--</span></div>
+                  </div>
+                </div>
+
+                <!-- YKRY -->
+                <div class="afwx-tile">
+                  <div class="tile-header">YKRY</div>
+                  <div class="tile-body">
+                    <div class="tile-row"><span class="tile-label">Wind</span><span id="ykry-wind" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Vis</span><span id="ykry-vis" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Cloud</span><span id="ykry-cloud" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">QNH</span><span id="ykry-qnh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Temp</span><span id="ykry-temp" class="tile-value">--</span></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div> <!-- end page-container -->
+        </div> <!-- end crt -->
+      </div> <!-- end mfd-screen -->
+    </div> <!-- end mfd-bezel -->
+  </div> <!-- end app-root -->
+</body>
+</html>
