@@ -1,40 +1,65 @@
-/* ===========================================================
-   SCALING ENGINE — iPhone SAFE, FULL WIDTH + CENTERED
-=========================================================== */
+/* ============================================================
+   SCALING.JS — Responsive MFD Scaling (Avionics-Accurate)
+============================================================ */
+
+/* ------------------------------------------------------------
+   Target Aspect Ratio (Avionics MFD)
+   4:3 is the correct ratio for your CRT layout
+------------------------------------------------------------ */
+
+const TARGET_RATIO = 4 / 3;
+
+/* ------------------------------------------------------------
+   Scale the Entire MFD
+------------------------------------------------------------ */
 
 function scaleMFD() {
-  const baseWidth = 1024;
-  const baseHeight = 768;
+  const root = document.getElementById("app-root");
+  if (!root) return;
 
-  // Use iOS-safe viewport height
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.visualViewport
-    ? window.visualViewport.height
-    : window.innerHeight;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
 
-  const scaleX = viewportWidth / baseWidth;
-  const scaleY = viewportHeight / baseHeight;
+  const currentRatio = w / h;
 
-  const scale = Math.min(scaleX, scaleY);
+  let scale;
 
-  const wrapper = document.getElementById("scale-wrapper");
+  if (currentRatio > TARGET_RATIO) {
+    // Screen is too wide → height is limiting factor
+    scale = h / 900; // 900px = your design height
+  } else {
+    // Screen is too tall → width is limiting factor
+    scale = w / 1200; // 1200px = your design width
+  }
 
-  wrapper.style.transform = `scale(${scale})`;
+  // Apply scaling
+  root.style.transform = `scale(${scale})`;
+  root.style.transformOrigin = "top center";
 
-  // Center horizontally and vertically
-  const offsetX = (viewportWidth - baseWidth * scale) / 2;
-  const offsetY = (viewportHeight - baseHeight * scale) / 2;
+  // Center horizontally
+  const scaledWidth = 1200 * scale;
+  const offsetX = (w - scaledWidth) / 2;
+  root.style.left = `${offsetX}px`;
 
-  wrapper.style.position = "absolute";
-  wrapper.style.left = `${offsetX}px`;
-  wrapper.style.top = `${offsetY}px`;
-  wrapper.style.transformOrigin = "top left";
+  // Vertical alignment
+  root.style.top = `20px`;
 
-  // Prevent iOS Safari from cropping top/bottom
-  document.body.style.margin = "0";
-  document.body.style.padding = "0";
-  document.body.style.overflow = "hidden";
+  console.log(`📐 MFD scaled: ${Math.round(scale * 100)}%`);
 }
 
+/* ------------------------------------------------------------
+   Recalculate on Resize + Orientation Change
+------------------------------------------------------------ */
+
 window.addEventListener("resize", scaleMFD);
-window.addEventListener("DOMContentLoaded", scaleMFD);
+window.addEventListener("orientationchange", () => {
+  setTimeout(scaleMFD, 150);
+});
+
+/* ------------------------------------------------------------
+   Initialize on MFD Ready
+------------------------------------------------------------ */
+
+document.addEventListener("mfd-ready", () => {
+  scaleMFD();
+});
