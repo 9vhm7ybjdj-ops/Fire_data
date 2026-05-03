@@ -4,10 +4,10 @@
 ============================================================ */
 
 /* ------------------------------------------------------------
-   METAR SOURCE (NOAA)
+   METAR SOURCE (CORS‑safe)
 ------------------------------------------------------------ */
-const METAR_URL =
-  "https://aviationweather.gov/api/data/metar?ids=YBSU&format=json";
+const METAR_URL = "https://corsproxy.io/?" +
+  encodeURIComponent("https://aviationweather.gov/api/data/metar?ids=YBSU&format=json");
 
 /* ------------------------------------------------------------
    Decode METAR into clean fields
