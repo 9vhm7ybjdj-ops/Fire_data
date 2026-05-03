@@ -1,95 +1,93 @@
 /* ============================================================
-   CORE.JS — MFD Boot, Page Loader, Event System
+   CORE PAGE + BUTTON CONTROLLER
+   Version A — Clean, stable, no drift
 ============================================================ */
 
-/* ------------------------------------------------------------
-   1. FIRE MFD-READY ONLY WHEN CRT EXISTS
------------------------------------------------------------- */
-
-window.addEventListener("DOMContentLoaded", () => {
-  const waitForCRT = setInterval(() => {
-    const crt = document.getElementById("crt");
-
-    if (crt) {
-      clearInterval(waitForCRT);
-      console.log("🔥 MFD READY — CRT + scaling stable");
-      document.dispatchEvent(new Event("mfd-ready"));
-    }
-  }, 50);
-});
-
-
-/* ------------------------------------------------------------
-   2. PAGE SWITCHING
------------------------------------------------------------- */
+/* -------------------------------
+   PAGE SWITCHING
+-------------------------------- */
 
 function showPage(pageId) {
-  const pages = document.querySelectorAll(".mfd-page");
-  pages.forEach(p => p.classList.remove("active-page"));
+  // Hide all pages
+  document.querySelectorAll(".mfd-page").forEach(p => {
+    p.classList.remove("active-page");
+  });
 
-  const target = document.getElementById(pageId);
-  if (target) {
-    target.classList.add("active-page");
+  // Show selected page
+  const page = document.getElementById(pageId);
+  if (page) {
+    page.classList.add("active-page");
   }
 
   // Update button highlight
-  const buttons = document.querySelectorAll(".bezel-btn[data-page]");
-  buttons.forEach(btn => {
+  updateActiveButton(pageId);
+}
+
+/* -------------------------------
+   BUTTON ACTIVE STATE
+-------------------------------- */
+
+function updateActiveButton(pageId) {
+  document.querySelectorAll(".bezel-btn").forEach(btn => {
+    btn.classList.remove("active-btn");
+
     if (btn.dataset.page === pageId) {
-      btn.classList.add("active-mode");
-    } else {
-      btn.classList.remove("active-mode");
+      btn.classList.add("active-btn");
     }
   });
 }
 
+/* -------------------------------
+   BUTTON EVENT ROUTING
+-------------------------------- */
 
-/* ------------------------------------------------------------
-   3. COPY PAGE CONTENT INTO CRT ON FIRST LOAD
------------------------------------------------------------- */
+function setupButtonEvents() {
+  document.querySelectorAll(".bezel-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const page = btn.dataset.page;
+      const action = btn.dataset.action;
 
-document.addEventListener("mfd-ready", () => {
-  console.log("📄 Injecting page templates…");
+      if (page) {
+        showPage(page);
+      }
 
-  const pages = [
-    "wx",
-    "radar",
-    "satellite",
-    "combo",
-    "airfieldwx"
-  ];
-
-  pages.forEach(name => {
-    const src = document.getElementById(`${name}-page-content`);
-    const dst = document.getElementById(`${name}-page`);
-
-    if (src && dst) {
-      dst.innerHTML = src.innerHTML;
-    }
+      if (action) {
+        handleAction(action);
+      }
+    });
   });
+}
 
-  // Default page
-  showPage("wx-page");
-});
+/* -------------------------------
+   ACTION HANDLER (Modes, etc.)
+-------------------------------- */
 
+function handleAction(action) {
+  switch (action) {
+    case "mode-normal":
+      document.body.classList.remove("nvg-mode", "red-mode");
+      break;
 
-/* ------------------------------------------------------------
-   4. BUTTON HANDLERS
------------------------------------------------------------- */
+    case "mode-nvg":
+      document.body.classList.add("nvg-mode");
+      document.body.classList.remove("red-mode");
+      break;
 
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".bezel-btn");
-  if (!btn) return;
+    case "mode-red":
+      document.body.classList.add("red-mode");
+      document.body.classList.remove("nvg-mode");
+      break;
 
-  // Page buttons
-  if (btn.dataset.page) {
-    showPage(btn.dataset.page);
+    default:
+      console.warn("Unknown action:", action);
   }
+}
 
-  // Mode buttons
-  if (btn.dataset.action) {
-    document.dispatchEvent(new CustomEvent("mfd-action", {
-      detail: btn.dataset.action
-    }));
-  }
+/* -------------------------------
+   INITIALIZE
+-------------------------------- */
+
+document.addEventListener("DOMContentLoaded", () => {
+  setupButtonEvents();
+  showPage("wx-page"); // default page
 });
