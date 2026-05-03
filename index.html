@@ -23,6 +23,7 @@
         <button class="bezel-btn" data-page="wx-page">WX</button>
         <button class="bezel-btn" data-page="radar-page">RADAR</button>
         <button class="bezel-btn" data-page="satellite-page">SAT</button>
+        <button class="bezel-btn" data-page="combo-page">COMBO</button>
         <button class="bezel-btn" data-page="airfieldwx-page">AF WX</button>
       </div>
 
@@ -109,6 +110,25 @@
               </div>
               <div id="satellite-container">
                 <canvas id="satellite-canvas" width="1280" height="720"></canvas>
+              </div>
+            </div>
+
+            <!-- COMBO PAGE (C2) -->
+            <div id="combo-page" class="mfd-page">
+              <div class="page-header">
+                <div class="page-title">Combo</div>
+                <div class="page-subtitle">Radar + Satellite</div>
+              </div>
+
+              <div id="combo-container">
+                <canvas id="combo-sat" width="1280" height="720"></canvas>
+                <canvas id="combo-radar" width="1280" height="720"></canvas>
+              </div>
+
+              <!-- Opacity slider at bottom -->
+              <div id="combo-slider-container">
+                <label for="combo-opacity">Radar Opacity</label>
+                <input type="range" id="combo-opacity" min="0" max="100" value="70">
               </div>
             </div>
 
