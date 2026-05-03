@@ -34,13 +34,15 @@ const wxStations = [
 ];
 
 /* ------------------------------------------------------------
-   Fetch Weather for One Station
+   Fetch Weather for One Station (CORS‑safe)
 ------------------------------------------------------------ */
 async function fetchStationWX(station) {
-  const url =
+  const base =
     `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}` +
     `&longitude=${station.lon}` +
     `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m`;
+
+  const url = "https://corsproxy.io/?" + encodeURIComponent(base);
 
   try {
     const res = await fetch(url);
