@@ -1,123 +1,52 @@
 /* ============================================================
-   BUTTONS — Avionics-Style Bezel Buttons
+   BUTTONS — Interaction + Visual States
+   (Geometry lives in bezel.css)
 ============================================================ */
 
-.bezel-button-column {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  z-index: 20;
-}
-
-#left-buttons {
-  left: 18px;
-}
-
-#right-buttons {
-  right: 18px;
-}
-
-/* ------------------------------------------------------------
-   Base Button Style
------------------------------------------------------------- */
-
 .bezel-btn {
-  width: 72px;
+  width: 90px;
   height: 42px;
-  border-radius: 22px; /* OVAL — correct avionics shape */
-  background: linear-gradient(to bottom, #1a1a1a, #0f0f0f);
-  color: #d8d8d8;
-  font-family: "Consolas", monospace;
-  font-size: 14px;
+  border-radius: 6px; /* rectangular, slight radius */
+  background: linear-gradient(to bottom, #1b1b1b, #0e0e0e);
   border: 2px solid #000;
-  outline: none;
-
+  color: #dcdcdc;
+  font-family: Consolas, monospace;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  box-shadow:
-    inset 0 0 6px rgba(255,255,255,0.05),
-    inset 0 0 12px rgba(0,0,0,0.8),
-    0 2px 4px rgba(0,0,0,0.8);
-
-  position: relative;
   cursor: pointer;
   user-select: none;
-}
 
-/* ------------------------------------------------------------
-   Button Grime (from bezel.css)
------------------------------------------------------------- */
-
-.bezel-btn::after {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 6px;
-  background: radial-gradient(
-    circle at 50% 60%,
-    rgba(0,0,0,0.35) 0%,
-    rgba(0,0,0,0) 70%
-  );
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-/* ------------------------------------------------------------
-   Active Button (Selected Page)
------------------------------------------------------------- */
-
-.bezel-btn.active-mode {
-  background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
-  color: #ffffff;
-  border-color: #444;
-
+  /* Mechanical depth */
   box-shadow:
-    inset 0 0 10px rgba(255,255,255,0.08),
-    inset 0 0 16px rgba(0,0,0,0.9),
-    0 0 6px rgba(255,255,255,0.15);
+    inset 0 0 4px rgba(255,255,255,0.05),
+    inset 0 0 10px rgba(0,0,0,0.8),
+    0 2px 3px rgba(0,0,0,0.7);
 
-  border-radius: 22px; /* Prevents rectangle override */
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
 }
 
-/* ------------------------------------------------------------
-   Pressed State (Tactile Feedback)
------------------------------------------------------------- */
-
+/* Depressed state */
 .bezel-btn:active {
   transform: translateY(1px);
   box-shadow:
-    inset 0 0 12px rgba(0,0,0,0.9),
-    0 1px 2px rgba(0,0,0,0.7);
+    inset 0 0 6px rgba(0,0,0,0.9),
+    0 1px 1px rgba(0,0,0,0.5);
 }
 
-/* ------------------------------------------------------------
-   NVG Mode — Dim Buttons
------------------------------------------------------------- */
-
-.nvg-mode .bezel-btn {
-  background: linear-gradient(to bottom, #0c0c0c, #050505);
-  color: #7f7f7f;
-}
-
-.nvg-mode .bezel-btn.active-mode {
-  color: #bfbfbf;
-}
-
-/* ------------------------------------------------------------
-   RED Mode — Red Backlit Buttons
------------------------------------------------------------- */
-
-.red-mode .bezel-btn {
-  background: linear-gradient(to bottom, #2a0000, #150000);
-  color: #ffb3b3;
-}
-
-.red-mode .bezel-btn.active-mode {
-  background: linear-gradient(to bottom, #3a0000, #1f0000);
+/* Active page button (highlight) */
+.bezel-btn.active-btn {
+  background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
   color: #ffffff;
+  box-shadow:
+    inset 0 0 8px rgba(255,255,255,0.08),
+    inset 0 0 14px rgba(0,0,0,0.9),
+    0 2px 3px rgba(0,0,0,0.7);
+}
+
+/* Disabled state (if needed later) */
+.bezel-btn.disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
