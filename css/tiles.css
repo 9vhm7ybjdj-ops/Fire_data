@@ -4,7 +4,57 @@
 
 #wx-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-/* WX grid and tiles */
+
+#wx-page {
+  position: relative;
+}
+
+#wx-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: auto;
+  gap: 16px;
+  padding: 16px 20px 60px 20px;
+}
+
+.wx-tile {
+  border: 2px solid #0f0;
+  padding: 8px 10px;
+}
+
+.tile-header {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.tile-body {
+  font-size: 18px;
+}
+
+.tile-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.tile-label {
+  padding-right: 10px;
+}
+
+.tile-value {
+  text-align: right;
+}
+
+/* Global OBS TIME, WX page only, inside CRT bottom-right */
+
+#wx-global-obs-time {
+  position: absolute;
+  right: 24px;
+  bottom: 18px;
+  font-size: 20px;
+}
+: 1fr 1fr;
   grid-template-/* ============================================================
    WX TILE GRID — 2×2 inside 1280×720 CRT
 ============================================================ */
