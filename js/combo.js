@@ -1,102 +1,77 @@
-/* ===========================================================
-   COMBO PAGE — C2 Layout
-   Satellite base + Radar overlay + Opacity slider
-   Uses the same canvas engine as radar.js and satellite.js
-=========================================================== */
+/* ============================================================
+   COMBO.JS — Radar + Satellite Overlay Engine (C2)
+============================================================ */
 
-let comboSatCanvas, comboSatCtx;
-let comboRadarCanvas, comboRadarCtx;
+let comboSatCanvas,
+  comboSatCtx,
+  comboRadarCanvas,
+  comboRadarCtx,
+  comboOpacitySlider;
 
-let comboRadarOpacity = 0.7; // default 70%
+let comboSatelliteImage = null;
+let comboRadarImage = null;
 
-/* -----------------------------------------------------------
-   INIT COMBO PAGE
------------------------------------------------------------ */
 function initCombo() {
   comboSatCanvas = document.getElementById("combo-sat");
   comboRadarCanvas = document.getElementById("combo-radar");
+  comboOpacitySlider = document.getElementById("combo-opacity");
+
+  if (!comboSatCanvas || !comboRadarCanvas || !comboOpacitySlider) return;
 
   comboSatCtx = comboSatCanvas.getContext("2d");
   comboRadarCtx = comboRadarCanvas.getContext("2d");
 
-  // Bind slider
-  const slider = document.getElementById("combo-opacity");
-  slider.value = comboRadarOpacity * 100;
+  comboOpacitySlider.addEventListener("input", drawCombo);
 
-  slider.addEventListener("input", (e) => {
-    comboRadarOpacity = e.target.value / 100;
-    drawCombo(); // redraw with new opacity
-  });
-
-  // Initial draw
   drawCombo();
 }
 
-/* -----------------------------------------------------------
-   DRAW SATELLITE + RADAR OVERLAY
------------------------------------------------------------ */
+/* ------------------------------------------------------------
+   Hooks called by radar.js / satellite.js
+------------------------------------------------------------ */
+function comboUpdateRadar(img) {
+  comboRadarImage = img;
+  drawCombo();
+}
+
+function comboUpdateSatellite(img) {
+  comboSatelliteImage = img;
+  drawCombo();
+}
+
+/* ------------------------------------------------------------
+   Draw Combo Overlay
+------------------------------------------------------------ */
 function drawCombo() {
   if (!comboSatCtx || !comboRadarCtx) return;
 
-  // Clear both layers
-  comboSatCtx.clearRect(0, 0, comboSatCanvas.width, comboSatCanvas.height);
-  comboRadarCtx.clearRect(0, 0, comboRadarCanvas.width, comboRadarCanvas.height);
+  const w = comboSatCanvas.width;
+  const h = comboSatCanvas.height;
 
-  /* ---------------------------------------------------------
-     1. Draw Satellite Base Layer
-     (Uses your existing satellite engine)
-  --------------------------------------------------------- */
-  if (window.latestSatelliteImage) {
-    comboSatCtx.drawImage(
-      window.latestSatelliteImage,
-      0, 0,
-      comboSatCanvas.width,
-      comboSatCanvas.height
-    );
-  } else {
-    comboSatCtx.fillStyle = "black";
-    comboSatCtx.fillText("SATELLITE LOADING…", 40, 40);
+  // Clear both
+  comboSatCtx.clearRect(0, 0, w, h);
+  comboRadarCtx.clearRect(0, 0, w, h);
+
+  // Draw satellite base
+  if (comboSatelliteImage) {
+    comboSatCtx.drawImage(comboSatelliteImage, 0, 0, w, h);
   }
 
-  /* ---------------------------------------------------------
-     2. Draw Radar Overlay Layer
-     (Uses your existing radar engine)
-  --------------------------------------------------------- */
-  comboRadarCtx.globalAlpha = comboRadarOpacity;
+  // Draw radar overlay with opacity
+  if (comboRadarImage) {
+    const opacity =
+      comboOpacitySlider && comboOpacitySlider.value != null
+        ? Number(comboOpacitySlider.value) / 100
+        : 0.7;
 
-  if (window.latestRadarImage) {
-    comboRadarCtx.drawImage(
-      window.latestRadarImage,
-      0, 0,
-      comboRadarCanvas.width,
-      comboRadarCanvas.height
-    );
-  } else {
-    comboRadarCtx.fillStyle = "yellow";
-    comboRadarCtx.fillText("RADAR LOADING…", 40, 40);
+    comboRadarCtx.save();
+    comboRadarCtx.globalAlpha = opacity;
+    comboRadarCtx.drawImage(comboRadarImage, 0, 0, w, h);
+    comboRadarCtx.restore();
   }
-
-  comboRadarCtx.globalAlpha = 1.0; // reset
 }
 
-/* -----------------------------------------------------------
-   REFRESH HANDLERS
-   Called by your radar/satellite update loops
------------------------------------------------------------ */
-function comboUpdateSatellite(img) {
-  window.latestSatelliteImage = img;
-  drawCombo();
-}
-
-function comboUpdateRadar(img) {
-  window.latestRadarImage = img;
-  drawCombo();
-}
-
-/* -----------------------------------------------------------
-   PAGE ACTIVATION HOOK
-   Called when switching to COMBO page
------------------------------------------------------------ */
-document.addEventListener("mfd-ready", () => {
-  initCombo();
-});
+/* ------------------------------------------------------------
+   Initialisation
+------------------------------------------------------------ */
+document.addEventListener("mfd-ready", initCombo);
