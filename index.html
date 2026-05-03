@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fireground WX Data</title>
 
-  <!-- Correct CSS paths -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/bezel.css" />
   <link rel="stylesheet" href="css/crt.css" />
@@ -49,9 +48,11 @@
                   <div class="tile-header">Nambour</div>
                   <div class="tile-body">
                     <div class="tile-row"><span class="tile-label">Temp</span><span id="nambour-temp" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Dew Pt</span><span id="nambour-dew" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">Wind</span><span id="nambour-wind" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">Gust</span><span id="nambour-gust" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">RH</span><span id="nambour-rh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Rain</span><span id="nambour-rain" class="tile-value">--</span></div>
                   </div>
                 </div>
 
@@ -60,9 +61,11 @@
                   <div class="tile-header">Beerburrum</div>
                   <div class="tile-body">
                     <div class="tile-row"><span class="tile-label">Temp</span><span id="beerburrum-temp" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Dew Pt</span><span id="beerburrum-dew" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">Wind</span><span id="beerburrum-wind" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">Gust</span><span id="beerburrum-gust" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">RH</span><span id="beerburrum-rh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Rain</span><span id="beerburrum-rain" class="tile-value">--</span></div>
                   </div>
                 </div>
 
@@ -71,9 +74,11 @@
                   <div class="tile-header">Tewantin</div>
                   <div class="tile-body">
                     <div class="tile-row"><span class="tile-label">Temp</span><span id="tewantin-temp" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Dew Pt</span><span id="tewantin-dew" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">Wind</span><span id="tewantin-wind" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">Gust</span><span id="tewantin-gust" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">RH</span><span id="tewantin-rh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Rain</span><span id="tewantin-rain" class="tile-value">--</span></div>
                   </div>
                 </div>
 
@@ -82,13 +87,18 @@
                   <div class="tile-header">Sunshine Coast Apt</div>
                   <div class="tile-body">
                     <div class="tile-row"><span class="tile-label">Temp</span><span id="apt-temp" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Dew Pt</span><span id="apt-dew" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">Wind</span><span id="apt-wind" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">Gust</span><span id="apt-gust" class="tile-value">--</span></div>
                     <div class="tile-row"><span class="tile-label">RH</span><span id="apt-rh" class="tile-value">--</span></div>
+                    <div class="tile-row"><span class="tile-label">Rain</span><span id="apt-rain" class="tile-value">--</span></div>
                   </div>
                 </div>
 
               </div>
+
+              <!-- Global OBS TIME, WX page only, inside CRT -->
+              <div id="wx-global-obs-time">Obs: --:--</div>
             </div>
 
             <!-- RADAR PAGE -->
@@ -113,7 +123,7 @@
               </div>
             </div>
 
-            <!-- COMBO PAGE (C2) -->
+            <!-- COMBO PAGE -->
             <div id="combo-page" class="mfd-page">
               <div class="page-header">
                 <div class="page-title">Combo</div>
@@ -125,7 +135,6 @@
                 <canvas id="combo-radar" width="1280" height="720"></canvas>
               </div>
 
-              <!-- Opacity slider at bottom -->
               <div id="combo-slider-container">
                 <label for="combo-opacity">Radar Opacity</label>
                 <input type="range" id="combo-opacity" min="0" max="100" value="70">
@@ -163,7 +172,6 @@
     </div>
   </div>
 
-  <!-- Correct JS paths -->
   <script src="js/core.js"></script>
   <script src="js/wx.js"></script>
   <script src="js/airfieldwx.js"></script>
