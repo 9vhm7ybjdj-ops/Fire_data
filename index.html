@@ -2,15 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fireground WX Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- CSS (logical order) -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/bezel.css" />
   <link rel="stylesheet" href="css/crt.css" />
+  <link rel="stylesheet" href="css/lcd.css" />
+  <link rel="stylesheet" href="css/buttons.css" />
   <link rel="stylesheet" href="css/tiles.css" />
-  <link rel="stylesheet" href="css/modes.css" />
   <link rel="stylesheet" href="css/airfieldwx.css" />
+  <link rel="stylesheet" href="css/modes.css" />
+
+  <!-- JS (in head, with defer, Option A order) -->
+  <script src="js/core.js" defer></script>
+  <script src="js/modes.js" defer></script>
+  <script src="js/brightness.js" defer></script>
+  <script src="js/scaling.js" defer></script>
+  <script src="js/wx.js" defer></script>
+  <script src="js/airfieldwx.js" defer></script>
+  <script src="js/radar.js" defer></script>
+  <script src="js/satellite.js" defer></script>
+  <script src="js/combo.js" defer></script>
 </head>
 
 <body>
@@ -42,7 +56,6 @@
               </div>
 
               <div id="wx-grid">
-
                 <!-- Nambour -->
                 <div class="wx-tile">
                   <div class="tile-header">Nambour</div>
@@ -94,10 +107,9 @@
                     <div class="tile-row"><span class="tile-label">Rain</span><span id="apt-rain" class="tile-value">--</span></div>
                   </div>
                 </div>
-
               </div>
 
-              <!-- Global OBS TIME, WX page only, inside CRT -->
+              <!-- Global OBS TIME, WX page only -->
               <div id="wx-global-obs-time">Obs: --:--</div>
             </div>
 
@@ -107,7 +119,7 @@
                 <div class="page-title">Radar</div>
                 <div class="page-subtitle">Pan + Zoom</div>
               </div>
-              <div id="radar-container">
+              <div class="map-container" id="radar-container">
                 <canvas id="radar-canvas" width="1280" height="720"></canvas>
               </div>
             </div>
@@ -118,7 +130,7 @@
                 <div class="page-title">Satellite</div>
                 <div class="page-subtitle">GeoColor</div>
               </div>
-              <div id="satellite-container">
+              <div class="map-container" id="satellite-container">
                 <canvas id="satellite-canvas" width="1280" height="720"></canvas>
               </div>
             </div>
@@ -130,14 +142,14 @@
                 <div class="page-subtitle">Radar + Satellite</div>
               </div>
 
-              <div id="combo-container">
+              <div class="map-container" id="combo-container">
                 <canvas id="combo-sat" width="1280" height="720"></canvas>
                 <canvas id="combo-radar" width="1280" height="720"></canvas>
               </div>
 
               <div id="combo-slider-container">
                 <label for="combo-opacity">Radar Opacity</label>
-                <input type="range" id="combo-opacity" min="0" max="100" value="70">
+                <input type="range" id="combo-opacity" min="0" max="100" value="70" />
               </div>
             </div>
 
@@ -171,10 +183,5 @@
 
     </div>
   </div>
-
-  <script src="js/core.js"></script>
-  <script src="js/wx.js"></script>
-  <script src="js/airfieldwx.js"></script>
-  <script src="js/maps.js"></script>
 </body>
 </html>
