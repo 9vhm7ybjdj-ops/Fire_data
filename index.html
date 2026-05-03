@@ -1,93 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fireground WX Data</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MFD Display</title>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/bezel.css" />
-  <link rel="stylesheet" href="css/buttons.css" />
-  <link rel="stylesheet" href="css/crt.css" />
-  <link rel="stylesheet" href="css/layout.css" />
+  <!-- ============================
+       CSS STACK (ORDER MATTERS)
+  ============================= -->
+  <link rel="stylesheet" href="css/bezel.css">
+  <link rel="stylesheet" href="css/buttons.css">
+  <link rel="stylesheet" href="css/crt.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/illumination.css">
 </head>
 
 <body>
 
-<div id="app-root">
-
   <!-- ============================
-       BEZEL FRAME
+       MFD BEZEL + CRT
   ============================= -->
   <div id="mfd-bezel">
 
-    <!-- Screws -->
-    <div class="screw screw-tl"></div>
-    <div class="screw screw-tr"></div>
-    <div class="screw screw-bl"></div>
-    <div class="screw screw-br"></div>
+    <!-- CRT GLASS -->
+    <div id="crt" class="crt-glass">
 
-    <!-- Left Buttons -->
-    <div id="left-buttons" class="bezel-button-column">
+      <!-- PAGE CONTAINER -->
+      <div id="page-container">
+
+        <!-- ============================
+             WX PAGE
+        ============================= -->
+        <div id="wx-page" class="mfd-page active-page">
+          <div id="wx-page-content"></div>
+        </div>
+
+        <!-- ============================
+             RADAR PAGE
+        ============================= -->
+        <div id="radar-page" class="mfd-page">
+          <canvas id="radar-canvas"></canvas>
+        </div>
+
+        <!-- ============================
+             SAT PAGE
+        ============================= -->
+        <div id="sat-page" class="mfd-page">
+          <canvas id="sat-canvas"></canvas>
+        </div>
+
+        <!-- ============================
+             COMBO PAGE
+        ============================= -->
+        <div id="combo-page" class="mfd-page">
+          <canvas id="combo-canvas"></canvas>
+        </div>
+
+      </div> <!-- end page-container -->
+    </div> <!-- end CRT -->
+    <!-- ============================
+         LEFT BUTTON COLUMN
+    ============================= -->
+    <div id="left-buttons">
       <button class="bezel-btn" data-page="wx-page">WX</button>
       <button class="bezel-btn" data-page="radar-page">RADAR</button>
-      <button class="bezel-btn" data-page="satellite-page">SAT</button>
+      <button class="bezel-btn" data-page="sat-page">SAT</button>
       <button class="bezel-btn" data-page="combo-page">COMBO</button>
     </div>
 
-    <!-- Right Buttons -->
-    <div id="right-buttons" class="bezel-button-column">
-      <button class="bezel-btn" data-page="airfieldwx-page">AF WX</button>
+    <!-- ============================
+         RIGHT BUTTON COLUMN
+    ============================= -->
+    <div id="right-buttons">
       <button class="bezel-btn" data-action="mode-normal">NORM</button>
       <button class="bezel-btn" data-action="mode-nvg">NVG</button>
       <button class="bezel-btn" data-action="mode-red">RED</button>
+      <button class="bezel-btn" data-action="brightness">BRT</button>
     </div>
 
-    <!-- ============================
-         CRT + PAGE CONTAINER
-    ============================= -->
-    <div class="crt-glass">
-      <div id="crt">
-        <div id="page-container">
+  </div> <!-- end mfd-bezel -->
 
-          <!-- WX PAGE -->
-          <div id="wx-page" class="mfd-page active-page">
-            <div id="wx-page-content"></div>
-          </div>
+  <!-- ============================
+       JAVASCRIPT STACK (ORDER MATTERS)
+  ============================= -->
 
-          <!-- RADAR PAGE -->
-          <div id="radar-page" class="mfd-page">
-            <canvas id="radar-canvas"></canvas>
-          </div>
+  <!-- Core page switching + button routing -->
+  <script src="js/core.js"></script>
 
-          <!-- SATELLITE PAGE -->
-          <div id="satellite-page" class="mfd-page">
-            <canvas id="sat-canvas"></canvas>
-          </div>
+  <!-- WX engine (Open‑Meteo version) -->
+  <script src="js/wx.js"></script>
 
-          <!-- COMBO PAGE -->
-          <div id="combo-page" class="mfd-page">
-            <canvas id="combo-canvas"></canvas>
-          </div>
+  <!-- Mode controller (Normal / NVG / Red) -->
+  <script src="js/modes.js"></script>
 
-          <!-- AIRFIELD WX PAGE -->
-          <div id="airfieldwx-page" class="mfd-page">
-            <div id="airfieldwx-content"></div>
-          </div>
+  <!-- Scaling engine (phone‑first, no drift) -->
+  <script src="js/scaling.js"></script>
 
-        </div>
-      </div>
-    </div>
+  <!-- Brightness engine (NVG/RED dimming) -->
+  <script src="js/brightness.js"></script>
 
-  </div>
-</div>
-
-<!-- JS -->
-<script src="js/core.js"></script>
-<script src="js/wx.js"></script>
-<script src="js/modes.js"></script>
-<script src="js/scaling.js"></script>
-<script src="js/brightness.js"></script>
+  <!-- Hard LED illumination + click sound -->
+  <script src="js/illumination.js"></script>
 
 </body>
 </html>
