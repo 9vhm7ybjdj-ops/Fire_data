@@ -1,12 +1,9 @@
 /* ===========================================================
    AIRFIELD WX PAGE — YBSU METAR DECODED
-   Clean avionics styling for 1280×720 CRT
 =========================================================== */
 
 #airfieldwx-page {
   padding: 20px;
-  color: #0f0;
-  font-family: LCD, monospace;
   font-size: 20px;
   overflow-y: auto;
 }
@@ -27,12 +24,9 @@
 
 .metar-value {
   font-size: 20px;
-  font-family: LCD, monospace;
 }
 
-/* -----------------------------------------------------------
-   FIX: Prevent YBSU METAR header from appearing on all pages
------------------------------------------------------------ */
+/* Hide YBSU METAR header unless AF WX page is active */
 
 #airfieldwx-page:not(.active-page) .page-title,
 #airfieldwx-page:not(.active-page) .page-subtitle {
